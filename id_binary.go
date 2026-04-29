@@ -160,7 +160,12 @@ func (id ID[B, V]) MarshalBinary() ([]byte, error) {
 		return b, nil
 	default:
 		if marshaler, ok := any(id.value).(encoding.BinaryMarshaler); ok {
-			return marshaler.MarshalBinary()
+			data, err := marshaler.MarshalBinary()
+			if err != nil {
+				return nil, fmt.Errorf("id: binary marshal %T: %w", id.value, err)
+			}
+
+			return data, nil
 		}
 
 		return nil, fmt.Errorf("id: unsupported type %T for binary marshaling", id.value)
@@ -187,7 +192,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"int",
 			readUint64,
-			func(n uint64) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+			func(n uint64) V {
 				return any(int(n)).(V)
 			},
 			byteSizeInt64,
@@ -200,15 +205,19 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case int8:
-		return id.readByte(data, "int8", func(b byte) V { //nolint:gosec // G115: byte to int8 is safe for deserialization
-			return any(int8(b)).(V)
-		})
+		return id.readByte(
+			data,
+			"int8",
+			func(b byte) V { //nolint:gosec // G115: byte to int8 is safe for deserialization
+				return any(int8(b)).(V)
+			},
+		)
 	case int16:
 		n, err := readSigned(
 			data,
 			"int16",
 			readUint16,
-			func(n uint16) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+			func(n uint16) V {
 				return any(int16(n)).(V)
 			},
 			byteSizeInt16,
@@ -225,7 +234,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"int32",
 			readUint32,
-			func(n uint32) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+			func(n uint32) V {
 				return any(int32(n)).(V)
 			},
 			byteSizeInt32,
@@ -242,7 +251,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"int64",
 			readUint64,
-			func(n uint64) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+			func(n uint64) V {
 				return any(int64(n)).(V)
 			},
 			byteSizeInt64,
@@ -259,7 +268,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"uint",
 			readUint64,
-			func(n uint64) V { //nolint:forcetypeassert // type switch guarantees V is uint
+			func(n uint64) V {
 				return any(uint(n)).(V)
 			},
 			byteSizeInt64,
@@ -272,9 +281,13 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case uint8:
-		return id.readByte(data, "uint8", func(b byte) V { //nolint:forcetypeassert // type switch guarantees V is uint8
-			return any(b).(V)
-		})
+		return id.readByte(
+			data,
+			"uint8",
+			func(b byte) V {
+				return any(b).(V)
+			},
+		)
 	case uint16:
 		return id.readUnsigned(
 			data,

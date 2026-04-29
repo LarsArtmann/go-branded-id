@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+const testIDValue = "test-id"
+
 type (
 	StringBrand struct{}
 	Int64Brand  struct{}
@@ -285,7 +287,7 @@ func TestIDString(t *testing.T) {
 		id       any
 		expected string
 	}{
-		{"string", NewID[StringBrand]("test-id"), "test-id"},
+		{"string", NewID[StringBrand](testIDValue), testIDValue},
 		{"int64", NewID[Int64Brand, int64](42), "42"},
 		{"int32", NewID[Int32Brand, int32](42), "42"},
 		{"uint64", NewID[Uint64Brand, uint64](42), "42"},
@@ -318,8 +320,8 @@ func TestIDString(t *testing.T) {
 func TestIDGoString(t *testing.T) {
 	t.Parallel()
 
-	id := NewID[StringBrand]("test-id")
-	if id.GoString() != "test-id" {
+	id := NewID[StringBrand](testIDValue)
+	if id.GoString() != testIDValue {
 		t.Errorf("expected test-id, got %s", id.GoString())
 	}
 }

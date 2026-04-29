@@ -136,7 +136,7 @@ func (id *ID[B, V]) Scan(src any) error {
 			id,
 			src,
 			"uint",
-			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
+			func(v int64) V {
 				return any(uint(v)).(V)
 			},
 		)
@@ -145,7 +145,7 @@ func (id *ID[B, V]) Scan(src any) error {
 			id,
 			src,
 			"uint32",
-			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
+			func(v int64) V {
 				return any(uint32(v)).(V)
 			},
 		)
@@ -154,7 +154,7 @@ func (id *ID[B, V]) Scan(src any) error {
 			id,
 			src,
 			"uint64",
-			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
+			func(v int64) V {
 				return any(uint64(v)).(V)
 			},
 		)
@@ -196,7 +196,7 @@ func (id *ID[B, V]) Scan(src any) error {
 // Returns nil for zero values, otherwise the underlying value.
 func (id ID[B, V]) Value() (driver.Value, error) {
 	if id.IsZero() {
-		return nil, nil
+		return nil, nil //nolint:nilnil // zero value maps to SQL NULL
 	}
 
 	switch v := any(id.value).(type) {
