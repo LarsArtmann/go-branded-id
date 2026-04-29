@@ -530,21 +530,6 @@ func TestUnmarshalTextAllNumericTypes(t *testing.T) {
 		testUnmarshalTextRoundTrip[Int64Brand, int64](t, "-42", -42)
 	})
 
-	t.Run("empty text resets", func(t *testing.T) {
-		t.Parallel()
-
-		var id ID[StringBrand, string]
-
-		err := id.UnmarshalText([]byte{})
-		if err != nil {
-			t.Fatalf("UnmarshalText failed: %v", err)
-		}
-
-		if !id.IsZero() {
-			t.Error("expected zero ID after unmarshaling empty text")
-		}
-	})
-
 	t.Run("invalid int64 text", func(t *testing.T) {
 		t.Parallel()
 

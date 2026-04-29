@@ -452,45 +452,26 @@ func TestIDSorting(t *testing.T) {
 	}
 }
 
-func newIDTestCase(name string, brandFunc func(v any) any, value any) struct {
+type edgeCaseTest struct {
 	name     string
 	brand    func(v any) any
 	value    any
 	expected any
-} {
-	return struct {
-		name     string
-		brand    func(v any) any
-		value    any
-		expected any
-	}{
-		name:     name,
-		brand:    brandFunc,
-		value:    value,
-		expected: value,
-	}
+}
+
+func edgeCase(name string, brandFunc func(v any) any, value any) edgeCaseTest {
+	return edgeCaseTest{name: name, brand: brandFunc, value: value, expected: value}
 }
 
 func TestIDEdgeCases(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name     string
-		brand    func(v any) any
-		value    any
-		expected any
-	}{
-		newIDTestCase(
-			"max int64",
-			func(v any) any { return NewID[Int64Brand](v.(int64)) }, //nolint:forcetypeassert // test construction
-			int64(math.MaxInt64),
-		),
-		newIDTestCase(
-			"min int64",
-			func(v any) any { return NewID[Int64Brand](v.(int64)) }, //nolint:forcetypeassert // test construction
-			int64(math.MinInt64),
-		),
-		newIDTestCase(
+	int64Brand := func(v any) any { return NewID[Int64Brand](v.(int64)) } //nolint:forcetypeassert // test construction
+
+	tests := []edgeCaseTest{
+		edgeCase("max int64", int64Brand, int64(math.MaxInt64)),
+		edgeCase("min int64", int64Brand, int64(math.MinInt64)),
+		edgeCase(
 			"max uint64",
 			func(v any) any { return NewID[Uint64Brand](v.(uint64)) }, //nolint:forcetypeassert // test construction
 			uint64(math.MaxUint64),

@@ -11,6 +11,8 @@ import (
 
 const benchIDValue = "test-id-12345"
 
+var fuzzInt64Seeds = []int64{0, 1, -1, 42, math.MaxInt64, math.MinInt64}
+
 // Fuzz tests
 
 func FuzzIDJSONString(f *testing.F) {
@@ -51,8 +53,7 @@ func FuzzIDJSONString(f *testing.F) {
 }
 
 func FuzzIDJSONInt64(f *testing.F) {
-	testcases := []int64{0, 1, -1, 42, math.MaxInt64, math.MinInt64}
-	for _, tc := range testcases {
+	for _, tc := range []int64{0, 1, -1, 42, math.MaxInt64, math.MinInt64} {
 		f.Add(tc)
 	}
 
@@ -114,8 +115,7 @@ func FuzzIDBinaryString(f *testing.F) {
 }
 
 func FuzzIDBinaryInt64(f *testing.F) {
-	testcases := []int64{0, 1, -1, 42, math.MaxInt64, math.MinInt64}
-	for _, tc := range testcases {
+	for _, tc := range fuzzInt64Seeds {
 		f.Add(tc)
 	}
 
