@@ -101,7 +101,7 @@ func readUint64(data []byte) uint64 {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler for binary encoding.
-func (id ID[B, V]) MarshalBinary() ([]byte, error) {
+func (id ID[B, V]) MarshalBinary() ([]byte, error) { //nolint:cyclop // type switch over 11 types is inherently multi-branch
 	if id.IsZero() {
 		return nil, nil
 	}
@@ -173,7 +173,7 @@ func (id ID[B, V]) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler for binary decoding.
-func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
+func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type switch over 11 types is inherently multi-branch
 	if len(data) == 0 {
 		id.Reset()
 

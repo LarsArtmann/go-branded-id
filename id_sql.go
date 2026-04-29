@@ -64,7 +64,7 @@ func scanIntegerID[B any, V comparable](
 
 // Scan implements sql.Scanner for database deserialization.
 // Supports string, []byte, int64, int, float64, and nil sources based on the underlying value type V.
-func (id *ID[B, V]) Scan(src any) error {
+func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 types with sub-branches
 	if id == nil {
 		return errors.New("id: scan: receiver is nil")
 	}
@@ -194,7 +194,7 @@ func (id *ID[B, V]) Scan(src any) error {
 
 // Value implements driver.Valuer for database serialization.
 // Returns nil for zero values, otherwise the underlying value.
-func (id ID[B, V]) Value() (driver.Value, error) {
+func (id ID[B, V]) Value() (driver.Value, error) { //nolint:cyclop // type switch over 11 types is inherently multi-branch
 	if id.IsZero() {
 		return nil, nil //nolint:nilnil // zero value maps to SQL NULL
 	}

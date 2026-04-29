@@ -24,7 +24,7 @@ func (id ID[B, V]) MarshalText() ([]byte, error) {
 
 // UnmarshalText implements encoding.TextUnmarshaler for text-based decoding (e.g., XML, TOML).
 // Note: This only works for string-based IDs. For other types, use JSON.
-func (id *ID[B, V]) UnmarshalText(data []byte) error {
+func (id *ID[B, V]) UnmarshalText(data []byte) error { //nolint:cyclop // type switch over 5 types with sub-branches
 	if len(data) == 0 {
 		id.Reset()
 

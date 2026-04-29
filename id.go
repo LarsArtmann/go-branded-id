@@ -75,7 +75,7 @@ func (id ID[B, V]) Equal(other ID[B, V]) bool {
 
 // Compare returns -1 if id < other, 0 if equal, 1 if id > other.
 // Returns ErrNotOrdered if V is not an ordered type.
-func (id ID[B, V]) Compare(other ID[B, V]) (int, error) {
+func (id ID[B, V]) Compare(other ID[B, V]) (int, error) { //nolint:cyclop // type switch over 13 ordered types is inherently multi-branch
 	switch a := any(id.value).(type) {
 	case int:
 		//nolint:forcetypeassert // V is same type for both id and other
@@ -131,7 +131,7 @@ func (id ID[B, V]) Or(defaultValue ID[B, V]) ID[B, V] {
 }
 
 // String returns a string representation of the value.
-func (id ID[B, V]) String() string {
+func (id ID[B, V]) String() string { //nolint:cyclop // type switch over 10+ numeric types is inherently multi-branch
 	switch v := any(id.value).(type) {
 	case string:
 		return v
