@@ -49,13 +49,13 @@ func (id *ID[B, V]) readUnsigned(
 	return nil
 }
 
-// readSigned reads a signed integer from data.
-// IntType is the unsigned type used to read the bytes (uint16, uint32, or uint64).
-func readSigned[V, IntType any](
+// readBinary reads a fixed-size integer from data and converts it to V.
+// I is the raw type read from bytes (uint16, uint32, or uint64).
+func readBinary[V, I any](
 	data []byte,
 	typeName string,
-	readFunc func([]byte) IntType,
-	convertFunc func(IntType) V,
+	readFunc func([]byte) I,
+	convertFunc func(I) V,
 	byteSize int,
 ) (V, error) {
 	var zero V
@@ -191,7 +191,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case int:
-		n, err := readSigned(
+		n, err := readBinary(
 			data,
 			"int",
 			readUint64,
@@ -216,7 +216,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			},
 		)
 	case int16:
-		n, err := readSigned(
+		n, err := readBinary(
 			data,
 			"int16",
 			readUint16,
@@ -233,7 +233,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case int32:
-		n, err := readSigned(
+		n, err := readBinary(
 			data,
 			"int32",
 			readUint32,
@@ -250,7 +250,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case int64:
-		n, err := readSigned(
+		n, err := readBinary(
 			data,
 			"int64",
 			readUint64,
@@ -267,7 +267,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case uint:
-		n, err := readSigned(
+		n, err := readBinary(
 			data,
 			"uint",
 			readUint64,
