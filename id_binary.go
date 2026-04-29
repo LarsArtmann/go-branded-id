@@ -36,15 +36,13 @@ func (id *ID[B, V]) readUnsigned(
 	byteSize int,
 	typeName string,
 	readFunc func([]byte) uint64,
+	convertFunc func(uint64) V,
 ) error {
-	err := validateSize(data, byteSize, typeName, *id)
-	if err != nil {
+	if err := validateSize(data, byteSize, typeName, *id); err != nil {
 		return err
 	}
 
-	n := readFunc(data)
-	//nolint:forcetypeassert // readUnsigned is only called for uint types where V matches uint64
-	*id = ID[B, V]{value: any(n).(V)}
+	*id = ID[B, V]{value: convertFunc(readFunc(data))}
 
 	return nil
 }
@@ -297,6 +295,9 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			byteSizeInt16,
 			"uint16",
 			func(d []byte) uint64 { return uint64(readUint16(d)) },
+			func(n uint64) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+				return any(uint16(n)).(V)
+			},
 		)
 	case uint32:
 		return id.readUnsigned(
@@ -304,9 +305,20 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			byteSizeInt32,
 			"uint32",
 			func(d []byte) uint64 { return uint64(readUint32(d)) },
+			func(n uint64) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+				return any(uint32(n)).(V)
+			},
 		)
 	case uint64:
-		return id.readUnsigned(data, byteSizeInt64, "uint64", readUint64)
+		return id.readUnsigned(
+			data,
+			byteSizeInt64,
+			"uint64",
+			readUint64,
+			func(n uint64) V { //nolint:forcetypeassert // guaranteed by outer type switch
+				return any(n).(V)
+			},
+		)
 	default:
 		var zero V
 		if unmarshaler, ok := any(&zero).(encoding.BinaryUnmarshaler); ok {
