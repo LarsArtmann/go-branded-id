@@ -111,6 +111,60 @@ func FuzzIDBinaryString(f *testing.F) {
 	})
 }
 
+func FuzzIDBinaryInt64(f *testing.F) {
+	testcases := []int64{0, 1, -1, 42, math.MaxInt64, math.MinInt64}
+	for _, tc := range testcases {
+		f.Add(tc)
+	}
+
+	f.Fuzz(func(t *testing.T, orig int64) {
+		id := NewID[Int64Brand, int64](orig)
+
+		data, err := id.MarshalBinary()
+		if err != nil {
+			t.Fatalf("MarshalBinary failed: %v", err)
+		}
+
+		var restored ID[Int64Brand, int64]
+
+		err = restored.UnmarshalBinary(data)
+		if err != nil {
+			t.Fatalf("UnmarshalBinary failed: %v", err)
+		}
+
+		if restored.Get() != orig {
+			t.Errorf("expected %d, got %d", orig, restored.Get())
+		}
+	})
+}
+
+func FuzzIDBinaryUint64(f *testing.F) {
+	testcases := []uint64{0, 1, 42, math.MaxUint64}
+	for _, tc := range testcases {
+		f.Add(tc)
+	}
+
+	f.Fuzz(func(t *testing.T, orig uint64) {
+		id := NewID[Uint64Brand, uint64](orig)
+
+		data, err := id.MarshalBinary()
+		if err != nil {
+			t.Fatalf("MarshalBinary failed: %v", err)
+		}
+
+		var restored ID[Uint64Brand, uint64]
+
+		err = restored.UnmarshalBinary(data)
+		if err != nil {
+			t.Fatalf("UnmarshalBinary failed: %v", err)
+		}
+
+		if restored.Get() != orig {
+			t.Errorf("expected %d, got %d", orig, restored.Get())
+		}
+	})
+}
+
 // Benchmarks
 
 func BenchmarkNewID(b *testing.B) {
