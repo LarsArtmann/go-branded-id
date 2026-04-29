@@ -9,6 +9,8 @@ import (
 	"unicode/utf8"
 )
 
+const benchIDValue = "test-id-12345"
+
 // Fuzz tests
 
 func FuzzIDJSONString(f *testing.F) {
@@ -169,18 +171,18 @@ func FuzzIDBinaryUint64(f *testing.F) {
 
 func BenchmarkNewID(b *testing.B) {
 	for b.Loop() {
-		_ = NewID[StringBrand]("test-id")
+		_ = NewID[StringBrand](benchIDValue)
 	}
 }
 
 func BenchmarkIDGet(b *testing.B) {
-	benchmarkIDMethod(b, NewID[StringBrand]("test-id"), func(id ID[StringBrand, string]) {
+	benchmarkIDMethod(b, NewID[StringBrand](benchIDValue), func(id ID[StringBrand, string]) {
 		_ = id.Get()
 	})
 }
 
 func BenchmarkIDString(b *testing.B) {
-	benchmarkIDMethod(b, NewID[StringBrand]("test-id"), func(id ID[StringBrand, string]) {
+	benchmarkIDMethod(b, NewID[StringBrand](benchIDValue), func(id ID[StringBrand, string]) {
 		_ = id.String()
 	})
 }
@@ -193,7 +195,7 @@ func BenchmarkIDStringInt64(b *testing.B) {
 }
 
 func BenchmarkIDIsZero(b *testing.B) {
-	benchmarkIDMethod(b, NewID[StringBrand]("test-id"), func(id ID[StringBrand, string]) {
+	benchmarkIDMethod(b, NewID[StringBrand](benchIDValue), func(id ID[StringBrand, string]) {
 		_ = id.IsZero()
 	})
 }
@@ -208,9 +210,9 @@ func benchmarkIDMethod[B, V comparable](b *testing.B, id ID[B, V], fn func(ID[B,
 }
 
 func BenchmarkIDEqual(b *testing.B) {
-	id1 := NewID[StringBrand]("test-id")
+	id1 := NewID[StringBrand](benchIDValue)
 
-	id2 := NewID[StringBrand]("test-id")
+	id2 := NewID[StringBrand](benchIDValue)
 	for b.Loop() {
 		_ = id1.Equal(id2)
 	}
@@ -228,7 +230,7 @@ func BenchmarkIDCompare(b *testing.B) {
 func BenchmarkIDMarshalJSON(b *testing.B) {
 	benchmarkIDMethodWithError(
 		b,
-		NewID[StringBrand]("test-id-12345"),
+		NewID[StringBrand](benchIDValue),
 		func(id ID[StringBrand, string]) ([]byte, error) {
 			return id.MarshalJSON()
 		},
@@ -294,7 +296,7 @@ func BenchmarkIDUnmarshalBinary(b *testing.B) {
 }
 
 func BenchmarkIDScan(b *testing.B) {
-	benchmarkIDScan[StringBrand, string](b, "test-id-12345")
+	benchmarkIDScan[StringBrand, string](b, benchIDValue)
 }
 
 func BenchmarkIDScanInt64(b *testing.B) {
@@ -314,7 +316,7 @@ func benchmarkIDScan[B, V comparable](b *testing.B, value V) {
 func BenchmarkIDValue(b *testing.B) {
 	benchmarkIDMethodWithError(
 		b,
-		NewID[StringBrand]("test-id-12345"),
+		NewID[StringBrand](benchIDValue),
 		func(id ID[StringBrand, string]) (driver.Value, error) {
 			return id.Value()
 		},
@@ -332,7 +334,7 @@ func BenchmarkIDValueInt64(b *testing.B) {
 }
 
 func BenchmarkJSONRoundTrip(b *testing.B) {
-	benchmarkJSONRoundTrip(b, NewID[StringBrand]("test-id-12345"))
+	benchmarkJSONRoundTrip(b, NewID[StringBrand](benchIDValue))
 }
 
 func BenchmarkJSONRoundTripInt64(b *testing.B) {

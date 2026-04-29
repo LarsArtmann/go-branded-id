@@ -39,7 +39,7 @@ import (
 )
 
 // ErrNotOrdered is returned when Compare is called on an ID with a non-ordered value type.
-var ErrNotOrdered = errors.New("id: Compare requires an ordered type (int, uint, float, or string)")
+var ErrNotOrdered = errors.New("id: Compare requires an ordered type (int, uint, or string)")
 
 // ID is a branded, strongly-typed identifier that prevents mixing different entity IDs.
 // B is the brand (phantom type for distinctness), V is the value type.
@@ -112,9 +112,6 @@ func (id ID[B, V]) Compare(other ID[B, V]) (int, error) {
 	case string:
 		//nolint:forcetypeassert // V is same type for both id and other
 		return cmp.Compare(a, any(other.value).(string)), nil
-	case float32:
-		//nolint:forcetypeassert // V is same type for both id and other
-		return cmp.Compare(a, any(other.value).(float32)), nil
 	case float64:
 		//nolint:forcetypeassert // V is same type for both id and other
 		return cmp.Compare(a, any(other.value).(float64)), nil

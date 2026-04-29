@@ -11,8 +11,15 @@ const testIDValue = "test-id"
 
 type (
 	StringBrand struct{}
-	Int64Brand  struct{}
+	IntBrand    struct{}
+	Int8Brand   struct{}
+	Int16Brand  struct{}
 	Int32Brand  struct{}
+	Int64Brand  struct{}
+	UintBrand   struct{}
+	Uint8Brand  struct{}
+	Uint16Brand struct{}
+	Uint32Brand struct{}
 	Uint64Brand struct{}
 )
 
@@ -25,12 +32,45 @@ func assertIDValue[B any, V comparable](t *testing.T, v, expected V) {
 	}
 }
 
+//nolint:cyclop // exhaustive type switch over all brand types
 func assertIDValueMatches(t *testing.T, v, expected any) {
 	t.Helper()
 
 	switch val := v.(type) {
+	case ID[IntBrand, int]:
+		if val.Get() != expected.(int) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
+	case ID[Int8Brand, int8]:
+		if val.Get() != expected.(int8) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
+	case ID[Int16Brand, int16]:
+		if val.Get() != expected.(int16) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
+	case ID[Int32Brand, int32]:
+		if val.Get() != expected.(int32) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
 	case ID[Int64Brand, int64]:
 		if val.Get() != expected.(int64) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
+	case ID[UintBrand, uint]:
+		if val.Get() != expected.(uint) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
+	case ID[Uint8Brand, uint8]:
+		if val.Get() != expected.(uint8) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
+	case ID[Uint16Brand, uint16]:
+		if val.Get() != expected.(uint16) { //nolint:forcetypeassert // guaranteed by test construction
+			t.Errorf("expected %v, got %v", expected, val.Get())
+		}
+	case ID[Uint32Brand, uint32]:
+		if val.Get() != expected.(uint32) { //nolint:forcetypeassert // guaranteed by test construction
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Uint64Brand, uint64]:
@@ -487,4 +527,64 @@ func testIDAllTypesRoundTrip(t *testing.T, rt roundTripTest) {
 	t.Run("int64 ID", rt.TestInt64)
 	t.Run("int32 ID", rt.TestInt32)
 	t.Run("uint64 ID", rt.TestUint64)
+}
+
+func TestPtr(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Ptr returns non-nil pointer", func(t *testing.T) {
+		t.Parallel()
+
+		id := NewID[StringBrand]("user-123")
+		p := id.Ptr()
+
+		if p == nil {
+			t.Fatal("expected non-nil pointer")
+		}
+
+		if p.Get() != "user-123" {
+			t.Errorf("expected user-123, got %s", p.Get())
+		}
+	})
+
+	t.Run("Ptr of zero value is non-nil", func(t *testing.T) {
+		t.Parallel()
+
+		var id ID[StringBrand, string]
+		p := id.Ptr()
+
+		if p == nil {
+			t.Fatal("expected non-nil pointer for zero ID")
+		}
+
+		if !p.IsZero() {
+			t.Error("expected zero ID through pointer")
+		}
+	})
+}
+
+func TestFromPtr(t *testing.T) {
+	t.Parallel()
+
+	t.Run("FromPtr with nil returns zero", func(t *testing.T) {
+		t.Parallel()
+
+		var p *ID[StringBrand, string]
+		id := FromPtr(p)
+
+		if !id.IsZero() {
+			t.Error("expected zero ID from nil pointer")
+		}
+	})
+
+	t.Run("FromPtr with non-nil returns value", func(t *testing.T) {
+		t.Parallel()
+
+		id := NewID[StringBrand]("user-123")
+		id2 := FromPtr(id.Ptr())
+
+		if !id.Equal(id2) {
+			t.Errorf("expected equal IDs, got %v", id2.Get())
+		}
+	})
 }

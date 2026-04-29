@@ -6,6 +6,14 @@ import (
 	"testing"
 )
 
+func assertCmpEqual[T comparable](tb testing.TB, got, want T) {
+	tb.Helper()
+
+	if got != want {
+		tb.Errorf("expected %v, got %v", want, got)
+	}
+}
+
 func TestIDText(t *testing.T) { //nolint:funlen // table-driven test with multiple sub-tests
 	t.Parallel()
 	t.Run("marshal non-zero string", func(t *testing.T) {

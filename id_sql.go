@@ -95,26 +95,30 @@ func (id *ID[B, V]) Scan(src any) error {
 		}
 
 	case int:
-		switch v := src.(type) {
-		case int64:
-			//nolint:forcetypeassert // outer type switch guarantees V is int
-			*id = ID[B, V]{value: any(int(v)).(V)}
-
-			return nil
-		case int:
-			//nolint:forcetypeassert // outer type switch guarantees V is int
-			*id = ID[B, V]{value: any(v).(V)}
-
-			return nil
-		case float64:
-			//nolint:forcetypeassert // outer type switch guarantees V is int
-			*id = ID[B, V]{value: any(int(v)).(V)}
-
-			return nil
-		default:
-			return fmt.Errorf("id: cannot scan %T into int-based ID (targetType=%T)", src, *new(V))
-		}
-
+		return scanIntegerID(
+			id,
+			src,
+			"int",
+			func(v int64) V { return any(int(v)).(V) }, //nolint:forcetypeassert // guaranteed by outer type switch
+		)
+	case int8:
+		return scanIntegerID(
+			id,
+			src,
+			"int8",
+			func(v int64) V {
+				return any(int8(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
+			},
+		)
+	case int16:
+		return scanIntegerID(
+			id,
+			src,
+			"int16",
+			func(v int64) V {
+				return any(int16(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
+			},
+		)
 	case int32:
 		return scanIntegerID(
 			id,
@@ -140,6 +144,24 @@ func (id *ID[B, V]) Scan(src any) error {
 			"uint",
 			func(v int64) V {
 				return any(uint(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
+			},
+		)
+	case uint8:
+		return scanIntegerID(
+			id,
+			src,
+			"uint8",
+			func(v int64) V {
+				return any(uint8(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
+			},
+		)
+	case uint16:
+		return scanIntegerID(
+			id,
+			src,
+			"uint16",
+			func(v int64) V {
+				return any(uint16(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
 			},
 		)
 	case uint32:
