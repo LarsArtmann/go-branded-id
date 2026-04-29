@@ -118,7 +118,9 @@ func (id *ID[B, V]) Scan(src any) error {
 			id,
 			src,
 			"int32",
-			func(v int64) V { return any(int32(v)).(V) },
+			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
+				return any(int32(v)).(V)
+			},
 		)
 	case int64:
 		return scanIntegerLikeID(
@@ -134,21 +136,27 @@ func (id *ID[B, V]) Scan(src any) error {
 			id,
 			src,
 			"uint",
-			func(v int64) V { return any(uint(v)).(V) },
+			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
+				return any(uint(v)).(V)
+			},
 		)
 	case uint32:
 		return scanIntegerID(
 			id,
 			src,
 			"uint32",
-			func(v int64) V { return any(uint32(v)).(V) },
+			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
+				return any(uint32(v)).(V)
+			},
 		)
 	case uint64:
 		return scanIntegerID(
 			id,
 			src,
 			"uint64",
-			func(v int64) V { return any(uint64(v)).(V) },
+			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
+				return any(uint64(v)).(V)
+			},
 		)
 
 	default:
