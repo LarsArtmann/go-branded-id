@@ -64,7 +64,9 @@ func scanIntegerID[B any, V comparable](
 
 // Scan implements sql.Scanner for database deserialization.
 // Supports string, []byte, int64, int, float64, and nil sources based on the underlying value type V.
-func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 types with sub-branches
+//
+//nolint:cyclop,funlen // exhaustive type switch over numeric types
+func (id *ID[B, V]) Scan(src any) error {
 	if id == nil {
 		return errors.New("id: scan: receiver is nil")
 	}
@@ -118,8 +120,8 @@ func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 
 			id,
 			src,
 			"int32",
-			func(v int64) V { //nolint:gosec // G115: SQL drivers return int64 for all integers
-				return any(int32(v)).(V)
+			func(v int64) V {
+				return any(int32(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
 			},
 		)
 	case int64:
@@ -127,9 +129,9 @@ func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 
 			id,
 			src,
 			"int64",
-			func(v int64) V { return any(v).(V) },
-			func(v int) V { return any(int64(v)).(V) },
-			func(v float64) V { return any(int64(v)).(V) },
+			func(v int64) V { return any(v).(V) }, //nolint:forcetypeassert // guaranteed by type switch
+			func(v int) V { return any(int64(v)).(V) },     //nolint:forcetypeassert // guaranteed by type switch
+			func(v float64) V { return any(int64(v)).(V) }, //nolint:forcetypeassert // guaranteed by type switch
 		)
 	case uint:
 		return scanIntegerID(
@@ -137,7 +139,7 @@ func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 
 			src,
 			"uint",
 			func(v int64) V {
-				return any(uint(v)).(V)
+				return any(uint(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
 			},
 		)
 	case uint32:
@@ -146,7 +148,7 @@ func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 
 			src,
 			"uint32",
 			func(v int64) V {
-				return any(uint32(v)).(V)
+				return any(uint32(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
 			},
 		)
 	case uint64:
@@ -155,7 +157,7 @@ func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 
 			src,
 			"uint64",
 			func(v int64) V {
-				return any(uint64(v)).(V)
+				return any(uint64(v)).(V) //nolint:gosec,forcetypeassert // G115: SQL drivers return int64; guaranteed by type switch
 			},
 		)
 
@@ -194,7 +196,9 @@ func (id *ID[B, V]) Scan(src any) error { //nolint:cyclop // type switch over 7 
 
 // Value implements driver.Valuer for database serialization.
 // Returns nil for zero values, otherwise the underlying value.
-func (id ID[B, V]) Value() (driver.Value, error) { //nolint:cyclop // type switch over 11 types is inherently multi-branch
+//
+//nolint:cyclop // exhaustive type switch over numeric types
+func (id ID[B, V]) Value() (driver.Value, error) {
 	if id.IsZero() {
 		return nil, nil //nolint:nilnil // zero value maps to SQL NULL
 	}

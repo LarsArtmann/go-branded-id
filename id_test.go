@@ -17,6 +17,8 @@ type (
 )
 
 func assertIDValue[B any, V comparable](t *testing.T, v, expected V) {
+	t.Helper()
+
 	id := NewID[B](v)
 	if id.Get() != expected {
 		t.Errorf("expected %v, got %v", expected, id.Get())
@@ -24,17 +26,19 @@ func assertIDValue[B any, V comparable](t *testing.T, v, expected V) {
 }
 
 func assertIDValueMatches(t *testing.T, v, expected any) {
+	t.Helper()
+
 	switch val := v.(type) {
 	case ID[Int64Brand, int64]:
-		if val.Get() != expected.(int64) {
+		if val.Get() != expected.(int64) { //nolint:forcetypeassert // guaranteed by test construction
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Uint64Brand, uint64]:
-		if val.Get() != expected.(uint64) {
+		if val.Get() != expected.(uint64) { //nolint:forcetypeassert // guaranteed by test construction
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[StringBrand, string]:
-		if val.Get() != expected.(string) {
+		if val.Get() != expected.(string) { //nolint:forcetypeassert // guaranteed by test construction
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 
@@ -77,11 +81,23 @@ func TestNewIDNumeric(t *testing.T) {
 
 			switch v := tt.value.(type) {
 			case int64:
-				assertIDValue[Int64Brand](t, v, tt.expected.(int64))
+				assertIDValue[Int64Brand](
+					t,
+					v,
+					tt.expected.(int64), //nolint:forcetypeassert // guaranteed by type switch
+				)
 			case int32:
-				assertIDValue[Int32Brand](t, v, tt.expected.(int32))
+				assertIDValue[Int32Brand](
+					t,
+					v,
+					tt.expected.(int32), //nolint:forcetypeassert // guaranteed by type switch
+				)
 			case uint64:
-				assertIDValue[Uint64Brand](t, v, tt.expected.(uint64))
+				assertIDValue[Uint64Brand](
+					t,
+					v,
+					tt.expected.(uint64), //nolint:forcetypeassert // guaranteed by type switch
+				)
 			}
 		})
 	}
@@ -137,6 +153,8 @@ func testIDCompareGeneric[B any, V comparable](
 		expected int
 	},
 ) {
+	t.Helper()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -424,20 +442,25 @@ func TestIDEdgeCases(t *testing.T) {
 	}{
 		newIDTestCase(
 			"max int64",
-			func(v any) any { return NewID[Int64Brand](v.(int64)) },
+			func(v any) any { return NewID[Int64Brand](v.(int64)) }, //nolint:forcetypeassert // test construction
 			int64(math.MaxInt64),
 		),
 		newIDTestCase(
 			"min int64",
-			func(v any) any { return NewID[Int64Brand](v.(int64)) },
+			func(v any) any { return NewID[Int64Brand](v.(int64)) }, //nolint:forcetypeassert // test construction
 			int64(math.MinInt64),
 		),
 		newIDTestCase(
 			"max uint64",
-			func(v any) any { return NewID[Uint64Brand](v.(uint64)) },
+			func(v any) any { return NewID[Uint64Brand](v.(uint64)) }, //nolint:forcetypeassert // test construction
 			uint64(math.MaxUint64),
 		),
-		{"empty string", func(v any) any { return NewID[StringBrand](v.(string)) }, "", ""},
+		{
+			"empty string",
+			func(v any) any { return NewID[StringBrand](v.(string)) }, //nolint:forcetypeassert // test construction
+			"",
+			"",
+		},
 	}
 
 	for _, tt := range tests {
@@ -458,7 +481,8 @@ type roundTripTest interface {
 }
 
 func testIDAllTypesRoundTrip(t *testing.T, rt roundTripTest) {
-	t.Parallel()
+	t.Helper()
+
 	t.Run("string ID", rt.TestString)
 	t.Run("int64 ID", rt.TestInt64)
 	t.Run("int32 ID", rt.TestInt32)

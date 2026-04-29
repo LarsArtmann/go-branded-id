@@ -5,9 +5,11 @@ import (
 )
 
 func testScanSubTest[B any, V comparable](t *testing.T, name string, input any, expected V) {
-	t.Run(name, func(tx *testing.T) {
-		tx.Parallel()
-		testScanRoundTrip[B, V](tx, input, expected)
+	t.Helper()
+
+	t.Run(name, func(t *testing.T) {
+		t.Parallel()
+		testScanRoundTrip[B, V](t, input, expected)
 	})
 }
 
@@ -16,27 +18,29 @@ func testScanInvalidSubTest[B any, V comparable](
 	name, typeName string,
 	invalidValue any,
 ) {
-	t.Run(name, func(tx *testing.T) {
-		tx.Parallel()
-		testScanInvalidType[B, V](tx, typeName, invalidValue)
+	t.Helper()
+
+	t.Run(name, func(t *testing.T) {
+		t.Parallel()
+		testScanInvalidType[B, V](t, typeName, invalidValue)
 	})
 }
 
 func TestIDScan(t *testing.T) {
 	t.Parallel()
-	testScanSubTest[StringBrand, string](t, "string ID from string", "test-id", "test-id")
+	testScanSubTest[StringBrand, string](t, "string ID from string", testIDValue, testIDValue)
 
 	t.Run("string ID from []byte", func(t *testing.T) {
 		t.Parallel()
 
 		var id ID[StringBrand, string]
 
-		err := id.Scan([]byte("test-id"))
+		err := id.Scan([]byte(testIDValue))
 		if err != nil {
 			t.Fatalf("Scan failed: %v", err)
 		}
 
-		if id.Get() != "test-id" {
+		if id.Get() != testIDValue {
 			t.Errorf("expected test-id, got %s", id.Get())
 		}
 	})
@@ -199,7 +203,7 @@ func testIDValueTests[B any, V comparable](
 
 func TestIDValue(t *testing.T) {
 	t.Parallel()
-	testIDValueTests[StringBrand, string](t, "string ID", "test-id", "test-id")
+	testIDValueTests[StringBrand, string](t, "string ID", testIDValue, testIDValue)
 	testIDValueTests[Int64Brand, int64](t, "int64 ID", int64(42), int64(42))
 	testIDValueTests[Int32Brand, int32](t, "int32 ID", int32(42), int64(42))
 	testIDValueTests[Uint64Brand, uint64](t, "uint64 ID", uint64(42), int64(42))

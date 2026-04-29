@@ -23,8 +23,9 @@ func (id ID[B, V]) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler for text-based decoding (e.g., XML, TOML).
-// Note: This only works for string-based IDs. For other types, use JSON.
-func (id *ID[B, V]) UnmarshalText(data []byte) error { //nolint:cyclop // type switch over 5 types with sub-branches
+//
+//nolint:cyclop,funlen // exhaustive type switch over supported types
+func (id *ID[B, V]) UnmarshalText(data []byte) error {
 	if len(data) == 0 {
 		id.Reset()
 
@@ -109,9 +110,9 @@ func parseIntegerID[B any, V comparable, I signedInt | unsignedInt](
 
 	switch any(n).(type) {
 	case signedInt:
-		v = any(int64(n)).(V)
+		v = any(int64(n)).(V) //nolint:forcetypeassert // guaranteed by type switch
 	case unsignedInt:
-		v = any(uint64(n)).(V)
+		v = any(uint64(n)).(V) //nolint:forcetypeassert // guaranteed by type switch
 	}
 
 	*id = ID[B, V]{value: v}

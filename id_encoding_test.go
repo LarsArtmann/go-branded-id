@@ -6,19 +6,19 @@ import (
 	"testing"
 )
 
-func TestIDText(t *testing.T) {
+func TestIDText(t *testing.T) { //nolint:funlen // table-driven test with multiple sub-tests
 	t.Parallel()
 	t.Run("marshal non-zero string", func(t *testing.T) {
 		t.Parallel()
 
-		id := NewID[StringBrand]("test-id")
+		id := NewID[StringBrand](testIDValue)
 
 		data, err := id.MarshalText()
 		if err != nil {
 			t.Fatalf("MarshalText failed: %v", err)
 		}
 
-		if string(data) != "test-id" {
+		if string(data) != testIDValue {
 			t.Errorf("expected test-id, got %s", string(data))
 		}
 	})
@@ -55,7 +55,7 @@ func TestIDText(t *testing.T) {
 
 	t.Run("unmarshal valid string", func(t *testing.T) {
 		t.Parallel()
-		testUnmarshalTextRoundTrip[StringBrand, string](t, "test-id", "test-id")
+		testUnmarshalTextRoundTrip[StringBrand, string](t, testIDValue, testIDValue)
 	})
 
 	t.Run("unmarshal empty", func(t *testing.T) {
@@ -74,6 +74,8 @@ func TestIDText(t *testing.T) {
 	})
 
 	t.Run("numeric IDs", func(t *testing.T) {
+		t.Parallel()
+
 		testIDAllTypesUnmarshalText(t, textUnmarshalTestImpl{})
 	})
 }
@@ -96,7 +98,8 @@ func (t textUnmarshalTestImpl) TestUint64(tx *testing.T) {
 }
 
 func testIDAllTypesUnmarshalText(t *testing.T, ut textUnmarshalTest) {
-	t.Parallel()
+	t.Helper()
+
 	t.Run("int64 ID", ut.TestInt64)
 	t.Run("uint64 ID", ut.TestUint64)
 }
@@ -170,7 +173,7 @@ type binaryRoundTripTest struct{}
 
 func (b binaryRoundTripTest) TestString(t *testing.T) {
 	t.Parallel()
-	testBinaryRoundTrip[StringBrand, string](t, "test-id")
+	testBinaryRoundTrip[StringBrand, string](t, testIDValue)
 }
 
 func (b binaryRoundTripTest) TestInt64(t *testing.T) {
@@ -193,7 +196,7 @@ func TestIDGob(t *testing.T) {
 	t.Run("string ID", func(t *testing.T) {
 		t.Parallel()
 
-		original := NewID[StringBrand]("test-id")
+		original := NewID[StringBrand](testIDValue)
 
 		var buf bytes.Buffer
 

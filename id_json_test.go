@@ -97,7 +97,10 @@ func TestIDJSON(t *testing.T) {
 	})
 }
 
-func TestIDUnmarshalJSON(t *testing.T) {
+//nolint:funlen // table-driven test with multiple sub-tests
+func TestIDUnmarshalJSON(
+	t *testing.T,
+) {
 	t.Parallel()
 	t.Run("string ID from string", func(t *testing.T) {
 		t.Parallel()
@@ -109,7 +112,7 @@ func TestIDUnmarshalJSON(t *testing.T) {
 			t.Fatalf("UnmarshalJSON failed: %v", err)
 		}
 
-		if id.Get() != "test-id" {
+		if id.Get() != testIDValue {
 			t.Errorf("expected test-id, got %s", id.Get())
 		}
 	})
@@ -130,6 +133,8 @@ func TestIDUnmarshalJSON(t *testing.T) {
 	})
 
 	t.Run("numeric IDs", func(t *testing.T) {
+		t.Parallel()
+
 		testIDAllTypesUnmarshalJSON(t, jsonUnmarshalTestImpl{})
 	})
 
@@ -167,29 +172,22 @@ func TestIDUnmarshalJSON(t *testing.T) {
 
 type jsonUnmarshalTestImpl struct{}
 
-func runTest(t *testing.T, testFunc func(tx *testing.T)) {
-	t.Run("", func(tx *testing.T) {
-		tx.Parallel()
-		testFunc(tx)
-	})
-}
-
 func (j jsonUnmarshalTestImpl) TestInt64(t *testing.T) {
-	runTest(t, func(tx *testing.T) {
-		testUnmarshalNonZeroID[Int64Brand, int64](tx, "42", 42)
-	})
+	t.Parallel()
+
+	testUnmarshalNonZeroID[Int64Brand, int64](t, "42", 42)
 }
 
 func (j jsonUnmarshalTestImpl) TestInt32(t *testing.T) {
-	runTest(t, func(tx *testing.T) {
-		testUnmarshalNonZeroID[Int32Brand, int32](tx, "42", 42)
-	})
+	t.Parallel()
+
+	testUnmarshalNonZeroID[Int32Brand, int32](t, "42", 42)
 }
 
 func (j jsonUnmarshalTestImpl) TestUint64(t *testing.T) {
-	runTest(t, func(tx *testing.T) {
-		testUnmarshalNonZeroID[Uint64Brand, uint64](tx, "42", 42)
-	})
+	t.Parallel()
+
+	testUnmarshalNonZeroID[Uint64Brand, uint64](t, "42", 42)
 }
 
 type jsonUnmarshalTest interface {
@@ -199,7 +197,8 @@ type jsonUnmarshalTest interface {
 }
 
 func testIDAllTypesUnmarshalJSON(t *testing.T, ut jsonUnmarshalTest) {
-	t.Parallel()
+	t.Helper()
+
 	t.Run("int64 ID", ut.TestInt64)
 	t.Run("int32 ID", ut.TestInt32)
 	t.Run("uint64 ID", ut.TestUint64)
@@ -226,6 +225,8 @@ func testJSONRoundTrip[B any, V comparable](t *testing.T, value V) {
 }
 
 func TestIDJSONRoundTrip(t *testing.T) {
+	t.Parallel()
+
 	testIDAllTypesRoundTrip(t, jsonRoundTripTest{})
 }
 
@@ -233,7 +234,7 @@ type jsonRoundTripTest struct{}
 
 func (j jsonRoundTripTest) TestString(t *testing.T) {
 	t.Parallel()
-	testJSONRoundTrip[StringBrand, string](t, "test-id")
+	testJSONRoundTrip[StringBrand, string](t, testIDValue)
 }
 
 func (j jsonRoundTripTest) TestInt64(t *testing.T) {

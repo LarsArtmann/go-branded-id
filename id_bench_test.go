@@ -12,7 +12,13 @@ import (
 // Fuzz tests
 
 func FuzzIDJSONString(f *testing.F) {
-	testcases := []string{"test", "hello-world", "123", "", "unicode-日本語"}
+	testcases := []string{
+		"test",
+		"hello-world",
+		"123",
+		"",
+		"unicode-日本語", //nolint:gosmopolitan // intentional unicode test data
+	}
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
@@ -70,7 +76,12 @@ func FuzzIDJSONInt64(f *testing.F) {
 }
 
 func FuzzIDBinaryString(f *testing.F) {
-	testcases := []string{"test", "hello-world", "123", "unicode-日本語"}
+	testcases := []string{
+		"test",
+		"hello-world",
+		"123",
+		"unicode-日本語", //nolint:gosmopolitan // intentional unicode test data
+	}
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
@@ -135,6 +146,8 @@ func BenchmarkIDIsZero(b *testing.B) {
 
 // Helper for benchmarking ID methods.
 func benchmarkIDMethod[B, V comparable](b *testing.B, id ID[B, V], fn func(ID[B, V])) {
+	b.Helper()
+
 	for b.Loop() {
 		fn(id)
 	}
@@ -183,6 +196,8 @@ func benchmarkIDMethodWithError[B, V comparable, R any](
 	id ID[B, V],
 	fn func(ID[B, V]) (R, error),
 ) {
+	b.Helper()
+
 	for b.Loop() {
 		_, _ = fn(id)
 	}
@@ -197,6 +212,8 @@ func BenchmarkIDUnmarshalJSONInt64(b *testing.B) {
 }
 
 func benchmarkIDUnmarshalJSON[B, V comparable](b *testing.B, data []byte) {
+	b.Helper()
+
 	for b.Loop() {
 		var id ID[B, V]
 
@@ -231,6 +248,8 @@ func BenchmarkIDScanInt64(b *testing.B) {
 }
 
 func benchmarkIDScan[B, V comparable](b *testing.B, value V) {
+	b.Helper()
+
 	for b.Loop() {
 		var id ID[B, V]
 
@@ -267,6 +286,8 @@ func BenchmarkJSONRoundTripInt64(b *testing.B) {
 }
 
 func benchmarkJSONRoundTrip[B, V comparable](b *testing.B, id ID[B, V]) {
+	b.Helper()
+
 	for b.Loop() {
 		data, _ := json.Marshal(id) //nolint:errchkjson // Benchmark: error check not needed
 

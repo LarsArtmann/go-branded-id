@@ -101,7 +101,9 @@ func readUint64(data []byte) uint64 {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler for binary encoding.
-func (id ID[B, V]) MarshalBinary() ([]byte, error) { //nolint:cyclop // type switch over 11 types is inherently multi-branch
+//
+//nolint:cyclop,funlen // exhaustive type switch over numeric types
+func (id ID[B, V]) MarshalBinary() ([]byte, error) {
 	if id.IsZero() {
 		return nil, nil
 	}
@@ -173,7 +175,9 @@ func (id ID[B, V]) MarshalBinary() ([]byte, error) { //nolint:cyclop // type swi
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler for binary decoding.
-func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type switch over 11 types is inherently multi-branch
+//
+//nolint:cyclop,funlen // exhaustive type switch over numeric types
+func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 	if len(data) == 0 {
 		id.Reset()
 
@@ -193,7 +197,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type
 			"int",
 			readUint64,
 			func(n uint64) V {
-				return any(int(n)).(V)
+				return any(int(n)).(V) //nolint:gosec,forcetypeassert // G115: uint64 to int for binary deserialization; guaranteed by type switch
 			},
 			byteSizeInt64,
 		)
@@ -208,7 +212,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type
 		return id.readByte(
 			data,
 			"int8",
-			func(b byte) V { //nolint:gosec // G115: byte to int8 is safe for deserialization
+			func(b byte) V { //nolint:gosec,forcetypeassert // G115: byte to int8 is safe for deserialization; guaranteed by type switch
 				return any(int8(b)).(V)
 			},
 		)
@@ -218,7 +222,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type
 			"int16",
 			readUint16,
 			func(n uint16) V {
-				return any(int16(n)).(V)
+				return any(int16(n)).(V) //nolint:gosec,forcetypeassert // G115: uint16 to int16 for binary deserialization; guaranteed by type switch
 			},
 			byteSizeInt16,
 		)
@@ -235,7 +239,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type
 			"int32",
 			readUint32,
 			func(n uint32) V {
-				return any(int32(n)).(V)
+				return any(int32(n)).(V) //nolint:gosec,forcetypeassert // G115: uint32 to int32 for binary deserialization; guaranteed by type switch
 			},
 			byteSizeInt32,
 		)
@@ -252,7 +256,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type
 			"int64",
 			readUint64,
 			func(n uint64) V {
-				return any(int64(n)).(V)
+				return any(int64(n)).(V) //nolint:gosec,forcetypeassert // G115: uint64 to int64 for binary deserialization; guaranteed by type switch
 			},
 			byteSizeInt64,
 		)
@@ -269,7 +273,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type
 			"uint",
 			readUint64,
 			func(n uint64) V {
-				return any(uint(n)).(V)
+				return any(uint(n)).(V) //nolint:forcetypeassert // guaranteed by type switch
 			},
 			byteSizeInt64,
 		)
@@ -285,7 +289,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error { //nolint:cyclop // type
 			data,
 			"uint8",
 			func(b byte) V {
-				return any(b).(V)
+				return any(b).(V) //nolint:forcetypeassert // guaranteed by outer type switch
 			},
 		)
 	case uint16:
