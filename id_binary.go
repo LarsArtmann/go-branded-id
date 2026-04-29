@@ -79,8 +79,7 @@ func (id *ID[B, V]) readByte(data []byte, typeName string, convertFunc func(byte
 		return err
 	}
 
-	//nolint:forcetypeassert // readByte is only called for byte-sized types where V matches
-	*id = ID[B, V]{value: any(convertFunc(data[0])).(V)}
+	*id = ID[B, V]{value: convertFunc(data[0])}
 
 	return nil
 }
