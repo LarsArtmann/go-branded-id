@@ -43,6 +43,7 @@ func (id *ID[B, V]) readUnsigned(
 	}
 
 	n := readFunc(data)
+	//nolint:forcetypeassert // readUnsigned is only called for uint types where V matches uint64
 	*id = ID[B, V]{value: any(n).(V)}
 
 	return nil
@@ -78,6 +79,7 @@ func (id *ID[B, V]) readByte(data []byte, typeName string, convertFunc func(byte
 		return err
 	}
 
+	//nolint:forcetypeassert // readByte is only called for byte-sized types where V matches
 	*id = ID[B, V]{value: any(convertFunc(data[0])).(V)}
 
 	return nil
@@ -176,6 +178,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 	var zero V
 	switch any(zero).(type) {
 	case string:
+		//nolint:forcetypeassert // type switch guarantees V is string
 		*id = ID[B, V]{value: any(string(data)).(V)}
 
 		return nil
@@ -246,7 +249,9 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"uint",
 			readUint64,
-			func(n uint64) V { return any(uint(n)).(V) },
+			func(n uint64) V { //nolint:forcetypeassert // type switch guarantees V is uint
+				return any(uint(n)).(V)
+			},
 			byteSizeInt64,
 		)
 		if err != nil {
@@ -257,7 +262,9 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case uint8:
-		return id.readByte(data, "uint8", func(b byte) V { return any(b).(V) })
+		return id.readByte(data, "uint8", func(b byte) V { //nolint:forcetypeassert // type switch guarantees V is uint8
+			return any(b).(V)
+		})
 	case uint16:
 		return id.readUnsigned(
 			data,

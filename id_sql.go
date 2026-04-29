@@ -79,10 +79,12 @@ func (id *ID[B, V]) Scan(src any) error {
 	case string:
 		switch v := src.(type) {
 		case string:
+			//nolint:forcetypeassert // outer type switch guarantees V is string
 			*id = ID[B, V]{value: any(v).(V)}
 
 			return nil
 		case []byte:
+			//nolint:forcetypeassert // outer type switch guarantees V is string
 			*id = ID[B, V]{value: any(string(v)).(V)}
 
 			return nil
@@ -93,14 +95,17 @@ func (id *ID[B, V]) Scan(src any) error {
 	case int:
 		switch v := src.(type) {
 		case int64:
+			//nolint:forcetypeassert // outer type switch guarantees V is int
 			*id = ID[B, V]{value: any(int(v)).(V)}
 
 			return nil
 		case int:
+			//nolint:forcetypeassert // outer type switch guarantees V is int
 			*id = ID[B, V]{value: any(v).(V)}
 
 			return nil
 		case float64:
+			//nolint:forcetypeassert // outer type switch guarantees V is int
 			*id = ID[B, V]{value: any(int(v)).(V)}
 
 			return nil
