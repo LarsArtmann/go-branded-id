@@ -187,7 +187,9 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"int",
 			readUint64,
-			func(n uint64) V { return any(int(n)).(V) },
+			func(n uint64) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+				return any(int(n)).(V)
+			},
 			byteSizeInt64,
 		)
 		if err != nil {
@@ -198,13 +200,17 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 
 		return nil
 	case int8:
-		return id.readByte(data, "int8", func(b byte) V { return any(int8(b)).(V) })
+		return id.readByte(data, "int8", func(b byte) V { //nolint:gosec // G115: byte to int8 is safe for deserialization
+			return any(int8(b)).(V)
+		})
 	case int16:
 		n, err := readSigned(
 			data,
 			"int16",
 			readUint16,
-			func(n uint16) V { return any(int16(n)).(V) },
+			func(n uint16) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+				return any(int16(n)).(V)
+			},
 			byteSizeInt16,
 		)
 		if err != nil {
@@ -219,7 +225,9 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"int32",
 			readUint32,
-			func(n uint32) V { return any(int32(n)).(V) },
+			func(n uint32) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+				return any(int32(n)).(V)
+			},
 			byteSizeInt32,
 		)
 		if err != nil {
@@ -234,7 +242,9 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			data,
 			"int64",
 			readUint64,
-			func(n uint64) V { return any(int64(n)).(V) },
+			func(n uint64) V { //nolint:gosec // G115: controlled conversion for binary deserialization
+				return any(int64(n)).(V)
+			},
 			byteSizeInt64,
 		)
 		if err != nil {
