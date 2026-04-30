@@ -123,25 +123,33 @@ func testUnmarshalTextRoundTrip[B any, V comparable](t *testing.T, input string,
 	assertCmpEqual(t, id.Get(), expected)
 }
 
-func testBinaryRoundTrip[B any, V comparable](t *testing.T, value V) {
+// testIDRoundTrip is a shared helper for round-trip serialization tests.
+func testIDRoundTrip[B any, V comparable](
+	t *testing.T,
+	value V,
+	marshal func(ID[B, V]) ([]byte, error),
+	unmarshal func(*ID[B, V], []byte) error,
+) {
 	t.Helper()
 
 	original := NewID[B, V](value)
 
-	data, err := original.MarshalBinary()
+	data, err := marshal(original)
 	if err != nil {
-		t.Fatalf("MarshalBinary failed: %v", err)
+		t.Fatalf("Marshal failed: %v", err)
 	}
 
 	var restored ID[B, V]
 
-	err = restored.UnmarshalBinary(data)
+	err = unmarshal(&restored, data)
 	if err != nil {
-		t.Fatalf("UnmarshalBinary failed: %v", err)
+		t.Fatalf("Unmarshal failed: %v", err)
 	}
 
 	assertCmpEqual(t, original.Get(), restored.Get())
 }
+
+
 
 func TestIDBinary(t *testing.T) {
 	testIDAllTypesRoundTrip(t, binaryRoundTripTest{})
@@ -177,22 +185,22 @@ type binaryRoundTripTest struct{}
 
 func (b binaryRoundTripTest) TestString(t *testing.T) {
 	t.Parallel()
-	testBinaryRoundTrip[StringBrand, string](t, testIDValue)
+	testIDRoundTrip(t, testIDValue, func(id ID[StringBrand, string]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[StringBrand, string], data []byte) error { return id.UnmarshalBinary(data) })
 }
 
 func (b binaryRoundTripTest) TestInt64(t *testing.T) {
 	t.Parallel()
-	testBinaryRoundTrip[Int64Brand, int64](t, 42)
+	testIDRoundTrip(t, int64(42), func(id ID[Int64Brand, int64]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[Int64Brand, int64], data []byte) error { return id.UnmarshalBinary(data) })
 }
 
 func (b binaryRoundTripTest) TestInt32(t *testing.T) {
 	t.Parallel()
-	testBinaryRoundTrip[Int32Brand, int32](t, 42)
+	testIDRoundTrip(t, int32(42), func(id ID[Int32Brand, int32]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[Int32Brand, int32], data []byte) error { return id.UnmarshalBinary(data) })
 }
 
 func (b binaryRoundTripTest) TestUint64(t *testing.T) {
 	t.Parallel()
-	testBinaryRoundTrip[Uint64Brand, uint64](t, 42)
+	testIDRoundTrip(t, uint64(42), func(id ID[Uint64Brand, uint64]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[Uint64Brand, uint64], data []byte) error { return id.UnmarshalBinary(data) })
 }
 
 func TestIDGob(t *testing.T) {

@@ -200,24 +200,15 @@ func testIDAllTypesUnmarshalJSON(t *testing.T, ut jsonUnmarshalTest) {
 	t.Run("uint64 ID", ut.TestUint64)
 }
 
+
+
 func testJSONRoundTrip[B any, V comparable](t *testing.T, value V) {
-	t.Helper()
-
-	original := NewID[B, V](value)
-
-	data, err := json.Marshal(original)
-	if err != nil {
-		t.Fatalf("Marshal failed: %v", err)
-	}
-
-	var restored ID[B, V]
-
-	err = json.Unmarshal(data, &restored)
-	if err != nil {
-		t.Fatalf("Unmarshal failed: %v", err)
-	}
-
-	assertCmpEqual(t, original.Get(), restored.Get())
+	testIDRoundTrip(
+		t,
+		value,
+		func(id ID[B, V]) ([]byte, error) { return json.Marshal(id) },
+		func(id *ID[B, V], data []byte) error { return json.Unmarshal(data, id) },
+	)
 }
 
 func TestIDJSONRoundTrip(t *testing.T) {
