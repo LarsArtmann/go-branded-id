@@ -1,8 +1,6 @@
 package id
 
 import (
-	"encoding"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math"

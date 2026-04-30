@@ -1,6 +1,7 @@
 package id
 
 import (
+	"encoding/json"
 	"math"
 	"testing"
 )
@@ -144,6 +145,15 @@ func testBinaryRoundTrip[B any, V comparable](t *testing.T, value V) {
 	testIDRoundTrip(t, value,
 		func(id ID[B, V]) ([]byte, error) { return id.MarshalBinary() },
 		func(id *ID[B, V], data []byte) error { return id.UnmarshalBinary(data) },
+	)
+}
+
+func testJSONRoundTrip[B any, V comparable](t *testing.T, value V) {
+	t.Helper()
+
+	testIDRoundTrip(t, value,
+		func(id ID[B, V]) ([]byte, error) { return json.Marshal(id) },
+		func(id *ID[B, V], data []byte) error { return json.Unmarshal(data, id) },
 	)
 }
 
