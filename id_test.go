@@ -25,12 +25,7 @@ type (
 )
 
 func assertIDValue[B any, V comparable](t *testing.T, v, expected V) {
-	t.Helper()
-
-	id := NewID[B](v)
-	if id.Get() != expected {
-		t.Errorf("expected %v, got %v", expected, id.Get())
-	}
+	assertCmpEqual(t, NewID[B](v).Get(), expected)
 }
 
 //nolint:cyclop // exhaustive type switch over all brand types
@@ -335,10 +330,7 @@ func TestIDOr(t *testing.T) {
 		id := NewID[StringBrand]("test")
 		defaultID := NewID[StringBrand]("default")
 
-		result := id.Or(defaultID)
-		if result.Get() != "test" {
-			t.Errorf("expected test, got %s", result.Get())
-		}
+		assertCmpEqual(t, id.Or(defaultID).Get(), "test")
 	})
 
 	t.Run("zero returns default", func(t *testing.T) {
@@ -348,10 +340,7 @@ func TestIDOr(t *testing.T) {
 
 		defaultID := NewID[StringBrand]("default")
 
-		result := id.Or(defaultID)
-		if result.Get() != "default" {
-			t.Errorf("expected default, got %s", result.Get())
-		}
+		assertCmpEqual(t, id.Or(defaultID).Get(), "default")
 	})
 }
 
@@ -386,9 +375,7 @@ func TestIDString(t *testing.T) {
 				got = v.String()
 			}
 
-			if got != tt.expected {
-				t.Errorf("expected %s, got %s", tt.expected, got)
-			}
+			assertCmpEqual(t, got, tt.expected)
 		})
 	}
 }
@@ -422,10 +409,7 @@ func TestIDFormat(t *testing.T) {
 		t.Run(tt.format, func(t *testing.T) {
 			t.Parallel()
 
-			got := fmt.Sprintf(tt.format, id)
-			if got != tt.expected {
-				t.Errorf("expected %q, got %q", tt.expected, got)
-			}
+			assertCmpEqual(t, fmt.Sprintf(tt.format, id), tt.expected)
 		})
 	}
 }

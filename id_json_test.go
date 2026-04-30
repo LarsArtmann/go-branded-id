@@ -110,9 +110,7 @@ func TestIDUnmarshalJSON(
 			t.Fatalf("UnmarshalJSON failed: %v", err)
 		}
 
-		if id.Get() != testIDValue {
-			t.Errorf("expected test-id, got %s", id.Get())
-		}
+		assertCmpEqual(t, id.Get(), testIDValue)
 	})
 
 	t.Run("string ID from null", func(t *testing.T) {

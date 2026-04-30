@@ -9,36 +9,40 @@ A Go library providing branded, strongly-typed identifiers that prevent mixing d
 
 In Go, regular types like `string` or `int64` provide no compile-time safety:
 
-<!-- skip-validate -->
-
 ```go
-func GetUser(id string) error { ... }
-func GetOrder(id string) error { ... }
+package main
 
-userID := "user-123"
-orderID := "order-456"
+func GetUser(id string) error { return nil }
+func GetOrder(id string) error { return nil }
 
-GetOrder(userID)  // Compiles! Runtime bug.
+func main() {
+	GetOrder(userID)
+}
+
+var userID = "user-123"
+var orderID = "order-456"
 ```
 
 With this package, the compiler catches these errors:
 
-<!-- skip-validate -->
-
 ```go
+package main
+
 type UserBrand struct{}
 type OrderBrand struct{}
 
 type UserID = id.ID[UserBrand, string]
 type OrderID = id.ID[OrderBrand, string]
 
-func GetUser(id UserID) error { ... }
-func GetOrder(id OrderID) error { ... }
+func GetUser(id UserID) error { return nil }
+func GetOrder(id OrderID) error { return nil }
 
-userID := id.NewID[UserBrand]("user-123")
-orderID := id.NewID[OrderBrand]("order-456")
+func main() {
+	GetOrder(userID)
+}
 
-GetOrder(userID)  // Compile error: type mismatch
+var userID = id.NewID[UserBrand]("user-123")
+var orderID = id.NewID[OrderBrand]("order-456")
 ```
 
 ## Installation
@@ -80,6 +84,7 @@ func main() {
     // Default value with Or
     defaultID := id.NewID[UserBrand]("unknown")
     fmt.Println(emptyUserID.Or(defaultID).Get())  // unknown
+    fmt.Println(orderID.Get())  // order-456
 }
 ```
 
@@ -98,6 +103,8 @@ type UserID = id.ID[UserBrand, string]
 This enables runtime introspection for logging, error messages, and debugging:
 
 ```go
+import "fmt"
+
 func ValidateID[B interface{ Name() string }, V comparable](id id.ID[B, V]) error {
     if id.IsZero() {
         var brand B

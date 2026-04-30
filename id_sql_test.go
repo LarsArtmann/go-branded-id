@@ -40,9 +40,7 @@ func TestIDScan(t *testing.T) {
 			t.Fatalf("Scan failed: %v", err)
 		}
 
-		if id.Get() != testIDValue {
-			t.Errorf("expected test-id, got %s", id.Get())
-		}
+		assertCmpEqual(t, id.Get(), testIDValue)
 	})
 
 	t.Run("string ID from nil", func(t *testing.T) {

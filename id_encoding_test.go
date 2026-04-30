@@ -56,9 +56,7 @@ func TestIDText(t *testing.T) { //nolint:funlen // table-driven test with multip
 			t.Fatalf("MarshalText failed: %v", err)
 		}
 
-		if string(data) != "42" {
-			t.Errorf("expected 42, got %s", string(data))
-		}
+		assertCmpEqual(t, string(data), "42")
 	})
 
 	t.Run("unmarshal valid string", func(t *testing.T) {
