@@ -76,9 +76,7 @@ func testScanRoundTrip[B any, V comparable](t *testing.T, input any, expected V)
 		t.Fatalf("Scan failed: %v", err)
 	}
 
-	if id.Get() != expected {
-		t.Errorf("expected %v, got %v", expected, id.Get())
-	}
+	assertCmpEqual(t, id.Get(), expected)
 }
 
 type scanTestCase[S any, V comparable] struct {

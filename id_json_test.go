@@ -59,9 +59,7 @@ func testUnmarshalNonZeroID[B any, V comparable](t *testing.T, jsonData string, 
 		t.Fatalf("UnmarshalJSON failed: %v", err)
 	}
 
-	if id.Get() != expected {
-		t.Errorf("expected %v, got %v", expected, id.Get())
-	}
+	assertCmpEqual(t, id.Get(), expected)
 }
 
 func TestIDJSON(t *testing.T) {

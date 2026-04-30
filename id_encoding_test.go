@@ -122,9 +122,7 @@ func testUnmarshalTextRoundTrip[B any, V comparable](t *testing.T, input string,
 		t.Fatalf("UnmarshalText failed: %v", err)
 	}
 
-	if id.Get() != expected {
-		t.Errorf("expected %v, got %v", expected, id.Get())
-	}
+	assertCmpEqual(t, id.Get(), expected)
 }
 
 func testBinaryRoundTrip[B any, V comparable](t *testing.T, value V) {

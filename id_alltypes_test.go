@@ -99,10 +99,7 @@ func TestStringAllTypes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := stringer(t, tt.id)
-			if got != tt.expected {
-				t.Errorf("expected %s, got %s", tt.expected, got)
-			}
+			assertCmpEqual(t, stringer(t, tt.id), tt.expected)
 		})
 	}
 }

@@ -9,6 +9,8 @@ A Go library providing branded, strongly-typed identifiers that prevent mixing d
 
 In Go, regular types like `string` or `int64` provide no compile-time safety:
 
+<!-- skip-validate -->
+
 ```go
 func GetUser(id string) error { ... }
 func GetOrder(id string) error { ... }
@@ -20,6 +22,8 @@ GetOrder(userID)  // Compiles! Runtime bug.
 ```
 
 With this package, the compiler catches these errors:
+
+<!-- skip-validate -->
 
 ```go
 type UserBrand struct{}
