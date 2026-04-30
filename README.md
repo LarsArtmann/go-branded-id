@@ -119,19 +119,11 @@ func ValidateID[B interface{ Name() string }, V comparable](id id.ID[B, V]) erro
 
 ## Supported Value Types
 
-| Type     | Alias               |
-| -------- | ------------------- |
-| `string` | `ID[Brand, string]` |
-| `int`    | `ID[Brand, int]`    |
-| `int8`   | `ID[Brand, int8]`   |
-| `int16`  | `ID[Brand, int16]`  |
-| `int32`  | `ID[Brand, int32]`  |
-| `int64`  | `ID[Brand, int64]`  |
-| `uint`   | `ID[Brand, uint]`   |
-| `uint8`  | `ID[Brand, uint8]`  |
-| `uint16` | `ID[Brand, uint16]` |
-| `uint32` | `ID[Brand, uint32]` |
-| `uint64` | `ID[Brand, uint64]` |
+The generic type is `ID[Brand, V comparable]` — any comparable type works as `V`.
+
+Full serialization support (JSON, SQL, Text, Binary, Gob): `string`, `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`.
+
+Other comparable types (structs, arrays, etc.) work for the core operations (`Get`, `Equal`, `IsZero`, `Reset`) but lack specialized serialization.
 
 ## Serialization
 
