@@ -439,3 +439,27 @@ func ExampleID_Reset() {
 	fmt.Println(id.IsZero())
 	// Output: true
 }
+
+func ExamplePtr() {
+	type UserBrand struct{}
+
+	id := NewID[UserBrand]("user-123")
+	p := id.Ptr()
+	fmt.Println(p.Get())
+	// Output: user-123
+}
+
+func ExampleFromPtr() {
+	type UserBrand struct{}
+
+	// With non-nil pointer
+	id := NewID[UserBrand]("user-123")
+	fmt.Println(FromPtr(id.Ptr()).Get())
+
+	// With nil pointer
+	var nilPtr *ID[UserBrand, string]
+	fmt.Println(FromPtr(nilPtr).IsZero())
+	// Output:
+	// user-123
+	// true
+}
