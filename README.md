@@ -16,7 +16,7 @@ func GetUser(id string) error { return nil }
 func GetOrder(id string) error { return nil }
 
 func main() {
-	GetOrder(userID)
+	GetOrder(userID) // Compiles! Runtime bug.
 }
 
 var userID = "user-123"
@@ -38,7 +38,7 @@ func GetUser(id UserID) error { return nil }
 func GetOrder(id OrderID) error { return nil }
 
 func main() {
-	GetOrder(userID)
+	GetOrder(userID) // Compile error: type mismatch
 }
 
 var userID = id.NewID[UserBrand]("user-123")
