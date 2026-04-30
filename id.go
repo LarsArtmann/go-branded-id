@@ -112,9 +112,6 @@ func (id ID[B, V]) Compare(other ID[B, V]) (int, error) {
 	case string:
 		//nolint:forcetypeassert // V is same type for both id and other
 		return cmp.Compare(a, any(other.value).(string)), nil
-	case float64:
-		//nolint:forcetypeassert // V is same type for both id and other
-		return cmp.Compare(a, any(other.value).(float64)), nil
 	default:
 		return 0, ErrNotOrdered
 	}

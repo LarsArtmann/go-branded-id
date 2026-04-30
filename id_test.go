@@ -309,6 +309,23 @@ func TestIDCompareUint64(t *testing.T) {
 	)
 }
 
+func TestIDCompareFloat64ReturnsErrNotOrdered(t *testing.T) {
+	t.Parallel()
+
+	type FloatBrand struct{}
+
+	id := NewID[FloatBrand, float64](1.5)
+	_, err := id.Compare(NewID[FloatBrand, float64](2.5))
+
+	if err == nil {
+		t.Fatal("expected error for float64 Compare")
+	}
+
+	if err != ErrNotOrdered {
+		t.Errorf("expected ErrNotOrdered, got %v", err)
+	}
+}
+
 func TestIDOr(t *testing.T) {
 	t.Parallel()
 	t.Run("non-zero returns self", func(t *testing.T) {
