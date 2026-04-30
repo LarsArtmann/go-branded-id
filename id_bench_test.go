@@ -440,7 +440,7 @@ func ExampleID_Reset() {
 	// Output: true
 }
 
-func ExamplePtr() {
+func ExampleID_Ptr() {
 	type UserBrand struct{}
 
 	id := NewID[UserBrand]("user-123")

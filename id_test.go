@@ -1,6 +1,7 @@
 package id
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"sort"
@@ -321,7 +322,7 @@ func TestIDCompareFloat64ReturnsErrNotOrdered(t *testing.T) {
 		t.Fatal("expected error for float64 Compare")
 	}
 
-	if err != ErrNotOrdered {
+	if !errors.Is(err, ErrNotOrdered) {
 		t.Errorf("expected ErrNotOrdered, got %v", err)
 	}
 }

@@ -349,6 +349,12 @@ var (
 	_ encoding.BinaryUnmarshaler = (*ID[struct{}, string])(nil)
 	_ encoding.BinaryMarshaler   = ID[struct{}, int64]{value: 0}
 	_ encoding.BinaryUnmarshaler = (*ID[struct{}, int64])(nil)
+	_ encoding.BinaryMarshaler   = ID[struct{}, int32]{value: 0}
+	_ encoding.BinaryUnmarshaler = (*ID[struct{}, int32])(nil)
+	_ encoding.BinaryMarshaler   = ID[struct{}, uint64]{value: 0}
+	_ encoding.BinaryUnmarshaler = (*ID[struct{}, uint64])(nil)
 	_ gob.GobEncoder             = ID[struct{}, string]{value: ""}
 	_ gob.GobDecoder             = (*ID[struct{}, string])(nil)
+	_ gob.GobEncoder             = ID[struct{}, int64]{value: 0}
+	_ gob.GobDecoder             = (*ID[struct{}, int64])(nil)
 )

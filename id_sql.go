@@ -284,8 +284,22 @@ var (
 	_ sql.Scanner      = (*ID[struct{}, int64])(nil)
 	_ sql.Scanner      = (*ID[struct{}, int32])(nil)
 	_ sql.Scanner      = (*ID[struct{}, uint64])(nil)
+	_ sql.Scanner      = (*ID[struct{}, int])(nil)
+	_ sql.Scanner      = (*ID[struct{}, int8])(nil)
+	_ sql.Scanner      = (*ID[struct{}, int16])(nil)
+	_ sql.Scanner      = (*ID[struct{}, uint])(nil)
+	_ sql.Scanner      = (*ID[struct{}, uint8])(nil)
+	_ sql.Scanner      = (*ID[struct{}, uint16])(nil)
+	_ sql.Scanner      = (*ID[struct{}, uint32])(nil)
 	_ driver.Valuer    = ID[struct{}, string]{value: ""}
 	_ driver.Valuer    = ID[struct{}, int64]{value: 0}
 	_ driver.Valuer    = ID[struct{}, int32]{value: 0}
 	_ driver.Valuer    = ID[struct{}, uint64]{value: 0}
+	_ driver.Valuer    = ID[struct{}, int]{value: 0}
+	_ driver.Valuer    = ID[struct{}, int8]{value: 0}
+	_ driver.Valuer    = ID[struct{}, int16]{value: 0}
+	_ driver.Valuer    = ID[struct{}, uint]{value: 0}
+	_ driver.Valuer    = ID[struct{}, uint8]{value: 0}
+	_ driver.Valuer    = ID[struct{}, uint16]{value: 0}
+	_ driver.Valuer    = ID[struct{}, uint32]{value: 0}
 )

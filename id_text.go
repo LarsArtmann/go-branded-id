@@ -126,4 +126,8 @@ var (
 	_ encoding.TextUnmarshaler = (*ID[struct{}, string])(nil)
 	_ encoding.TextMarshaler   = ID[struct{}, int64]{value: 0}
 	_ encoding.TextUnmarshaler = (*ID[struct{}, int64])(nil)
+	_ encoding.TextMarshaler   = ID[struct{}, int32]{value: 0}
+	_ encoding.TextUnmarshaler = (*ID[struct{}, int32])(nil)
+	_ encoding.TextMarshaler   = ID[struct{}, uint64]{value: 0}
+	_ encoding.TextUnmarshaler = (*ID[struct{}, uint64])(nil)
 )
