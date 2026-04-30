@@ -138,6 +138,15 @@ func stringer(t *testing.T, v any) string {
 	}
 }
 
+func testBinaryRoundTrip[B any, V comparable](t *testing.T, value V) {
+	t.Helper()
+
+	testIDRoundTrip(t, value,
+		func(id ID[B, V]) ([]byte, error) { return id.MarshalBinary() },
+		func(id *ID[B, V], data []byte) error { return id.UnmarshalBinary(data) },
+	)
+}
+
 //nolint:funlen // table-driven test with multiple type sub-tests
 func TestBinaryRoundTripAllTypes(t *testing.T) {
 	t.Parallel()

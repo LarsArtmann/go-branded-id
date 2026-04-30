@@ -202,14 +202,7 @@ func testIDAllTypesUnmarshalJSON(t *testing.T, ut jsonUnmarshalTest) {
 
 
 
-func testJSONRoundTrip[B any, V comparable](t *testing.T, value V) {
-	testIDRoundTrip(
-		t,
-		value,
-		func(id ID[B, V]) ([]byte, error) { return json.Marshal(id) },
-		func(id *ID[B, V], data []byte) error { return json.Unmarshal(data, id) },
-	)
-}
+
 
 func TestIDJSONRoundTrip(t *testing.T) {
 	t.Parallel()
@@ -221,20 +214,20 @@ type jsonRoundTripTest struct{}
 
 func (j jsonRoundTripTest) TestString(t *testing.T) {
 	t.Parallel()
-	testJSONRoundTrip[StringBrand, string](t, testIDValue)
+	testIDRoundTrip(t, testIDValue, func(id ID[StringBrand, string]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[StringBrand, string], data []byte) error { return json.Unmarshal(data, id) })
 }
 
 func (j jsonRoundTripTest) TestInt64(t *testing.T) {
 	t.Parallel()
-	testJSONRoundTrip[Int64Brand, int64](t, 42)
+	testIDRoundTrip(t, int64(42), func(id ID[Int64Brand, int64]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[Int64Brand, int64], data []byte) error { return json.Unmarshal(data, id) })
 }
 
 func (j jsonRoundTripTest) TestInt32(t *testing.T) {
 	t.Parallel()
-	testJSONRoundTrip[Int32Brand, int32](t, 42)
+	testIDRoundTrip(t, int32(42), func(id ID[Int32Brand, int32]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[Int32Brand, int32], data []byte) error { return json.Unmarshal(data, id) })
 }
 
 func (j jsonRoundTripTest) TestUint64(t *testing.T) {
 	t.Parallel()
-	testJSONRoundTrip[Uint64Brand, uint64](t, 42)
+	testIDRoundTrip(t, uint64(42), func(id ID[Uint64Brand, uint64]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[Uint64Brand, uint64], data []byte) error { return json.Unmarshal(data, id) })
 }
