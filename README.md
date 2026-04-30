@@ -1,5 +1,8 @@
 # go-branded-id
 
+[![Go Version](https://img.shields.io/github/go-mod/go-version/larsartmann/go-branded-id)](go.mod)
+[![License: Proprietary](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
+
 A Go library providing branded, strongly-typed identifiers that prevent mixing different entity IDs at compile time using phantom types.
 
 ## Why?
@@ -124,7 +127,7 @@ func ValidateID[B interface{ Name() string }, V comparable](id id.ID[B, V]) erro
 The package implements all standard Go interfaces for seamless serialization:
 
 - **JSON**: `json.Marshaler` / `json.Unmarshaler` (zero values → `null`)
-- **SQL**: `sql.Scanner` / `driver.Valuer` (string, int64, int32, uint64, []byte, nil)
+- **SQL**: `sql.Scanner` / `driver.Valuer` (string, all int/uint types, nil)
 - **Binary**: `encoding.BinaryMarshaler` / `BinaryUnmarshaler`
 - **Text**: `encoding.TextMarshaler` / `TextUnmarshaler` (XML, TOML)
 - **Gob**: `gob.GobEncoder` / `gob.GobDecoder`
@@ -181,6 +184,7 @@ sort.Slice(ids, func(i, j int) bool {
 | `Compare(other ID) (int, error)`  | -1, 0, or 1 for less/equal/greater          |
 | `Or(default ID) ID`               | Returns self if not zero, otherwise default |
 | `String() string`                 | String representation                       |
+| `Format(fmt.State, rune)`         | Custom formatting (%s, %d, %v, %#v, %q)     |
 | `MarshalJSON() ([]byte, error)`   | JSON serialization                          |
 | `UnmarshalJSON([]byte) error`     | JSON deserialization                        |
 | `MarshalText() ([]byte, error)`   | Text serialization (XML/TOML)               |
@@ -191,15 +195,23 @@ sort.Slice(ids, func(i, j int) bool {
 | `GobDecode([]byte) error`         | Gob decoding                                |
 | `Scan(any) error`                 | SQL scan                                    |
 | `Value() (driver.Value, error)`   | SQL value                                   |
+| `Ptr() *ID[B, V]`                 | Returns pointer to ID (for optional fields)  |
+| `FromPtr(*ID[B, V]) ID[B, V]`    | Dereferences pointer, returns zero if nil   |
 
 ## Performance
 
-Zero-allocation, stdlib-only implementation:
+Zero-allocation, stdlib-only implementation (benchmarked on Go 1.26):
 
-- `NewID`: ~1-2 ns/op
-- `Get`: ~1 ns/op
-- `MarshalJSON`: ~50-100 ns/op
-- `Scan` (string): ~30-50 ns/op
+| Operation       | Typical Latency |
+|-----------------|----------------|
+| `NewID`         | ~1-2 ns/op     |
+| `Get`           | ~1 ns/op       |
+| `MarshalJSON`   | ~50-100 ns/op  |
+| `Scan` (string) | ~30-50 ns/op   |
+
+## Contributing
+
+Contributions are welcome. Please ensure all tests pass (`go test ./... -race`) and lint is clean (`golangci-lint run`) before submitting changes.
 
 ## License
 
