@@ -44,9 +44,7 @@ func FuzzIDJSONString(f *testing.F) {
 			t.Fatalf("Unmarshal failed: %v", err)
 		}
 
-		if restored.Get() != orig {
-			t.Errorf("expected %q, got %q", orig, restored.Get())
-		}
+		assertCmpEqual(t, restored.Get(), orig)
 	})
 }
 
@@ -70,9 +68,7 @@ func FuzzIDJSONInt64(f *testing.F) {
 			t.Fatalf("Unmarshal failed: %v", err)
 		}
 
-		if restored.Get() != orig {
-			t.Errorf("expected %d, got %d", orig, restored.Get())
-		}
+		assertCmpEqual(t, restored.Get(), orig)
 	})
 }
 
@@ -106,9 +102,7 @@ func FuzzIDBinaryString(f *testing.F) {
 			t.Fatalf("UnmarshalBinary failed: %v", err)
 		}
 
-		if restored.Get() != orig {
-			t.Errorf("expected %q, got %q", orig, restored.Get())
-		}
+		assertCmpEqual(t, restored.Get(), orig)
 	})
 }
 
@@ -132,9 +126,7 @@ func FuzzIDBinaryInt64(f *testing.F) {
 			t.Fatalf("UnmarshalBinary failed: %v", err)
 		}
 
-		if restored.Get() != orig {
-			t.Errorf("expected %d, got %d", orig, restored.Get())
-		}
+		assertCmpEqual(t, restored.Get(), orig)
 	})
 }
 
@@ -159,9 +151,7 @@ func FuzzIDBinaryUint64(f *testing.F) {
 			t.Fatalf("UnmarshalBinary failed: %v", err)
 		}
 
-		if restored.Get() != orig {
-			t.Errorf("expected %d, got %d", orig, restored.Get())
-		}
+		assertCmpEqual(t, restored.Get(), orig)
 	})
 }
 
