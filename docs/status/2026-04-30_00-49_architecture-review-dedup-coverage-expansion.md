@@ -42,18 +42,18 @@ Conducted a comprehensive architecture review of `go-branded-id`. Found and fixe
 
 Added comprehensive test file `id_alltypes_test.go` (554 lines) covering:
 
-| Function | Before | After |
-|---|---|---|
-| `Compare` | 33.3% | 78.6% |
-| `String` | 27.8% | 66.7% |
-| `MarshalBinary` | 36.1% | 88.9% |
-| `UnmarshalBinary` | 33.3% | 80.7% |
-| `Scan` | 42.2% | 70.2% |
-| `Value` | 35.0% | 70.0% |
-| `UnmarshalText` | 46.9% | 65.6% |
-| `readByte` | 0.0% | 80.0% |
-| `readBinary` | 75.0% | 100.0% |
-| `readUint16` | 0.0% | 100.0% |
+| Function          | Before | After  |
+| ----------------- | ------ | ------ |
+| `Compare`         | 33.3%  | 78.6%  |
+| `String`          | 27.8%  | 66.7%  |
+| `MarshalBinary`   | 36.1%  | 88.9%  |
+| `UnmarshalBinary` | 33.3%  | 80.7%  |
+| `Scan`            | 42.2%  | 70.2%  |
+| `Value`           | 35.0%  | 70.0%  |
+| `UnmarshalText`   | 46.9%  | 65.6%  |
+| `readByte`        | 0.0%   | 80.0%  |
+| `readBinary`      | 75.0%  | 100.0% |
+| `readUint16`      | 0.0%   | 100.0% |
 
 Test brands expanded from 4 to 11 types:
 `StringBrand`, `IntBrand`, `Int8Brand`, `Int16Brand`, `Int32Brand`, `Int64Brand`, `UintBrand`, `Uint8Brand`, `Uint16Brand`, `Uint32Brand`, `Uint64Brand`
@@ -62,12 +62,12 @@ Test brands expanded from 4 to 11 types:
 
 Eliminated 4 clone groups:
 
-| Group | What | Fix |
-|---|---|---|
-| 1 | Duplicate UnmarshalText empty test | Removed from `id_alltypes_test.go` (kept canonical in `id_encoding_test.go`) |
-| 2 | `newIDTestCase` repeated struct (3×) | Extracted named type `edgeCaseTest` + `edgeCase()` helper |
-| 5 | Duplicate `int64Brand` lambda (2×) | Extracted to local variable |
-| 9 | Duplicate fuzz seed data (2×) | Extracted to `fuzzInt64Seeds` package var |
+| Group | What                                 | Fix                                                                          |
+| ----- | ------------------------------------ | ---------------------------------------------------------------------------- |
+| 1     | Duplicate UnmarshalText empty test   | Removed from `id_alltypes_test.go` (kept canonical in `id_encoding_test.go`) |
+| 2     | `newIDTestCase` repeated struct (3×) | Extracted named type `edgeCaseTest` + `edgeCase()` helper                    |
+| 5     | Duplicate `int64Brand` lambda (2×)   | Extracted to local variable                                                  |
+| 9     | Duplicate fuzz seed data (2×)        | Extracted to `fuzzInt64Seeds` package var                                    |
 
 Remaining 8 groups: 7 test-only assertion boilerplate (idiomatic Go), 1 production error-wrap pattern (not extractable without obscuring error context).
 
@@ -148,33 +148,33 @@ Nothing. All changes compile, pass tests (including race detector), and pass `go
 
 ## F) Top 25 Things To Do Next
 
-| # | Priority | Task | Category |
-|---|---|---|---|
-| 1 | P0 | **Remove `float64` from `Compare`** — full split brain elimination | Production fix |
-| 2 | P0 | **Update README** — add Ptr/FromPtr, remove float references, update API table | Docs |
-| 3 | P0 | **Update CHANGELOG** — document all changes since v0.1.0 | Docs |
-| 4 | P1 | **Extract type-switch strategies** — reduce 7-location boilerplate | Architecture |
-| 5 | P1 | **Split `id_binary.go` helpers** — move to `id_binary_helpers.go` (<350 lines) | File size |
-| 6 | P1 | **Remove or repurpose `GoString()`** — currently dead code | Cleanup |
-| 7 | P1 | **Push coverage to 90%** — exercise error paths, TextMarshaler fallbacks | Testing |
-| 8 | P1 | **Add `ExamplePtr` and `ExampleFromPtr` godoc examples** | Docs |
-| 9 | P1 | **Add `Sort` helper** — `Less()` method or `slices.SortFunc` adapter | Feature |
-| 10 | P2 | **Centralize errors** — move to `errors.go` with sentinel errors | Architecture |
-| 11 | P2 | **Add `MustID` constructor** — panic-on-invalid for config parsing | Feature |
-| 12 | P2 | **Add BDD-style tests** — for JSON null, SQL NULL, zero-value semantics | Testing |
-| 13 | P2 | **Add compile-time assertions** for TextMarshaler, Formatter, binary interfaces | Safety |
-| 14 | P2 | **Parameterize benchmarks** — reduce bench test duplication | Testing |
-| 15 | P2 | **Tag Go module version** — `v0.2.0` or similar | Release |
-| 16 | P3 | **Fix `assertCmpEqual` to use `testing.TB`** | Test cleanup |
-| 17 | P3 | **Add `scanIntegerID` error path test** — string source into integer ID | Testing |
-| 18 | P3 | **Add `Format` error branch tests** — `%!d`, `%!c` for non-matching types | Testing |
-| 19 | P3 | **Add `String()` TextMarshaler fallback test** — custom types implementing TextMarshaler | Testing |
-| 20 | P3 | **Consider `UnmarshalText` for all int types** — currently only `int` and `int64`/`uint64` | Feature gap |
-| 21 | P3 | **Add `fmt.Stringer` brand constraint** — leverage `Name()` in error messages | Architecture |
-| 22 | P4 | **Review `Value()` for uint64 → int64 overflow** — values > MaxInt64 silently truncate | Safety |
-| 23 | P4 | **Add `MarshalBinary` custom type fallback test** — types implementing BinaryMarshaler | Testing |
-| 24 | P4 | **Add `UnmarshalBinary` custom type fallback test** — types implementing BinaryUnmarshaler | Testing |
-| 25 | P4 | **Add `UnmarshalText` custom type fallback test** — types implementing TextUnmarshaler | Testing |
+| #   | Priority | Task                                                                                       | Category       |
+| --- | -------- | ------------------------------------------------------------------------------------------ | -------------- |
+| 1   | P0       | **Remove `float64` from `Compare`** — full split brain elimination                         | Production fix |
+| 2   | P0       | **Update README** — add Ptr/FromPtr, remove float references, update API table             | Docs           |
+| 3   | P0       | **Update CHANGELOG** — document all changes since v0.1.0                                   | Docs           |
+| 4   | P1       | **Extract type-switch strategies** — reduce 7-location boilerplate                         | Architecture   |
+| 5   | P1       | **Split `id_binary.go` helpers** — move to `id_binary_helpers.go` (<350 lines)             | File size      |
+| 6   | P1       | **Remove or repurpose `GoString()`** — currently dead code                                 | Cleanup        |
+| 7   | P1       | **Push coverage to 90%** — exercise error paths, TextMarshaler fallbacks                   | Testing        |
+| 8   | P1       | **Add `ExamplePtr` and `ExampleFromPtr` godoc examples**                                   | Docs           |
+| 9   | P1       | **Add `Sort` helper** — `Less()` method or `slices.SortFunc` adapter                       | Feature        |
+| 10  | P2       | **Centralize errors** — move to `errors.go` with sentinel errors                           | Architecture   |
+| 11  | P2       | **Add `MustID` constructor** — panic-on-invalid for config parsing                         | Feature        |
+| 12  | P2       | **Add BDD-style tests** — for JSON null, SQL NULL, zero-value semantics                    | Testing        |
+| 13  | P2       | **Add compile-time assertions** for TextMarshaler, Formatter, binary interfaces            | Safety         |
+| 14  | P2       | **Parameterize benchmarks** — reduce bench test duplication                                | Testing        |
+| 15  | P2       | **Tag Go module version** — `v0.2.0` or similar                                            | Release        |
+| 16  | P3       | **Fix `assertCmpEqual` to use `testing.TB`**                                               | Test cleanup   |
+| 17  | P3       | **Add `scanIntegerID` error path test** — string source into integer ID                    | Testing        |
+| 18  | P3       | **Add `Format` error branch tests** — `%!d`, `%!c` for non-matching types                  | Testing        |
+| 19  | P3       | **Add `String()` TextMarshaler fallback test** — custom types implementing TextMarshaler   | Testing        |
+| 20  | P3       | **Consider `UnmarshalText` for all int types** — currently only `int` and `int64`/`uint64` | Feature gap    |
+| 21  | P3       | **Add `fmt.Stringer` brand constraint** — leverage `Name()` in error messages              | Architecture   |
+| 22  | P4       | **Review `Value()` for uint64 → int64 overflow** — values > MaxInt64 silently truncate     | Safety         |
+| 23  | P4       | **Add `MarshalBinary` custom type fallback test** — types implementing BinaryMarshaler     | Testing        |
+| 24  | P4       | **Add `UnmarshalBinary` custom type fallback test** — types implementing BinaryUnmarshaler | Testing        |
+| 25  | P4       | **Add `UnmarshalText` custom type fallback test** — types implementing TextUnmarshaler     | Testing        |
 
 ---
 
@@ -192,14 +192,14 @@ My recommendation: Remove from `Compare` entirely. Floats are not identifiers. B
 
 ## Metrics Summary
 
-| Metric | Before | After | Delta |
-|---|---|---|---|
-| Test coverage | 49.5% | 79.4% | +29.9pp |
-| Clone groups | 12 | 8 | -4 |
-| Production source files | 5 | 6 (+id_ptr.go) | +1 |
-| Test files | 6 | 7 (+id_alltypes_test.go) | +1 |
-| Source lines (prod) | ~990 | ~1,026 | +36 |
-| Test lines | ~1,600 | ~2,290 | +690 |
-| Supported Scan types | 6 (missing int8/int16/uint8/uint16) | 10 (all numeric) | +4 |
-| Race detector | Pass | Pass | ✅ |
-| go vet | Clean | Clean | ✅ |
+| Metric                  | Before                              | After                    | Delta   |
+| ----------------------- | ----------------------------------- | ------------------------ | ------- |
+| Test coverage           | 49.5%                               | 79.4%                    | +29.9pp |
+| Clone groups            | 12                                  | 8                        | -4      |
+| Production source files | 5                                   | 6 (+id_ptr.go)           | +1      |
+| Test files              | 6                                   | 7 (+id_alltypes_test.go) | +1      |
+| Source lines (prod)     | ~990                                | ~1,026                   | +36     |
+| Test lines              | ~1,600                              | ~2,290                   | +690    |
+| Supported Scan types    | 6 (missing int8/int16/uint8/uint16) | 10 (all numeric)         | +4      |
+| Race detector           | Pass                                | Pass                     | ✅      |
+| go vet                  | Clean                               | Clean                    | ✅      |

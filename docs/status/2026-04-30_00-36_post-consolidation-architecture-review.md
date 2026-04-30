@@ -12,25 +12,25 @@
 
 ### Production Code
 
-| File | Lines | Status | Notes |
-|------|-------|--------|-------|
-| `id.go` | 200 | ✅ Complete | Core type, Compare, String, Format, Or, Reset |
-| `id_binary.go` | 354 | ✅ Complete | Unified `readBinary` function for all integer deserialization |
-| `id_json.go` | 43 | ✅ Complete | Clean JSON marshal/unmarshal via stdlib |
-| `id_sql.go` | 291 | ✅ Complete | Full Scan/Value for all int/uint types + string |
-| `id_text.go` | 129 | ⚠️ Partial | Missing int8/int16/int32/uint/uint8/uint16 text unmarshal |
-| `id_ptr.go` | 13 | ✅ Complete | Ptr/FromPtr helpers |
+| File           | Lines | Status      | Notes                                                         |
+| -------------- | ----- | ----------- | ------------------------------------------------------------- |
+| `id.go`        | 200   | ✅ Complete | Core type, Compare, String, Format, Or, Reset                 |
+| `id_binary.go` | 354   | ✅ Complete | Unified `readBinary` function for all integer deserialization |
+| `id_json.go`   | 43    | ✅ Complete | Clean JSON marshal/unmarshal via stdlib                       |
+| `id_sql.go`    | 291   | ✅ Complete | Full Scan/Value for all int/uint types + string               |
+| `id_text.go`   | 129   | ⚠️ Partial  | Missing int8/int16/int32/uint/uint8/uint16 text unmarshal     |
+| `id_ptr.go`    | 13    | ✅ Complete | Ptr/FromPtr helpers                                           |
 
 ### Test Code
 
-| File | Lines | Status |
-|------|-------|--------|
-| `id_test.go` | 584 | ✅ Core tests + all brand types |
-| `id_alltypes_test.go` | 554 | ✅ Comprehensive multi-type coverage |
-| `id_bench_test.go` | 443 | ✅ Fuzz tests + benchmarks + examples |
-| `id_encoding_test.go` | 255 | ✅ Text/Binary/Gob tests |
-| `id_json_test.go` | 253 | ✅ JSON tests |
-| `id_sql_test.go` | 210 | ✅ SQL tests |
+| File                  | Lines | Status                                |
+| --------------------- | ----- | ------------------------------------- |
+| `id_test.go`          | 584   | ✅ Core tests + all brand types       |
+| `id_alltypes_test.go` | 554   | ✅ Comprehensive multi-type coverage  |
+| `id_bench_test.go`    | 443   | ✅ Fuzz tests + benchmarks + examples |
+| `id_encoding_test.go` | 255   | ✅ Text/Binary/Gob tests              |
+| `id_json_test.go`     | 253   | ✅ JSON tests                         |
+| `id_sql_test.go`      | 210   | ✅ SQL tests                          |
 
 ### Infrastructure
 
@@ -52,7 +52,9 @@
 ## B) PARTIALLY DONE ⚠️
 
 ### 1. UnmarshalText — Type Coverage Gap
+
 **Status:** `MarshalText` works for ALL types (via `String()`). `UnmarshalText` only handles:
+
 - `string`, `int`, `int64`, `uint64`
 
 **Missing:** `int8`, `int16`, `int32`, `uint`, `uint8`, `uint16`, `uint32`
@@ -60,19 +62,21 @@
 This is an **asymmetry** — you can marshal any type but can't unmarshal it back via text.
 
 ### 2. Coverage Gaps
-| Function | Coverage | Gap |
-|----------|----------|-----|
-| `Compare` | 78.6% | float64 case untested |
-| `String` | 66.7% | `TextMarshaler` fallback, default `%v` fallback untested |
-| `Format` | 80.0% | Unknown verb fallback untested |
-| `MarshalBinary` | 88.9% | `BinaryMarshaler` fallback untested |
-| `UnmarshalBinary` | 78.7% | `BinaryUnmarshaler` fallback, error paths |
-| `Scan` | 70.2% | int/int8/int16/uint8/uint16/uint32 cases tested but error paths missed |
-| `Value` | 70.0% | int8/int16/uint/uint8/uint16/uint32 Value() untested |
-| `UnmarshalText` | 65.6% | Missing type coverage (see above) |
-| `scanIntegerID` | 33.3% | Only tested indirectly via `Scan` |
+
+| Function          | Coverage | Gap                                                                    |
+| ----------------- | -------- | ---------------------------------------------------------------------- |
+| `Compare`         | 78.6%    | float64 case untested                                                  |
+| `String`          | 66.7%    | `TextMarshaler` fallback, default `%v` fallback untested               |
+| `Format`          | 80.0%    | Unknown verb fallback untested                                         |
+| `MarshalBinary`   | 88.9%    | `BinaryMarshaler` fallback untested                                    |
+| `UnmarshalBinary` | 78.7%    | `BinaryUnmarshaler` fallback, error paths                              |
+| `Scan`            | 70.2%    | int/int8/int16/uint8/uint16/uint32 cases tested but error paths missed |
+| `Value`           | 70.0%    | int8/int16/uint/uint8/uint16/uint32 Value() untested                   |
+| `UnmarshalText`   | 65.6%    | Missing type coverage (see above)                                      |
+| `scanIntegerID`   | 33.3%    | Only tested indirectly via `Scan`                                      |
 
 ### 3. Package Doc Comment in id.go
+
 Line 28 says "SQL: string, int64, int32, uint64 types supported" but now ALL int/uint types are supported. Needs update.
 
 ---
@@ -116,9 +120,11 @@ Line 28 says "SQL: string, int64, int32, uint64 types supported" but now ALL int
 ## D) TOTALLY FUCKED UP 💥
 
 ### Nothing is truly broken!
+
 All tests pass. Zero lint issues. The production bug was found and fixed. The code is clean and working.
 
 ### Close calls from previous sessions:
+
 - **`id_alltypes_test.go` "mystery regeneration"** — Turned out to be from a previous session's uncommitted work, not a file watcher
 - **`sed` damage to `id_bench_test.go`** — Previous session replaced inside backtick strings and created self-referencing constants. Fully repaired.
 - **`fuzzInt64Seeds` global variable** — Flagged by `gochecknoglobals`. Inlined into the fuzz function.
@@ -151,33 +157,33 @@ All tests pass. Zero lint issues. The production bug was found and fixed. The co
 
 ## F) TOP 25 THINGS TO DO NEXT (sorted by impact/effort)
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Add `UnmarshalText` for int8/int16/int32/uint/uint8/uint16/uint32 | HIGH | LOW | Feature gap |
-| 2 | Update package doc in `id.go` (SQL types list) | HIGH | TRIVIAL | Doc accuracy |
-| 3 | Update README SQL section to list all supported types | HIGH | TRIVIAL | Doc accuracy |
-| 4 | Add `sql.Scanner`/`driver.Valuer` interface assertions for all types | MED | TRIVIAL | Completeness |
-| 5 | Add `encoding.TextMarshaler`/`TextUnmarshaler` assertions for all types | MED | TRIVIAL | Completeness |
-| 6 | Add `encoding.BinaryMarshaler`/`BinaryUnmarshaler` assertions for all types | MED | TRIVIAL | Completeness |
-| 7 | Add `float64` support to `MarshalBinary`/`UnmarshalBinary` | MED | LOW | Split brain fix |
-| 8 | Add `float64` support to `Scan`/`Value` | MED | LOW | Split brain fix |
-| 9 | Test `float64` Compare case | MED | TRIVIAL | Coverage |
-| 10 | Test `String()` TextMarshaler fallback | MED | TRIVIAL | Coverage |
-| 11 | Test `String()` default `%v` fallback | LOW | TRIVIAL | Coverage |
-| 12 | Test `Format()` unknown verb | LOW | TRIVIAL | Coverage |
-| 13 | Test `MarshalBinary` BinaryMarshaler fallback | MED | TRIVIAL | Coverage |
-| 14 | Test `UnmarshalBinary` BinaryUnmarshaler fallback | MED | TRIVIAL | Coverage |
-| 15 | Add Value() tests for int8/int16/uint/uint8/uint16/uint32 | MED | LOW | Coverage |
-| 16 | Split GobEncode/GobDecode into `id_gob.go` | LOW | TRIVIAL | File size |
-| 17 | Add `MustNewID` constructor | MED | LOW | API |
-| 18 | Add `Set(value V)` method | MED | TRIVIAL | API |
-| 19 | Unify `UnmarshalText` to use `parseIntegerID` for all types | MED | MED | Consistency |
-| 20 | Add CHANGELOG.md entries | MED | LOW | Documentation |
-| 21 | Add `OrderedID` compile-time constraint | HIGH | MED | Type safety |
-| 22 | Split test files by domain (binary, json, sql, text, compare) | LOW | MED | Organization |
-| 23 | Add Go reference docs (godoc improvements) | MED | MED | Documentation |
-| 24 | Consider `Map[B1, B2, V]` rebrand function | LOW | LOW | API |
-| 25 | Consider UUID support (V = [16]byte) with tests | HIGH | HIGH | Feature |
+| #   | Task                                                                        | Impact | Effort  | Category        |
+| --- | --------------------------------------------------------------------------- | ------ | ------- | --------------- |
+| 1   | Add `UnmarshalText` for int8/int16/int32/uint/uint8/uint16/uint32           | HIGH   | LOW     | Feature gap     |
+| 2   | Update package doc in `id.go` (SQL types list)                              | HIGH   | TRIVIAL | Doc accuracy    |
+| 3   | Update README SQL section to list all supported types                       | HIGH   | TRIVIAL | Doc accuracy    |
+| 4   | Add `sql.Scanner`/`driver.Valuer` interface assertions for all types        | MED    | TRIVIAL | Completeness    |
+| 5   | Add `encoding.TextMarshaler`/`TextUnmarshaler` assertions for all types     | MED    | TRIVIAL | Completeness    |
+| 6   | Add `encoding.BinaryMarshaler`/`BinaryUnmarshaler` assertions for all types | MED    | TRIVIAL | Completeness    |
+| 7   | Add `float64` support to `MarshalBinary`/`UnmarshalBinary`                  | MED    | LOW     | Split brain fix |
+| 8   | Add `float64` support to `Scan`/`Value`                                     | MED    | LOW     | Split brain fix |
+| 9   | Test `float64` Compare case                                                 | MED    | TRIVIAL | Coverage        |
+| 10  | Test `String()` TextMarshaler fallback                                      | MED    | TRIVIAL | Coverage        |
+| 11  | Test `String()` default `%v` fallback                                       | LOW    | TRIVIAL | Coverage        |
+| 12  | Test `Format()` unknown verb                                                | LOW    | TRIVIAL | Coverage        |
+| 13  | Test `MarshalBinary` BinaryMarshaler fallback                               | MED    | TRIVIAL | Coverage        |
+| 14  | Test `UnmarshalBinary` BinaryUnmarshaler fallback                           | MED    | TRIVIAL | Coverage        |
+| 15  | Add Value() tests for int8/int16/uint/uint8/uint16/uint32                   | MED    | LOW     | Coverage        |
+| 16  | Split GobEncode/GobDecode into `id_gob.go`                                  | LOW    | TRIVIAL | File size       |
+| 17  | Add `MustNewID` constructor                                                 | MED    | LOW     | API             |
+| 18  | Add `Set(value V)` method                                                   | MED    | TRIVIAL | API             |
+| 19  | Unify `UnmarshalText` to use `parseIntegerID` for all types                 | MED    | MED     | Consistency     |
+| 20  | Add CHANGELOG.md entries                                                    | MED    | LOW     | Documentation   |
+| 21  | Add `OrderedID` compile-time constraint                                     | HIGH   | MED     | Type safety     |
+| 22  | Split test files by domain (binary, json, sql, text, compare)               | LOW    | MED     | Organization    |
+| 23  | Add Go reference docs (godoc improvements)                                  | MED    | MED     | Documentation   |
+| 24  | Consider `Map[B1, B2, V]` rebrand function                                  | LOW    | LOW     | API             |
+| 25  | Consider UUID support (V = [16]byte) with tests                             | HIGH   | HIGH    | Feature         |
 
 ---
 
@@ -192,6 +198,7 @@ Currently `Compare` handles `float64` but no serialization method does. This cre
 3. **Keep current state** — `Compare` supports it, serialization doesn't. Users get a runtime error when trying to persist float IDs.
 
 I lean toward **option 1** (remove float64 from Compare) because:
+
 - Float IDs are a design smell
 - `float64` IDs will silently break equality checks (NaN != NaN)
 - Removing it makes the supported type set clear and intentional
