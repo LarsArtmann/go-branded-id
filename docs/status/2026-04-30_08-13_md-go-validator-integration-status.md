@@ -15,6 +15,7 @@ Integrated `md-go-validator` into `go-branded-id` repository. All 9 Go code bloc
 ## Work Items
 
 ### 1. Build Fix: md-go-validator duplicate `:=` declarations
+
 - **Status:** ✅ FULLY DONE
 - **File:** `md-go-validator/pkg/output/output.go` lines 209, 216
 - **Problem:** `err := writeCSVRows(...)` and `err := csvWriter.Error()` redeclared `err` in same scope — invalid Go.
@@ -22,6 +23,7 @@ Integrated `md-go-validator` into `go-branded-id` repository. All 9 Go code bloc
 - **Verification:** `GOWORK=off go build -o /tmp/md-go-validator ./cmd/md-go-validator` succeeds.
 
 ### 2. go-branded-id README.md Code Block Fixes
+
 - **Status:** ✅ FULLY DONE
 - **File:** `go-branded-id/README.md`
 - **Changes:**
@@ -33,6 +35,7 @@ Integrated `md-go-validator` into `go-branded-id` repository. All 9 Go code bloc
 - **Note:** Removed `<!-- skip-validate -->` HTML comment directives entirely — all blocks are now valid Go.
 
 ### 3. GitHub Actions CI Workflow
+
 - **Status:** ✅ FULLY DONE
 - **File:** `.github/workflows/validate-docs.yml` (new)
 - **Trigger:** Every push to `master`/`main` and all pull requests.
@@ -40,6 +43,7 @@ Integrated `md-go-validator` into `go-branded-id` repository. All 9 Go code bloc
 - **⚠️ Blocker:** The `go install` step requires the module to be published with a git tag. Currently returns `404 Not Found` because `md-go-validator` has no releases yet.
 
 ### 4. go-branded-id Test Files (Unrelated Changes)
+
 - **Status:** ⚠️ PARTIALLY DONE
 - **Files:** `id_encoding_test.go`, `id_json_test.go`
 - **Problem:** These files have uncommitted changes from a previous session (refactoring to `testIDRoundTrip` shared helper). These were NOT made during this session and need review.
@@ -70,12 +74,12 @@ Valid: 9 | Skipped: 0 | Errors: 0
 
 ## Known Issues & Blockers
 
-| # | Issue | Severity | Notes |
-|---|---|---|---|
-| 1 | md-go-validator has no Git tags/releases | **Critical** | CI `go install @latest` fails with 404. Need first release. |
-| 2 | Unrelated test file changes in go-branded-id | Medium | `id_encoding_test.go` and `id_json_test.go` have uncommitted refactoring. |
-| 3 | md-go-validator not in parent `go.work` | Low | Build requires `GOWORK=off`. Not a runtime issue. |
-| 4 | go-branded-id not in parent `go.work` | Low | Currently not in `/home/lars/projects/go.work`. |
+| #   | Issue                                        | Severity     | Notes                                                                     |
+| --- | -------------------------------------------- | ------------ | ------------------------------------------------------------------------- |
+| 1   | md-go-validator has no Git tags/releases     | **Critical** | CI `go install @latest` fails with 404. Need first release.               |
+| 2   | Unrelated test file changes in go-branded-id | Medium       | `id_encoding_test.go` and `id_json_test.go` have uncommitted refactoring. |
+| 3   | md-go-validator not in parent `go.work`      | Low          | Build requires `GOWORK=off`. Not a runtime issue.                         |
+| 4   | go-branded-id not in parent `go.work`        | Low          | Currently not in `/home/lars/projects/go.work`.                           |
 
 ---
 
@@ -129,6 +133,7 @@ Valid: 9 | Skipped: 0 | Errors: 0
 **Why does `md-go-validator`'s parser.go Strategy 2 (`package main\n\n` + code) fail for Block 1 and Block 2 after my first round of fixes (where I replaced `{ ... }` with `return nil` but kept `:=` at what appeared to be package level)?**
 
 Specifically:
+
 - Strategy 1: `func GetUser...` → "expected 'package', found 'func'" ✅ makes sense
 - Strategy 2: `package main\nfunc GetUser...` → `expected declaration, found userID` ❌ at the `userID := "user-123"` line
 - But `userID := "user-123"` with `package main` should be a valid package-level short variable declaration in Go 1.26...?

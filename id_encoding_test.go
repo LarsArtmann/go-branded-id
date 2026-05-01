@@ -149,8 +149,6 @@ func testIDRoundTrip[B any, V comparable](
 	assertCmpEqual(t, original.Get(), restored.Get())
 }
 
-
-
 func TestIDBinary(t *testing.T) {
 	testIDAllTypesRoundTrip(t, binaryRoundTripTest{})
 
@@ -185,22 +183,42 @@ type binaryRoundTripTest struct{}
 
 func (b binaryRoundTripTest) TestString(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, testIDValue, func(id ID[StringBrand, string]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[StringBrand, string], data []byte) error { return id.UnmarshalBinary(data) })
+	testIDRoundTrip(
+		t,
+		testIDValue,
+		func(id ID[StringBrand, string]) ([]byte, error) { return id.MarshalBinary() },
+		func(id *ID[StringBrand, string], data []byte) error { return id.UnmarshalBinary(data) },
+	)
 }
 
 func (b binaryRoundTripTest) TestInt64(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, int64(42), func(id ID[Int64Brand, int64]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[Int64Brand, int64], data []byte) error { return id.UnmarshalBinary(data) })
+	testIDRoundTrip(
+		t,
+		int64(42),
+		func(id ID[Int64Brand, int64]) ([]byte, error) { return id.MarshalBinary() },
+		func(id *ID[Int64Brand, int64], data []byte) error { return id.UnmarshalBinary(data) },
+	)
 }
 
 func (b binaryRoundTripTest) TestInt32(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, int32(42), func(id ID[Int32Brand, int32]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[Int32Brand, int32], data []byte) error { return id.UnmarshalBinary(data) })
+	testIDRoundTrip(
+		t,
+		int32(42),
+		func(id ID[Int32Brand, int32]) ([]byte, error) { return id.MarshalBinary() },
+		func(id *ID[Int32Brand, int32], data []byte) error { return id.UnmarshalBinary(data) },
+	)
 }
 
 func (b binaryRoundTripTest) TestUint64(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, uint64(42), func(id ID[Uint64Brand, uint64]) ([]byte, error) { return id.MarshalBinary() }, func(id *ID[Uint64Brand, uint64], data []byte) error { return id.UnmarshalBinary(data) })
+	testIDRoundTrip(
+		t,
+		uint64(42),
+		func(id ID[Uint64Brand, uint64]) ([]byte, error) { return id.MarshalBinary() },
+		func(id *ID[Uint64Brand, uint64], data []byte) error { return id.UnmarshalBinary(data) },
+	)
 }
 
 func TestIDGob(t *testing.T) {

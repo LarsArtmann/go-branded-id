@@ -200,10 +200,6 @@ func testIDAllTypesUnmarshalJSON(t *testing.T, ut jsonUnmarshalTest) {
 	t.Run("uint64 ID", ut.TestUint64)
 }
 
-
-
-
-
 func TestIDJSONRoundTrip(t *testing.T) {
 	t.Parallel()
 
@@ -214,20 +210,40 @@ type jsonRoundTripTest struct{}
 
 func (j jsonRoundTripTest) TestString(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, testIDValue, func(id ID[StringBrand, string]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[StringBrand, string], data []byte) error { return json.Unmarshal(data, id) })
+	testIDRoundTrip(
+		t,
+		testIDValue,
+		func(id ID[StringBrand, string]) ([]byte, error) { return json.Marshal(id) },
+		func(id *ID[StringBrand, string], data []byte) error { return json.Unmarshal(data, id) },
+	)
 }
 
 func (j jsonRoundTripTest) TestInt64(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, int64(42), func(id ID[Int64Brand, int64]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[Int64Brand, int64], data []byte) error { return json.Unmarshal(data, id) })
+	testIDRoundTrip(
+		t,
+		int64(42),
+		func(id ID[Int64Brand, int64]) ([]byte, error) { return json.Marshal(id) },
+		func(id *ID[Int64Brand, int64], data []byte) error { return json.Unmarshal(data, id) },
+	)
 }
 
 func (j jsonRoundTripTest) TestInt32(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, int32(42), func(id ID[Int32Brand, int32]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[Int32Brand, int32], data []byte) error { return json.Unmarshal(data, id) })
+	testIDRoundTrip(
+		t,
+		int32(42),
+		func(id ID[Int32Brand, int32]) ([]byte, error) { return json.Marshal(id) },
+		func(id *ID[Int32Brand, int32], data []byte) error { return json.Unmarshal(data, id) },
+	)
 }
 
 func (j jsonRoundTripTest) TestUint64(t *testing.T) {
 	t.Parallel()
-	testIDRoundTrip(t, uint64(42), func(id ID[Uint64Brand, uint64]) ([]byte, error) { return json.Marshal(id) }, func(id *ID[Uint64Brand, uint64], data []byte) error { return json.Unmarshal(data, id) })
+	testIDRoundTrip(
+		t,
+		uint64(42),
+		func(id ID[Uint64Brand, uint64]) ([]byte, error) { return json.Marshal(id) },
+		func(id *ID[Uint64Brand, uint64], data []byte) error { return json.Unmarshal(data, id) },
+	)
 }
