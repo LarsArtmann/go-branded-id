@@ -1,7 +1,7 @@
 # go-branded-id
 
 [![Go Version](https://img.shields.io/github/go-mod/go-version/larsartmann/go-branded-id)](go.mod)
-[![License: Proprietary](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 A Go library providing branded, strongly-typed identifiers that prevent mixing different entity IDs at compile time using phantom types.
 
@@ -218,4 +218,4 @@ Contributions are welcome. Please ensure all tests pass (`go test ./... -race`) 
 
 ## License
 
-Proprietary — Copyright (c) 2026 Lars Artmann. All rights reserved.
+MIT — Copyright (c) 2026 Lars Artmann. See [LICENSE](LICENSE).
