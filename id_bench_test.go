@@ -14,6 +14,7 @@ const benchIDValue = "test-id-12345"
 // Fuzz tests
 
 func addInt64FuzzCases(f *testing.F) {
+	f.Helper()
 	for _, tc := range []int64{0, 1, -1, 42, math.MaxInt64, math.MinInt64} {
 		f.Add(tc)
 	}

@@ -25,6 +25,7 @@ type (
 )
 
 func assertIDValue[B any, V comparable](t *testing.T, v, expected V) {
+	t.Helper()
 	assertCmpEqual(t, NewID[B](v).Get(), expected)
 }
 
