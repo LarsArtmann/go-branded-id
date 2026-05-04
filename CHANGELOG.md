@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.2.0] - 2026-05-04
 
 ### Added
 
@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `Format` method implementing `fmt.Formatter` for custom formatting (`%s`, `%d`, `%v`, `%#v`, `%q`)
 - Comprehensive test coverage for all integer types across serialization methods
 - Fuzz tests for JSON and binary round-trips
+- CI workflow for build, test (with race detector), and lint
+- MIT license (changed from Proprietary)
 
 ### Changed
 
@@ -28,10 +30,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Removed
 
 - `float64` support from `Compare` — eliminated split-brain (no serialization format supports float64)
-
-### Deprecated
-
-### Security
 
 ## [0.1.0] - 2026-01-01
 
