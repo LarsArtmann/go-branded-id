@@ -8,23 +8,23 @@
 
 ## Project Overview
 
-| Metric | Value |
-|---|---|
-| **Module** | `github.com/larsartmann/go-branded-id` |
-| **Go version** | 1.26.2 |
-| **Dependencies** | 0 (pure stdlib) |
-| **Source files** | 8 (`id.go`, `id_binary.go`, `id_gob.go`, `id_json.go`, `id_ptr.go`, `id_sql.go`, `id_text.go`) |
-| **Test files** | 6 |
-| **Total LoC** | 3,393 (1,260 production, 2,133 test) |
-| **Test-to-code ratio** | 1.69:1 |
-| **Coverage** | 80.0% |
-| **License** | MIT |
-| **Current tag** | `v0.1.0` |
-| **Pending release** | `v0.2.0` (ready) |
-| **Size** | 172KB |
-| **Lint** | 0 issues |
-| **Race detector** | Clean |
-| **Consumers** | 6 files in `go-composable-business-types` |
+| Metric                 | Value                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| **Module**             | `github.com/larsartmann/go-branded-id`                                                         |
+| **Go version**         | 1.26.2                                                                                         |
+| **Dependencies**       | 0 (pure stdlib)                                                                                |
+| **Source files**       | 8 (`id.go`, `id_binary.go`, `id_gob.go`, `id_json.go`, `id_ptr.go`, `id_sql.go`, `id_text.go`) |
+| **Test files**         | 6                                                                                              |
+| **Total LoC**          | 3,393 (1,260 production, 2,133 test)                                                           |
+| **Test-to-code ratio** | 1.69:1                                                                                         |
+| **Coverage**           | 80.0%                                                                                          |
+| **License**            | MIT                                                                                            |
+| **Current tag**        | `v0.1.0`                                                                                       |
+| **Pending release**    | `v0.2.0` (ready)                                                                               |
+| **Size**               | 172KB                                                                                          |
+| **Lint**               | 0 issues                                                                                       |
+| **Race detector**      | Clean                                                                                          |
+| **Consumers**          | 6 files in `go-composable-business-types`                                                      |
 
 ---
 
@@ -124,33 +124,33 @@
 
 ## f) Top #25 Things We Should Get Done Next
 
-| # | Priority | Task | Est. Effort |
-|---|---|---|---|
-| 1 | P0 | Tag `v0.2.0` and push to remote | 1 min |
-| 2 | P0 | Remove `replace` directive from `go-composable-business-types/go.mod` | 2 min |
-| 3 | P0 | Update consumer to `v0.2.0` (remove local replace) | 2 min |
-| 4 | P0 | Add `coverage.out` to `.gitignore` | 1 min |
-| 5 | P0 | Delete stale `coverage.out` from project root | 1 min |
-| 6 | P1 | Add tests for `scanIntegerID` (33.3% → 90%+) | 30 min |
-| 7 | P1 | Add tests for `UnmarshalText` error paths (65.6% → 90%+) | 20 min |
-| 8 | P1 | Add tests for `String()` `TextMarshaler` fallback path (66.7% → 90%+) | 15 min |
-| 9 | P1 | Add tests for `Value()` all int/uint types (70% → 90%+) | 20 min |
-| 10 | P1 | Add tests for `Scan()` all int/uint types (70.2% → 90%+) | 20 min |
-| 11 | P1 | Add tests for `UnmarshalBinary` error paths (78.7% → 90%+) | 15 min |
-| 12 | P1 | Add tests for `Format` all verbs (80% → 95%+) | 15 min |
-| 13 | P1 | Add coverage threshold to CI (`go.yml`) — fail below 85% | 5 min |
-| 14 | P1 | Add `SECURITY.md` | 10 min |
-| 15 | P2 | Add `CONTRIBUTING.md` | 15 min |
-| 16 | P2 | Add `doc.go` with package examples | 10 min |
-| 17 | P2 | Add pkg.go.dev badge to README | 5 min |
-| 18 | P2 | Add tag-triggered release GitHub Action | 30 min |
-| 19 | P2 | Add `UnmarshalText` example to README | 5 min |
-| 20 | P2 | Add `Gob` example to README | 5 min |
-| 21 | P2 | Add `Format` verb examples to README | 5 min |
-| 22 | P3 | Add `.github/ISSUE_TEMPLATE/` (bug + feature) | 15 min |
-| 23 | P3 | Add `.github/PULL_REQUEST_TEMPLATE.md` | 10 min |
-| 24 | P3 | Add reproducible build flags to CI (`GOFLAGS=-trimpath`) | 5 min |
-| 25 | P3 | Explore code generation for repetitive type-switch patterns | 2 hr |
+| #   | Priority | Task                                                                  | Est. Effort |
+| --- | -------- | --------------------------------------------------------------------- | ----------- |
+| 1   | P0       | Tag `v0.2.0` and push to remote                                       | 1 min       |
+| 2   | P0       | Remove `replace` directive from `go-composable-business-types/go.mod` | 2 min       |
+| 3   | P0       | Update consumer to `v0.2.0` (remove local replace)                    | 2 min       |
+| 4   | P0       | Add `coverage.out` to `.gitignore`                                    | 1 min       |
+| 5   | P0       | Delete stale `coverage.out` from project root                         | 1 min       |
+| 6   | P1       | Add tests for `scanIntegerID` (33.3% → 90%+)                          | 30 min      |
+| 7   | P1       | Add tests for `UnmarshalText` error paths (65.6% → 90%+)              | 20 min      |
+| 8   | P1       | Add tests for `String()` `TextMarshaler` fallback path (66.7% → 90%+) | 15 min      |
+| 9   | P1       | Add tests for `Value()` all int/uint types (70% → 90%+)               | 20 min      |
+| 10  | P1       | Add tests for `Scan()` all int/uint types (70.2% → 90%+)              | 20 min      |
+| 11  | P1       | Add tests for `UnmarshalBinary` error paths (78.7% → 90%+)            | 15 min      |
+| 12  | P1       | Add tests for `Format` all verbs (80% → 95%+)                         | 15 min      |
+| 13  | P1       | Add coverage threshold to CI (`go.yml`) — fail below 85%              | 5 min       |
+| 14  | P1       | Add `SECURITY.md`                                                     | 10 min      |
+| 15  | P2       | Add `CONTRIBUTING.md`                                                 | 15 min      |
+| 16  | P2       | Add `doc.go` with package examples                                    | 10 min      |
+| 17  | P2       | Add pkg.go.dev badge to README                                        | 5 min       |
+| 18  | P2       | Add tag-triggered release GitHub Action                               | 30 min      |
+| 19  | P2       | Add `UnmarshalText` example to README                                 | 5 min       |
+| 20  | P2       | Add `Gob` example to README                                           | 5 min       |
+| 21  | P2       | Add `Format` verb examples to README                                  | 5 min       |
+| 22  | P3       | Add `.github/ISSUE_TEMPLATE/` (bug + feature)                         | 15 min      |
+| 23  | P3       | Add `.github/PULL_REQUEST_TEMPLATE.md`                                | 10 min      |
+| 24  | P3       | Add reproducible build flags to CI (`GOFLAGS=-trimpath`)              | 5 min       |
+| 25  | P3       | Explore code generation for repetitive type-switch patterns           | 2 hr        |
 
 ---
 
@@ -168,11 +168,11 @@
 
 ## Session Changes Summary
 
-| File | Change |
-|---|---|
-| `MIGRATION.md` | Rewritten: added prerequisites, verification, bonus features, troubleshooting |
-| `CHANGELOG.md` | Cut v0.2.0 release (2026-05-04) |
-| `.github/workflows/go.yml` | NEW: CI build + test (race) + lint |
-| `docs/status/*` | DELETED: 5 stale status reports |
-| `report/` | DELETED: empty directory |
-| `docs/` | DELETED: was empty after status removal |
+| File                       | Change                                                                        |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `MIGRATION.md`             | Rewritten: added prerequisites, verification, bonus features, troubleshooting |
+| `CHANGELOG.md`             | Cut v0.2.0 release (2026-05-04)                                               |
+| `.github/workflows/go.yml` | NEW: CI build + test (race) + lint                                            |
+| `docs/status/*`            | DELETED: 5 stale status reports                                               |
+| `report/`                  | DELETED: empty directory                                                      |
+| `docs/`                    | DELETED: was empty after status removal                                       |
