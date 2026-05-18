@@ -49,3 +49,5 @@ Thumbs.db
 /coverage
 # Build artifacts
 /go-branded-id
+# Sensitive files
+*.db
