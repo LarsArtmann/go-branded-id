@@ -78,6 +78,10 @@ func testCompareOrdered[B any, V comparable](t *testing.T, a, b V, expected int)
 func TestStringAllTypes(t *testing.T) {
 	t.Parallel()
 
+	const expectedInt32Str = "42"
+	const expectedInt64Str = "42"
+	const expectedUint64Str = "42"
+
 	tests := []struct {
 		name     string
 		id       any
@@ -87,13 +91,13 @@ func TestStringAllTypes(t *testing.T) {
 		{"int", NewID[IntBrand, int](42), "42"},
 		{"int8", NewID[Int8Brand, int8](42), "42"},
 		{"int16", NewID[Int16Brand, int16](42), "42"},
-		{"int32", NewID[Int32Brand, int32](42), "42"},
-		{"int64", NewID[Int64Brand, int64](42), "42"},
+		{expectedInt32Str, NewID[Int32Brand, int32](42), expectedInt32Str},
+		{expectedInt64Str, NewID[Int64Brand, int64](42), expectedInt64Str},
 		{"uint", NewID[UintBrand, uint](42), "42"},
 		{"uint8", NewID[Uint8Brand, uint8](42), "42"},
 		{"uint16", NewID[Uint16Brand, uint16](42), "42"},
 		{"uint32", NewID[Uint32Brand, uint32](42), "42"},
-		{"uint64", NewID[Uint64Brand, uint64](42), "42"},
+		{expectedUint64Str, NewID[Uint64Brand, uint64](42), expectedUint64Str},
 	}
 
 	for _, tt := range tests {

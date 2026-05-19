@@ -101,15 +101,19 @@ func TestNewID(t *testing.T) {
 func TestNewIDNumeric(t *testing.T) {
 	t.Parallel()
 
+	const testNameInt64 = "int64"
+	const testNameInt32 = "int32"
+	const testNameUint64 = "uint64"
+
 	tests := []struct {
 		name     string
 		brand    any
 		value    any
 		expected any
 	}{
-		{"int64", Int64Brand{}, int64(42), int64(42)},
-		{"int32", Int32Brand{}, int32(42), int32(42)},
-		{"uint64", Uint64Brand{}, uint64(42), uint64(42)},
+		{testNameInt64, Int64Brand{}, int64(42), int64(42)},
+		{testNameInt32, Int32Brand{}, int32(42), int32(42)},
+		{testNameUint64, Uint64Brand{}, uint64(42), uint64(42)},
 	}
 
 	for _, tt := range tests {
@@ -214,14 +218,18 @@ func testIDCompareGeneric[B any, V comparable](
 func TestIDCompare(t *testing.T) {
 	t.Parallel()
 
+	const testNameLess = "less"
+	const testNameEqual = "equal"
+	const testNameGreater = "greater"
+
 	tests := []struct {
 		name     string
 		a, b     int
 		expected int
 	}{
-		{"less", 1, 2, -1},
-		{"equal", 5, 5, 0},
-		{"greater", 3, 1, 1},
+		{testNameLess, 1, 2, -1},
+		{testNameEqual, 5, 5, 0},
+		{testNameGreater, 3, 1, 1},
 	}
 
 	testIDCompareGeneric(
