@@ -62,6 +62,9 @@ import (
 )
 
 type UserBrand struct{}
+
+func (UserBrand) Name() string { return "User" }
+
 type OrderBrand struct{}
 
 type UserID = id.ID[UserBrand, string]
@@ -71,7 +74,9 @@ func main() {
     userID := id.NewID[UserBrand]("user-123")
     orderID := id.NewID[OrderBrand]("order-456")
 
-    fmt.Println(userID.Get())  // user-123
+    fmt.Println(userID)       // User:user-123  (named brand shows prefix)
+    fmt.Println(orderID)      // order-456      (unnamed brand, value only)
+    fmt.Printf("%#v\n", userID) // id.User(user-123)
 
     // Type-safe comparison
     otherUserID := id.NewID[UserBrand]("user-123")
@@ -84,38 +89,39 @@ func main() {
     // Default value with Or
     defaultID := id.NewID[UserBrand]("unknown")
     fmt.Println(emptyUserID.Or(defaultID).Get())  // unknown
-    fmt.Println(orderID.Get())  // order-456
 }
 ```
 
-## Best Practice: Named Brand Types
+## Named Brand Types
 
-For better debugging and error messages, add a `Name()` method to your brand types:
+Adding a `Name()` method to your brand type enables:
+
+- **Debug-visible IDs**: `String()` returns `"User:abc123"` instead of just `"abc123"`
+- **Brand-aware validation**: `ValidateID` errors include the brand name
+- **Runtime introspection**: `BrandName[T]()` for logging and error messages
 
 ```go
 type UserBrand struct{}
 
 func (UserBrand) Name() string { return "User" }
 
-type UserID = id.ID[UserBrand, string]
+// String output includes the brand name
+userID := id.NewID[UserBrand]("abc123")
+fmt.Println(userID) // User:abc123
+
+// Debug format shows full type info
+fmt.Printf("%#v\n", userID) // id.User(abc123)
+
+// Validation errors identify the brand
+var empty ID[UserBrand, string]
+err := id.ValidateID(empty)
+fmt.Println(err) // id: invalid: User: empty
+
+// Introspection for logging
+fmt.Println(id.BrandName[UserBrand]()) // User
 ```
 
-This enables runtime introspection for logging, error messages, and debugging:
-
-```go
-import "fmt"
-
-func ValidateID[B interface{ Name() string }, V comparable](id id.ID[B, V]) error {
-    if id.IsZero() {
-        var brand B
-        return fmt.Errorf("invalid %s ID: empty", brand.Name())
-    }
-    return nil
-}
-// Output: "invalid User ID: empty"
-```
-
-**Note:** This is optional. The phantom type pattern works perfectly without any methods on the brand type.
+IDs without `Name()` work exactly as before — `String()` returns just the value.
 
 ## Supported Value Types
 
@@ -134,6 +140,8 @@ The package implements all standard Go interfaces for seamless serialization:
 - **Binary**: `encoding.BinaryMarshaler` / `BinaryUnmarshaler`
 - **Text**: `encoding.TextMarshaler` / `TextUnmarshaler` (XML, TOML)
 - **Gob**: `gob.GobEncoder` / `gob.GobDecoder`
+
+Serialization always uses the raw value (no brand prefix), so `"user-123"` not `"User:user-123"`.
 
 ### JSON Example
 
@@ -186,7 +194,8 @@ sort.Slice(ids, func(i, j int) bool {
 | `Equal(other ID) bool`            | True if IDs are equal                       |
 | `Compare(other ID) (int, error)`  | -1, 0, or 1 for less/equal/greater          |
 | `Or(default ID) ID`               | Returns self if not zero, otherwise default |
-| `String() string`                 | String representation                       |
+| `String() string`                 | `"Brand:value"` if named, else value only   |
+| `GoString() string`               | `id.Brand(value)` for debugging             |
 | `Format(fmt.State, rune)`         | Custom formatting (%s, %d, %v, %#v, %q)     |
 | `MarshalJSON() ([]byte, error)`   | JSON serialization                          |
 | `UnmarshalJSON([]byte) error`     | JSON deserialization                        |
@@ -200,6 +209,14 @@ sort.Slice(ids, func(i, j int) bool {
 | `Value() (driver.Value, error)`   | SQL value                                   |
 | `Ptr() *ID[B, V]`                 | Returns pointer to ID (for optional fields) |
 | `FromPtr(*ID[B, V]) ID[B, V]`     | Dereferences pointer, returns zero if nil   |
+
+### Brand Utilities
+
+| Function                          | Description                                    |
+| --------------------------------- | ---------------------------------------------- |
+| `BrandName[B]() string`           | Returns brand name (or type name if no Name()) |
+| `ValidateID(id ID[B, V]) error`   | Returns error if ID is zero (brand-aware)      |
+| `ValidateIDWithValue(id, fn) err` | Validates ID and optionally validates value    |
 
 ## Performance
 

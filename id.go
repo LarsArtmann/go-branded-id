@@ -126,10 +126,11 @@ func (id ID[B, V]) Or(defaultValue ID[B, V]) ID[B, V] {
 	return id
 }
 
-// String returns a string representation of the value.
+// valueString returns the string representation of the underlying value only,
+// without any brand prefix. Used internally by serialization methods.
 //
 //nolint:cyclop // exhaustive type switch over numeric types
-func (id ID[B, V]) String() string {
+func (id ID[B, V]) valueString() string {
 	switch v := any(id.value).(type) {
 	case string:
 		return v
@@ -167,8 +168,22 @@ func (id ID[B, V]) String() string {
 	}
 }
 
+// String returns a string representation of the ID.
+// If the brand type implements BrandNamer, the format is "Brand:value"
+// (e.g., "User:abc123"). Otherwise, returns just the value (e.g., "abc123").
+func (id ID[B, V]) String() string {
+	if name, ok := brandName[B](); ok {
+		return name + ":" + id.valueString()
+	}
+
+	return id.valueString()
+}
+
 // GoString implements fmt.GoStringer for debugging.
-func (id ID[B, V]) GoString() string { return id.String() }
+// Returns a Go-syntax-like representation, e.g., id.User("abc123").
+func (id ID[B, V]) GoString() string {
+	return fmt.Sprintf("id.%s(%s)", BrandName[B](), id.valueString())
+}
 
 // Format implements fmt.Formatter for custom formatting.
 // Supports %s (string), %d (decimal), %v (default), %#v (GoString), %q (quoted).
@@ -187,7 +202,7 @@ func (id ID[B, V]) Format(f fmt.State, verb rune) {
 		_, _ = fmt.Fprintf(f, "%q", id.String())
 	case 'v':
 		if f.Flag('#') {
-			_, _ = fmt.Fprintf(f, "id(%s)", id.String())
+			_, _ = fmt.Fprintf(f, "id.%s(%s)", BrandName[B](), id.valueString())
 		} else {
 			_, _ = fmt.Fprint(f, id.String())
 		}

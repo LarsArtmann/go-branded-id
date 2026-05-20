@@ -393,8 +393,9 @@ func TestIDGoString(t *testing.T) {
 	t.Parallel()
 
 	id := NewID[StringBrand](testIDValue)
-	if id.GoString() != testIDValue {
-		t.Errorf("expected test-id, got %s", id.GoString())
+	expected := "id.id.StringBrand(" + testIDValue + ")"
+	if id.GoString() != expected {
+		t.Errorf("expected %s, got %s", expected, id.GoString())
 	}
 }
 
@@ -411,7 +412,7 @@ func TestIDFormat(t *testing.T) {
 		{"%d", "42"},
 		{"%q", `"42"`},
 		{"%v", "42"},
-		{"%#v", "id(42)"},
+		{"%#v", "id.id.Int64Brand(42)"},
 	}
 
 	for _, tt := range tests {

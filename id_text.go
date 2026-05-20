@@ -19,7 +19,7 @@ func (id ID[B, V]) MarshalText() ([]byte, error) {
 		return nil, nil
 	}
 
-	return []byte(id.String()), nil
+	return []byte(id.valueString()), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler for text-based decoding (e.g., XML, TOML).
