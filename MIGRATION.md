@@ -60,6 +60,45 @@ After migrating, you also gain access to new APIs not present in the original `i
 - `id.FromPtr()` — dereferences a pointer, returns zero value if nil
 - `Format` method — implements `fmt.Formatter` (`%s`, `%d`, `%v`, `%#v`, `%q`)
 
+## v0.3.0: Brand-Aware String()
+
+`String()` now includes the brand name prefix for brands that implement `BrandNamer`:
+
+```go
+// Before v0.3.0 (all brands)
+fmt.Println(userID) // "abc123"
+
+// After v0.3.0 (named brands)
+fmt.Println(userID) // "User:abc123"
+
+// After v0.3.0 (unnamed brands — unchanged)
+fmt.Println(orderID) // "abc123"
+```
+
+### Is this a breaking change?
+
+**No**, for brands without a `Name()` method, `String()` returns the same value as before.
+
+For brands with `Name()` (ActaFlow, CreditReformBilanzampel, InboxClean), `String()` now includes the prefix. If you parse `String()` output, use `Get()` instead:
+
+```go
+// Before: parsed String() output
+value := id.String()
+
+// After: use Get() for the raw value
+value := id.Get() // always returns "abc123"
+```
+
+Serialization (JSON, SQL, Text, Binary, Gob) is unaffected — always uses the raw value.
+
+### New APIs
+
+- `BrandNamer` interface — add `Name() string` to your brand types
+- `BrandName[B]()` — returns brand name for logging
+- `ValidateID(id)` — returns brand-aware error for zero IDs
+- `ValidateIDWithValue(id, fn)` — validates ID and value
+- `GoString()` — returns `id.BrandName(value)` for debugging
+
 ## Troubleshooting
 
 ### `go get` fails with Go version error

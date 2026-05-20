@@ -456,3 +456,86 @@ func ExampleFromPtr() {
 	// user-123
 	// true
 }
+
+// Brand-aware benchmarks
+
+func BenchmarkStringNamedBrand(b *testing.B) {
+	for b.Loop() {
+		_ = NewID[testUserBrand](benchIDValue).String()
+	}
+}
+
+func BenchmarkStringUnnamedBrand(b *testing.B) {
+	for b.Loop() {
+		_ = NewID[StringBrand](benchIDValue).String()
+	}
+}
+
+func BenchmarkBrandName_Named(b *testing.B) {
+	for b.Loop() {
+		_ = BrandName[testUserBrand]()
+	}
+}
+
+func BenchmarkBrandName_Unnamed(b *testing.B) {
+	for b.Loop() {
+		_ = BrandName[StringBrand]()
+	}
+}
+
+func BenchmarkValidateID(b *testing.B) {
+	id := NewID[testUserBrand](benchIDValue)
+	for b.Loop() {
+		_ = ValidateID(id)
+	}
+}
+
+func BenchmarkValidateID_Zero(b *testing.B) {
+	var zero ID[testUserBrand, string]
+	for b.Loop() {
+		_ = ValidateID(zero)
+	}
+}
+
+// Brand-aware fuzz tests
+
+func FuzzValidateID(f *testing.F) {
+	f.Add("test-id")
+	f.Add("")
+	f.Add("user-123")
+
+	f.Fuzz(func(t *testing.T, value string) {
+		id := NewID[testUserBrand](value)
+
+		err := ValidateID(id)
+		if value == "" {
+			if err == nil {
+				t.Error("expected error for zero ID")
+			}
+		} else {
+			if err != nil {
+				t.Errorf("unexpected error for non-zero ID: %v", err)
+			}
+		}
+	})
+}
+
+// Brand-aware example tests
+
+func ExampleValidateIDWithValue() {
+	userID := NewID[testUserBrand]("ab")
+	err := ValidateIDWithValue(userID, func(v string) error {
+		if len(v) < 3 {
+			return fmt.Errorf("too short: got %d chars", len(v))
+		}
+		return nil
+	})
+	fmt.Println(err)
+	// Output: id: invalid: User: too short: got 2 chars
+}
+
+func ExampleBrandName_unnamed() {
+	type MyBrand struct{}
+	fmt.Println(BrandName[MyBrand]())
+	// Output: id.MyBrand
+}

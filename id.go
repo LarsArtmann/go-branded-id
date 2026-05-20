@@ -20,9 +20,19 @@
 //	ProcessUser(userID)   // OK
 //	ProcessUser(orderID)  // Compile error: type mismatch
 //
+// # Named Brands
+//
+// Brand types can implement the [BrandNamer] interface to provide a human-readable
+// name. This makes IDs debug-visible: [ID.String] returns "User:abc123" instead of
+// just "abc123", and [ValidateID] produces brand-aware error messages.
+//
+//	type UserBrand struct{}
+//	func (UserBrand) Name() string { return "User" }
+//
 // # Serialization
 //
-// ID supports multiple serialization formats:
+// ID supports multiple serialization formats. Serialization always uses the raw
+// value (no brand prefix):
 //   - JSON: string-based IDs serialize as strings, numeric IDs as numbers
 //   - Text (XML/TOML): string-based IDs only
 //   - SQL: string, int64, int32, uint64 types supported
