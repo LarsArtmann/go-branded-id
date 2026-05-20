@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `BrandName[B]()` function — returns brand name (or type name fallback) for logging and introspection
 - `ValidateID[B, V]()` — validates ID is not zero, returns brand-aware error messages
 - `ValidateIDWithValue[B, V]()` — validates ID and optionally validates the value with a custom function
+- `MustValidateID[B, V]()` — panic version of ValidateID for init-time validation
 - `ErrInvalidID` sentinel error for ID validation failures
 - `GoString()` now returns `id.BrandName(value)` instead of mirroring `String()`
 - `%#v` format now shows `id.BrandName(value)` for meaningful debug output

@@ -14,6 +14,8 @@ type testIntBrand struct{}
 
 func (testIntBrand) Name() string { return "Order" }
 
+const testErrInvalidEmpty = "id: invalid: User: empty"
+
 func TestBrandName_WithNameMethod(t *testing.T) {
 	t.Parallel()
 	name := BrandName[testUserBrand]()
@@ -109,7 +111,7 @@ func TestValidateID_Zero(t *testing.T) {
 		t.Error("expected error for zero ID")
 	}
 
-	expected := "id: invalid: User: empty"
+	expected := testErrInvalidEmpty
 	if err.Error() != expected {
 		t.Errorf("expected error %q, got %q", expected, err.Error())
 	}
@@ -182,7 +184,7 @@ func TestValidateIDWithValue_ZeroID(t *testing.T) {
 		t.Error("expected error for zero ID")
 	}
 
-	expected := "id: invalid: User: empty"
+	expected := testErrInvalidEmpty
 	if err.Error() != expected {
 		t.Errorf("expected error %q, got %q", expected, err.Error())
 	}
@@ -219,4 +221,32 @@ func ExampleValidateID_zero() {
 		fmt.Println(err)
 	}
 	// Output: id: invalid: User: empty
+}
+
+func TestMustValidateID_Valid(t *testing.T) {
+	t.Parallel()
+	MustValidateID(NewID[testUserBrand]("user-123")) // should not panic
+}
+
+func TestMustValidateID_Zero(t *testing.T) {
+	t.Parallel()
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Error("expected panic for zero ID")
+		}
+
+		err, ok := r.(error)
+		if !ok {
+			t.Fatalf("expected error, got %T", r)
+		}
+
+		expected := testErrInvalidEmpty
+		if err.Error() != expected {
+			t.Errorf("expected %q, got %q", expected, err.Error())
+		}
+	}()
+
+	var zero ID[testUserBrand, string]
+	MustValidateID(zero)
 }

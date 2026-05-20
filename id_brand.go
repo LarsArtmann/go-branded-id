@@ -79,3 +79,11 @@ func ValidateIDWithValue[B any, V comparable](
 
 	return nil
 }
+
+// MustValidateID is like ValidateID but panics if the ID is zero.
+// Use for init-time validation or when a zero ID is a programming error.
+func MustValidateID[B any, V comparable](id ID[B, V]) {
+	if err := ValidateID[B, V](id); err != nil {
+		panic(err)
+	}
+}

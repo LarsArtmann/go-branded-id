@@ -217,6 +217,7 @@ sort.Slice(ids, func(i, j int) bool {
 | `BrandName[B]() string`           | Returns brand name (or type name if no Name()) |
 | `ValidateID(id ID[B, V]) error`   | Returns error if ID is zero (brand-aware)      |
 | `ValidateIDWithValue(id, fn) err` | Validates ID and optionally validates value    |
+| `MustValidateID(id)`              | Panics if ID is zero                           |
 
 ## Performance
 
