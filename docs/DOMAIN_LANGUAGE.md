@@ -8,15 +8,15 @@ If a word means something different to a developer than to a customer, define it
 
 ## Glossary
 
-| Term         | Definition               | Context                        |
-| ------------ | ------------------------ | ------------------------------ |
-| Brand         | A phantom type that distinguishes different ID types at compile time | `type UserBrand struct{}` |
-| Brand Name    | A human-readable label for a brand, provided via the `BrandNamer` interface | `"User"` for `UserBrand` |
-| Named Brand   | A brand that implements `Name() string` — enables `"Brand:value"` in String() | Debug-visible IDs |
-| Unnamed Brand | A brand without `Name()` — String() returns just the value | Backward compatible |
-| Branded ID    | An `ID[B, V]` value — strongly typed, zero-cost identifier | `ID[UserBrand, string]` |
-| Value         | The underlying raw data of an ID, accessed via `.Get()` | The actual ULID, string, or int |
-| Validation    | Checking an ID is not zero, optionally with custom rules | `ValidateID`, `ValidateIDWithValue` |
+| Term          | Definition                                                                    | Context                             |
+| ------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
+| Brand         | A phantom type that distinguishes different ID types at compile time          | `type UserBrand struct{}`           |
+| Brand Name    | A human-readable label for a brand, provided via the `BrandNamer` interface   | `"User"` for `UserBrand`            |
+| Named Brand   | A brand that implements `Name() string` — enables `"Brand:value"` in String() | Debug-visible IDs                   |
+| Unnamed Brand | A brand without `Name()` — String() returns just the value                    | Backward compatible                 |
+| Branded ID    | An `ID[B, V]` value — strongly typed, zero-cost identifier                    | `ID[UserBrand, string]`             |
+| Value         | The underlying raw data of an ID, accessed via `.Get()`                       | The actual ULID, string, or int     |
+| Validation    | Checking an ID is not zero, optionally with custom rules                      | `ValidateID`, `ValidateIDWithValue` |
 
 ## Entities
 

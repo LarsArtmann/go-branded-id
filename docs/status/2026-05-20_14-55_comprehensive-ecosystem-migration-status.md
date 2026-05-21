@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-20 14:55  
 **Author:** Crush (assisted) + Lars  
-**Scope:** Library hardening + 14 ecosystem repos  
+**Scope:** Library hardening + 14 ecosystem repos
 
 ---
 
@@ -18,80 +18,80 @@ The `go-branded-id` library was critically reviewed for having **phantom types i
 
 ### 1. go-branded-id Library (v0.3.0)
 
-| Item | Status | Details |
-|------|--------|---------|
-| `BrandNamer` interface | DONE | `Name() string` on brand struct → enables brand-aware String() |
-| `String()` brand-aware | DONE | Returns `"Brand:value"` for named brands, `"value"` for unnamed |
-| `valueString()` internal | DONE | Raw-value-only serialization — used by MarshalText/JSON/SQL/Binary/Gob |
-| `GoString()` | DONE | Returns `id.BrandName(value)` format |
-| `Format()` `%#v` | DONE | Uses BrandName + valueString |
-| `ValidateID` | DONE | Returns `ErrInvalidID` sentinel for zero IDs |
-| `ValidateIDWithValue` | DONE | Returns (value, ErrInvalidID) tuple |
-| `MustValidateID` | DONE | Panics on zero — for init-time validation |
-| `ErrInvalidID` sentinel | DONE | Typed sentinel error with BrandName in message |
-| `BrandName[B]()` public | DONE | Returns brand name string for any branded type |
-| Tests | DONE | 89 tests, all passing with `-race` |
-| Benchmarks | DONE | String named/unnamed, BrandName, ValidateID, zero |
-| Fuzz | DONE | `FuzzValidateID` |
-| Examples | DONE | ValidateIDWithValue, BrandName unnamed |
-| README | DONE | Rewritten with Named Brands section, API table, migration guidance |
-| CHANGELOG.md | DONE | v0.3.0 section with all changes |
-| MIGRATION.md | DONE | String() behavior change section with guidance |
-| DOMAIN_LANGUAGE.md | DONE | Brand terminology definitions |
-| golangci-lint | DONE | 0 issues on HEAD |
-| Git tag v0.3.0 | DONE | Tag exists locally + remote (BUT points to wrong commit — see blockers) |
+| Item                     | Status | Details                                                                 |
+| ------------------------ | ------ | ----------------------------------------------------------------------- |
+| `BrandNamer` interface   | DONE   | `Name() string` on brand struct → enables brand-aware String()          |
+| `String()` brand-aware   | DONE   | Returns `"Brand:value"` for named brands, `"value"` for unnamed         |
+| `valueString()` internal | DONE   | Raw-value-only serialization — used by MarshalText/JSON/SQL/Binary/Gob  |
+| `GoString()`             | DONE   | Returns `id.BrandName(value)` format                                    |
+| `Format()` `%#v`         | DONE   | Uses BrandName + valueString                                            |
+| `ValidateID`             | DONE   | Returns `ErrInvalidID` sentinel for zero IDs                            |
+| `ValidateIDWithValue`    | DONE   | Returns (value, ErrInvalidID) tuple                                     |
+| `MustValidateID`         | DONE   | Panics on zero — for init-time validation                               |
+| `ErrInvalidID` sentinel  | DONE   | Typed sentinel error with BrandName in message                          |
+| `BrandName[B]()` public  | DONE   | Returns brand name string for any branded type                          |
+| Tests                    | DONE   | 89 tests, all passing with `-race`                                      |
+| Benchmarks               | DONE   | String named/unnamed, BrandName, ValidateID, zero                       |
+| Fuzz                     | DONE   | `FuzzValidateID`                                                        |
+| Examples                 | DONE   | ValidateIDWithValue, BrandName unnamed                                  |
+| README                   | DONE   | Rewritten with Named Brands section, API table, migration guidance      |
+| CHANGELOG.md             | DONE   | v0.3.0 section with all changes                                         |
+| MIGRATION.md             | DONE   | String() behavior change section with guidance                          |
+| DOMAIN_LANGUAGE.md       | DONE   | Brand terminology definitions                                           |
+| golangci-lint            | DONE   | 0 issues on HEAD                                                        |
+| Git tag v0.3.0           | DONE   | Tag exists locally + remote (BUT points to wrong commit — see blockers) |
 
 ### 2. Ecosystem Migration — Name() Methods Added
 
 64 `Name()` methods added across 12 repos:
 
-| Repo | Name() Count | Status |
-|------|-------------|--------|
-| InboxClean | 4 (Message, Label, Thread, User) | DONE, pushed |
-| CreditReformBilanzampel | 0 (indirect dep only) | DONE, pushed |
-| ActaFlow | 1 (Correlation) | DONE, pushed |
-| SEC | 2 (Game, Player) | DONE, pushed |
-| storbi | 8 (Item, SKU, Category, ItemName, Target, Id, Row, Request) | DONE, pushed |
-| ChastityAPI | 14 (User, UUID, Device, Command, Aggregate, Event, Correlation, Causation, Request, LastEvent, FirstLockEvent, PreviousLock, PreviousDevice, TargetDevice) | DONE, pushed |
-| smart-configs | 10 (Account, Build, PullRequest, Project, Container, Secret, Suggestion, IDSuffix, ValidValue, InvalidValue) | DONE, pushed |
-| StopTube | 6 (Schedule, VID, IDID, RequestID, ResponseID, ExtensionID) | DONE, pushed |
-| universal-workflow | 10 (Workflow, Activity, Session, Request, Target, Device, Correlation, ID, Branch, BranchContext) | DONE, pushed |
-| Zlota44 | 6 (DiscoveredProperty, DiscoveryCheckpoint, Property, ValidKW, Worker, SearcherWorker) | DONE, pushed |
-| timesheets | 6 (Timesheet, NaturalPerson, Project, InputFile, OutputFile, PersonConfig) | DONE, pushed |
-| complaints-mcp | 1 (Complaint) | DONE, pushed |
-| cqrs-htmx | 1 (userBrand) | DONE, pushed |
-| emeet-pixyd | 2 (pid, sourceID) | DONE, pushed |
+| Repo                    | Name() Count                                                                                                                                               | Status       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| InboxClean              | 4 (Message, Label, Thread, User)                                                                                                                           | DONE, pushed |
+| CreditReformBilanzampel | 0 (indirect dep only)                                                                                                                                      | DONE, pushed |
+| ActaFlow                | 1 (Correlation)                                                                                                                                            | DONE, pushed |
+| SEC                     | 2 (Game, Player)                                                                                                                                           | DONE, pushed |
+| storbi                  | 8 (Item, SKU, Category, ItemName, Target, Id, Row, Request)                                                                                                | DONE, pushed |
+| ChastityAPI             | 14 (User, UUID, Device, Command, Aggregate, Event, Correlation, Causation, Request, LastEvent, FirstLockEvent, PreviousLock, PreviousDevice, TargetDevice) | DONE, pushed |
+| smart-configs           | 10 (Account, Build, PullRequest, Project, Container, Secret, Suggestion, IDSuffix, ValidValue, InvalidValue)                                               | DONE, pushed |
+| StopTube                | 6 (Schedule, VID, IDID, RequestID, ResponseID, ExtensionID)                                                                                                | DONE, pushed |
+| universal-workflow      | 10 (Workflow, Activity, Session, Request, Target, Device, Correlation, ID, Branch, BranchContext)                                                          | DONE, pushed |
+| Zlota44                 | 6 (DiscoveredProperty, DiscoveryCheckpoint, Property, ValidKW, Worker, SearcherWorker)                                                                     | DONE, pushed |
+| timesheets              | 6 (Timesheet, NaturalPerson, Project, InputFile, OutputFile, PersonConfig)                                                                                 | DONE, pushed |
+| complaints-mcp          | 1 (Complaint)                                                                                                                                              | DONE, pushed |
+| cqrs-htmx               | 1 (userBrand)                                                                                                                                              | DONE, pushed |
+| emeet-pixyd             | 2 (pid, sourceID)                                                                                                                                          | DONE, pushed |
 
 ### 3. Ecosystem Migration — `.String()` → `.Get()` Fixes
 
 27 critical replacements where `.String()` was used for API calls, storage keys, or external system IDs:
 
-| Repo | Fixes | What |
-|------|-------|------|
-| InboxClean | 12 | Gmail API calls + CQRS aggregate ID conversion |
-| CreditReformBilanzampel | 6 | Process map keys, correlation headers, company ID |
-| ActaFlow | 1 | Correlation ID matching in query response |
-| cqrs-htmx | 8 | Casbin RBAC subject construction |
+| Repo                    | Fixes | What                                              |
+| ----------------------- | ----- | ------------------------------------------------- |
+| InboxClean              | 12    | Gmail API calls + CQRS aggregate ID conversion    |
+| CreditReformBilanzampel | 6     | Process map keys, correlation headers, company ID |
+| ActaFlow                | 1     | Correlation ID matching in query response         |
+| cqrs-htmx               | 8     | Casbin RBAC subject construction                  |
 
 ### 4. Ecosystem Migration — Test Fixes
 
 Tests that compared `.String()` output against raw values were updated:
 
-| Repo | Fixes | What |
-|------|-------|------|
-| InboxClean | 15 | `client_test.go` + `gmail_tools_test.go` |
-| storbi | 6 | `types_test.go` + `inventory_handler_test.go` |
-| Zlota44 | 2 | `id_test.go` |
-| cqrs-htmx | 2 | `user_test.go` |
-| emeet-pixyd | 2 | `ids_test.go` (used `.Get()` which exists in v0.1.0) |
+| Repo        | Fixes | What                                                 |
+| ----------- | ----- | ---------------------------------------------------- |
+| InboxClean  | 15    | `client_test.go` + `gmail_tools_test.go`             |
+| storbi      | 6     | `types_test.go` + `inventory_handler_test.go`        |
+| Zlota44     | 2     | `id_test.go`                                         |
+| cqrs-htmx   | 2     | `user_test.go`                                       |
+| emeet-pixyd | 2     | `ids_test.go` (used `.Get()` which exists in v0.1.0) |
 
 ### 5. Deliberately NOT Changed
 
-| Repo | Reason |
-|------|--------|
+| Repo         | Reason                                                                          |
+| ------------ | ------------------------------------------------------------------------------- |
 | go-cqrs-lite | Marker types are internal storage/stream keys — `Name()` would break key format |
-| BerryBig | Only test brands |
-| Cyberdom | No brand types found |
+| BerryBig     | Only test brands                                                                |
+| Cyberdom     | No brand types found                                                            |
 
 ---
 
@@ -116,6 +116,7 @@ Tests that compared `.String()` output against raw values were updated:
 ### 3. Ecosystem go.mod Upgrade — NOT Started
 
 All 14 ecosystem repos still depend on `go-branded-id v0.1.0`. None have been bumped to `v0.3.0`.
+
 - The `Name()` methods work with v0.1.0 (they're no-ops until v0.3.0 is pulled)
 - The `.Get()` calls work with v0.1.0 (method exists in v0.1.0)
 - **But:** String() won't be brand-aware until v0.3.0 is actually pulled as a dependency
@@ -140,6 +141,7 @@ All 14 ecosystem repos still depend on `go-branded-id v0.1.0`. None have been bu
 ### 1. Tag vs HEAD Mismatch
 
 The v0.3.0 tag was created on commit `044bd67` (the CHANGELOG/docs commit), but 2 more commits landed after:
+
 - `5d981ad` — MustValidateID + README/CHANGELOG updates
 - `117fbf4` — DOMAIN_LANGUAGE.md + final status report
 
@@ -148,6 +150,7 @@ This means **v0.3.0 doesn't include MustValidateID**, which is documented as a v
 ### 2. Release CI Failed on golangci-lint
 
 The `golangci-lint-action@v6` failed on commit `044bd67`. The same lint passes locally on HEAD. Possible causes:
+
 - golangci-lint version difference between CI and local
 - The lint failure was real on that commit but fixed in a later commit
 - Regardless, **no GitHub Release exists for v0.3.0**
@@ -162,19 +165,19 @@ Every single repo still depends on `v0.1.0`. The `Name()` methods are added to b
 
 ### 5. Pre-existing Build Failures
 
-| Repo | Issue |
-|------|-------|
-| storbi | `internal/di/container.go` — `:=` instead of `=` in 5 places (pre-existing) |
+| Repo           | Issue                                                                            |
+| -------------- | -------------------------------------------------------------------------------- |
+| storbi         | `internal/di/container.go` — `:=` instead of `=` in 5 places (pre-existing)      |
 | complaints-mcp | `internal/tracing/real_tracer.go` — syntax error + undefined `v2` (pre-existing) |
 
 ### 6. Pre-existing Test Failures (NOT our fault)
 
-| Repo | Test | Issue |
-|------|------|-------|
-| CreditReformBilanzampel | BDD tests | Undefined step (pre-existing) |
-| timesheets | FuzzWorkHoursJSONRoundTrip | Hours exceed daily maximum (pre-existing) |
-| emeet-pixyd | auto_test.go integration | PipeWire state file rename failure (pre-existing) |
-| Zlota44 | internal/discovery | Unknown (pre-existing) |
+| Repo                    | Test                       | Issue                                             |
+| ----------------------- | -------------------------- | ------------------------------------------------- |
+| CreditReformBilanzampel | BDD tests                  | Undefined step (pre-existing)                     |
+| timesheets              | FuzzWorkHoursJSONRoundTrip | Hours exceed daily maximum (pre-existing)         |
+| emeet-pixyd             | auto_test.go integration   | PipeWire state file rename failure (pre-existing) |
+| Zlota44                 | internal/discovery         | Unknown (pre-existing)                            |
 
 ---
 
@@ -244,6 +247,7 @@ Every single repo still depends on `v0.1.0`. The `Name()` methods are added to b
 The tag currently points to commit `044bd67` which is 2 commits behind HEAD (`117fbf4`). The tagged commit is missing MustValidateID (a documented v0.3.0 feature). The Release CI also failed on that commit.
 
 Force-pushing the tag would:
+
 - Re-trigger the Release workflow on the correct commit
 - Create the GitHub Release that should have been created
 - Anyone who already pulled v0.3.0 would have a different commit (but Go module proxy may cache the old one)
@@ -254,16 +258,16 @@ This is an irreversible operation on a public tag. **I need your explicit approv
 
 ## Verification Checklist
 
-| Check | Result |
-|-------|--------|
-| Library tests (race) | 89 PASS, 0 FAIL |
-| Library lint | 0 issues |
-| Library tag v0.3.0 | EXISTS (wrong commit) |
-| Library pushed | UP TO DATE |
-| Ecosystem Name() added | 64 methods / 14 repos |
-| Ecosystem .String()→.Get() | 27 fixes / 4 repos |
-| Ecosystem test fixes | 27 fixes / 5 repos |
-| Ecosystem all pushed | ALL 14 PUSHED |
-| Ecosystem v0.3.0 bump | NOT STARTED |
-| GitHub Release | NOT CREATED (CI failed) |
-| gh CLI auth | EXPIRED |
+| Check                      | Result                  |
+| -------------------------- | ----------------------- |
+| Library tests (race)       | 89 PASS, 0 FAIL         |
+| Library lint               | 0 issues                |
+| Library tag v0.3.0         | EXISTS (wrong commit)   |
+| Library pushed             | UP TO DATE              |
+| Ecosystem Name() added     | 64 methods / 14 repos   |
+| Ecosystem .String()→.Get() | 27 fixes / 4 repos      |
+| Ecosystem test fixes       | 27 fixes / 5 repos      |
+| Ecosystem all pushed       | ALL 14 PUSHED           |
+| Ecosystem v0.3.0 bump      | NOT STARTED             |
+| GitHub Release             | NOT CREATED (CI failed) |
+| gh CLI auth                | EXPIRED                 |
