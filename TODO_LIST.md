@@ -70,31 +70,31 @@
 
 ## Category D: Ecosystem Build/Test Fixes
 
-| #   | Repo           | Issue                                                                  | Status         | Notes                                                                                             |
-| --- | -------------- | ---------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------- |
-| D1  | storbi         | `:=` instead of `=` in `internal/di/container.go:41,46,51,56,61,66,71` | ✅ DONE        | 7 occurrences of `err :=` where `err` already declared. Fix: change to `err =`. Confirmed already applied.                   |
-| D2  | complaints-mcp | Pre-existing build errors (syntax + undefined `v2`)                    | ❌ NOT MY JOB  | Repo is archived at `/home/lars/projects/archived/complaints-mcp`. Build errors are pre-existing. |
+| #   | Repo           | Issue                                                                  | Status        | Notes                                                                                                      |
+| --- | -------------- | ---------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| D1  | storbi         | `:=` instead of `=` in `internal/di/container.go:41,46,51,56,61,66,71` | ✅ DONE       | 7 occurrences of `err :=` where `err` already declared. Fix: change to `err =`. Confirmed already applied. |
+| D2  | complaints-mcp | Pre-existing build errors (syntax + undefined `v2`)                    | ❌ NOT MY JOB | Repo is archived at `/home/lars/projects/archived/complaints-mcp`. Build errors are pre-existing.          |
 
 ---
 
 ## Category E: Verification After v0.3.0 Bump
 
-| #   | Item                                      | Status  | Notes                                                           |
-| --- | ----------------------------------------- | ------- | --------------------------------------------------------------- |
-| E1  | Run test suites after bump                | 🔜 TODO | Each repo after v0.3.0 bump, especially repos with `Name()`     |
-| E2  | Audit for missed `.String()` calls        | 🔜 TODO | Audit done. Key finding: storbi (SQL params), cqrs-htmx (Casbin Enforce). Full report below.   |
-| E3  | Verify String() behavior for named brands | 🔜 TODO | After v0.3.0 bump, `String()` should return `"Brand:value"`     |
+| #   | Item                                      | Status  | Notes                                                                                        |
+| --- | ----------------------------------------- | ------- | -------------------------------------------------------------------------------------------- |
+| E1  | Run test suites after bump                | 🔜 TODO | Each repo after v0.3.0 bump, especially repos with `Name()`                                  |
+| E2  | Audit for missed `.String()` calls        | 🔜 TODO | Audit done. Key finding: storbi (SQL params), cqrs-htmx (Casbin Enforce). Full report below. |
+| E3  | Verify String() behavior for named brands | 🔜 TODO | After v0.3.0 bump, `String()` should return `"Brand:value"`                                  |
 
 ---
 
 ## Category F: Process & Tooling Improvements
 
-| #   | Item                                    | Status         | Notes                                                     |
-| --- | --------------------------------------- | -------------- | --------------------------------------------------------- |
-| F1  | Create codemod tool                     | ✅ DONE        | `cmd/namer/main.go` created. AST-based scanner for brand types missing `Name()`. 0 lint issues. |
-| F2  | Add CI integration test                 | 🔜 TODO        | Test go-branded-id against representative ecosystem repos |
-| F3  | Document go-cqrs-lite decision          | 🔜 TODO        | Why `Name()` was deliberately skipped for marker types    |
-| F4  | Verify storbi pre-existing build errors | ✅ DONE        | Verified: storbi was already fixed. Confirmed clean git status. |
+| #   | Item                                    | Status  | Notes                                                                                           |
+| --- | --------------------------------------- | ------- | ----------------------------------------------------------------------------------------------- |
+| F1  | Create codemod tool                     | ✅ DONE | `cmd/namer/main.go` created. AST-based scanner for brand types missing `Name()`. 0 lint issues. |
+| F2  | Add CI integration test                 | 🔜 TODO | Test go-branded-id against representative ecosystem repos                                       |
+| F3  | Document go-cqrs-lite decision          | 🔜 TODO | Why `Name()` was deliberately skipped for marker types                                          |
+| F4  | Verify storbi pre-existing build errors | ✅ DONE | Verified: storbi was already fixed. Confirmed clean git status.                                 |
 
 ---
 
