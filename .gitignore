@@ -51,3 +51,5 @@ Thumbs.db
 /go-branded-id
 # Sensitive files
 *.db
+# Nix build output
+/result
