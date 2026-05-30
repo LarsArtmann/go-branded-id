@@ -95,7 +95,6 @@ func TestIDJSON(t *testing.T) {
 	})
 }
 
-//nolint:funlen // table-driven test with multiple sub-tests
 func TestIDUnmarshalJSON(
 	t *testing.T,
 ) {

@@ -109,7 +109,6 @@ func TestStringAllTypes(t *testing.T) {
 	}
 }
 
-//nolint:cyclop // exhaustive type switch
 func stringer(t *testing.T, v any) string {
 	t.Helper()
 
@@ -163,7 +162,6 @@ func testJSONRoundTrip[B any, V comparable](t *testing.T, value V) {
 	)
 }
 
-//nolint:funlen // table-driven test with multiple type sub-tests
 func TestBinaryRoundTripAllTypes(t *testing.T) {
 	t.Parallel()
 
@@ -466,7 +464,6 @@ func TestValueAllTypes(t *testing.T) {
 	}
 }
 
-//nolint:cyclop // exhaustive type switch
 func valuer(t *testing.T, v any) (any, error) {
 	t.Helper()
 

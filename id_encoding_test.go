@@ -14,7 +14,7 @@ func assertCmpEqual[T comparable](tb testing.TB, got, want T) {
 	}
 }
 
-func TestIDText(t *testing.T) { //nolint:funlen // table-driven test with multiple sub-tests
+func TestIDText(t *testing.T) {
 	t.Parallel()
 	t.Run("marshal non-zero string", func(t *testing.T) {
 		t.Parallel()
