@@ -45,6 +45,7 @@ import (
 	"encoding"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 )
 
@@ -189,18 +190,31 @@ func (id ID[B, V]) String() string {
 	return id.valueString()
 }
 
+// writeTo writes the ID's string representation directly to w.
+// Avoids allocating an intermediate string when called from Format.
+func (id ID[B, V]) writeTo(w io.Writer) {
+	if name, ok := brandName[B](); ok {
+		io.WriteString(w, name)
+		io.WriteString(w, ":")
+	}
+	io.WriteString(w, id.valueString())
+}
+
 // GoString implements fmt.GoStringer for debugging.
 // Returns a Go-syntax-like representation, e.g., id.User("abc123").
 func (id ID[B, V]) GoString() string {
-	return fmt.Sprintf("id.%s(%s)", BrandName[B](), id.valueString())
+	return "id." + BrandName[B]() + "(" + id.valueString() + ")"
 }
 
 // Format implements fmt.Formatter for custom formatting.
 // Supports %s (string), %d (decimal), %v (default), %#v (GoString), %q (quoted).
+//
+// Writes directly to fmt.State via io.WriteString to avoid allocations
+// from string concatenation and fmt.Fprint's any boxing.
 func (id ID[B, V]) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		_, _ = fmt.Fprint(f, id.String())
+		id.writeTo(f)
 	case 'd':
 		switch v := any(id.value).(type) {
 		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
@@ -212,9 +226,13 @@ func (id ID[B, V]) Format(f fmt.State, verb rune) {
 		_, _ = fmt.Fprintf(f, "%q", id.String())
 	case 'v':
 		if f.Flag('#') {
-			_, _ = fmt.Fprintf(f, "id.%s(%s)", BrandName[B](), id.valueString())
+			io.WriteString(f, "id.")
+			io.WriteString(f, BrandName[B]())
+			io.WriteString(f, "(")
+			io.WriteString(f, id.valueString())
+			io.WriteString(f, ")")
 		} else {
-			_, _ = fmt.Fprint(f, id.String())
+			id.writeTo(f)
 		}
 	default:
 		_, _ = fmt.Fprintf(f, "%%!%c(type=%T)", verb, id.value)
