@@ -8,19 +8,19 @@ A Go library providing branded, strongly-typed identifiers using phantom types (
 
 All build/test tasks go through the Nix flake. **Do not use `just`** — the `justfile` is deprecated and `CONTRIBUTING.md` references to it are stale.
 
-| Command | Purpose |
-|---------|---------|
-| `nix run .#test` | Run tests (`go test ./... -count=1`) |
-| `nix run .#test-race` | Run with race detector |
-| `nix run .#build` | Build (`go build ./...`) |
-| `nix run .#lint` | Run golangci-lint |
-| `nix run .#vet` | Run `go vet ./...` |
-| `nix run .#coverage` | Generate and display coverage report |
-| `nix run .#clean` | Clean test cache and coverage.out |
-| `nix flake check` | Run all flake checks (includes build) |
-| `nix fmt` | Format everything (gofumpt, goimports, golines, nixfmt) |
-| `go test ./... -count=1` | Plain Go test (no Nix needed) |
-| `go test ./... -race -count=1` | Plain race test |
+| Command                        | Purpose                                                 |
+| ------------------------------ | ------------------------------------------------------- |
+| `nix run .#test`               | Run tests (`go test ./... -count=1`)                    |
+| `nix run .#test-race`          | Run with race detector                                  |
+| `nix run .#build`              | Build (`go build ./...`)                                |
+| `nix run .#lint`               | Run golangci-lint                                       |
+| `nix run .#vet`                | Run `go vet ./...`                                      |
+| `nix run .#coverage`           | Generate and display coverage report                    |
+| `nix run .#clean`              | Clean test cache and coverage.out                       |
+| `nix flake check`              | Run all flake checks (includes build)                   |
+| `nix fmt`                      | Format everything (gofumpt, goimports, golines, nixfmt) |
+| `go test ./... -count=1`       | Plain Go test (no Nix needed)                           |
+| `go test ./... -race -count=1` | Plain race test                                         |
 
 The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.26, golangci-lint, gopls, and trash-cli.
 
@@ -87,7 +87,7 @@ There is no `internal/` or `pkg/` — this is intentionally a flat, single-packa
 
 ### String() vs Get() — Know the Difference
 
-`String()` changed behavior in v0.3.0. For named brands it now returns `"Brand:value"`. **Serialization never uses String()** — it always uses `valueString()` internally. But if *user code* was parsing `String()` output, it will break after adding `Name()` to a brand.
+`String()` changed behavior in v0.3.0. For named brands it now returns `"Brand:value"`. **Serialization never uses String()** — it always uses `valueString()` internally. But if _user code_ was parsing `String()` output, it will break after adding `Name()` to a brand.
 
 **Rule**: Use `Get()` for any programmatic value extraction. Use `String()` only for display/logging.
 
@@ -124,6 +124,7 @@ The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspa
 This library was extracted from `go-composable-business-types/id`. It has 14 downstream repos in the ecosystem. The `cmd/namer` tool was created to help migrate those repos by identifying brand types missing `Name()` methods.
 
 When making breaking changes, consider the migration impact across:
+
 - InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI, smart-configs, StopTube, universal-workflow, Zlota44, timesheets, complaints-mcp, cqrs-htmx, emeet-pixyd
 
 ## Release Process
