@@ -194,10 +194,10 @@ func (id ID[B, V]) String() string {
 // Avoids allocating an intermediate string when called from Format.
 func (id ID[B, V]) writeTo(w io.Writer) {
 	if name, ok := brandName[B](); ok {
-		io.WriteString(w, name)
-		io.WriteString(w, ":")
+		_, _ = io.WriteString(w, name)
+		_, _ = io.WriteString(w, ":")
 	}
-	io.WriteString(w, id.valueString())
+	_, _ = io.WriteString(w, id.valueString())
 }
 
 // GoString implements fmt.GoStringer for debugging.
@@ -226,11 +226,11 @@ func (id ID[B, V]) Format(f fmt.State, verb rune) {
 		_, _ = fmt.Fprintf(f, "%q", id.String())
 	case 'v':
 		if f.Flag('#') {
-			io.WriteString(f, "id.")
-			io.WriteString(f, BrandName[B]())
-			io.WriteString(f, "(")
-			io.WriteString(f, id.valueString())
-			io.WriteString(f, ")")
+			_, _ = io.WriteString(f, "id.")
+			_, _ = io.WriteString(f, BrandName[B]())
+			_, _ = io.WriteString(f, "(")
+			_, _ = io.WriteString(f, id.valueString())
+			_, _ = io.WriteString(f, ")")
 		} else {
 			id.writeTo(f)
 		}
