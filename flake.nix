@@ -70,6 +70,15 @@
             '';
           };
 
+          devShells.ci = pkgs.mkShellNoCC {
+            packages = [
+              goPkg
+              pkgs.golangci-lint
+            ];
+
+            GOWORK = "off";
+          };
+
           checks = {
             build = pkgs.runCommand "go-branded-id-build" { nativeBuildInputs = [ goPkg ]; } ''
               export GOWORK=off
