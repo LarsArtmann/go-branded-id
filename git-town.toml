@@ -4,3 +4,6 @@
 
 [branches]
 main = "master"
+
+[hosting]
+github-connector = "api"
