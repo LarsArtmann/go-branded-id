@@ -221,14 +221,22 @@ sort.Slice(ids, func(i, j int) bool {
 
 ## Performance
 
-Zero-allocation, stdlib-only implementation (benchmarked on Go 1.26):
+Stdlib-only, allocation-conscious implementation (benchmarked on Go 1.26):
 
-| Operation       | Typical Latency |
-| --------------- | --------------- |
-| `NewID`         | ~1-2 ns/op      |
-| `Get`           | ~1 ns/op        |
-| `MarshalJSON`   | ~50-100 ns/op   |
-| `Scan` (string) | ~30-50 ns/op    |
+| Operation           | Typical Latency | Allocations |
+| ------------------- | --------------- | ----------- |
+| `NewID`             | ~0.3 ns/op      | 0           |
+| `Get`               | ~1 ns/op        | 0           |
+| `Equal`             | ~0.2 ns/op      | 0           |
+| `Compare`           | ~1.5 ns/op      | 0           |
+| `IsZero`            | ~1.3 ns/op      | 0           |
+| `String` (no brand) | ~4.5 ns/op      | 0           |
+| `String` (named)    | ~20 ns/op       | 1           |
+| `MarshalJSON`       | ~60 ns/op       | 2           |
+| `MarshalBinary`     | ~8 ns/op        | 1           |
+| `Scan` (string)     | ~18 ns/op       | 1           |
+
+Core operations (`NewID`, `Get`, `Equal`, `Compare`, `IsZero`) and unbranded `String()` are zero-allocation. Named-brand `String()` requires one allocation for the `"Brand:value"` concatenation. `Format()` (via `fmt.Sprintf`) benefits from direct `io.Writer` writes introduced in v0.3.1.
 
 ## Contributing
 

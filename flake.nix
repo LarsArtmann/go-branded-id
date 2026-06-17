@@ -83,6 +83,7 @@
           checks = {
             build = pkgs.runCommand "go-branded-id-build" { nativeBuildInputs = [ goPkg ]; } ''
               export GOWORK=off
+              export GOCACHE="$TMPDIR/go-cache"
               cp -r ${
                 pkgs.lib.fileset.toSource {
                   root = ./.;

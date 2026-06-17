@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.1] - 2026-06-17
+
+### Changed
+
+- **`Format()` and `GoString()` allocate significantly less**: `Format()` now writes brand name and value directly to `fmt.State` via `io.WriteString` instead of building intermediate strings; `GoString()` uses concatenation instead of `fmt.Sprintf`. The new internal `writeTo(io.Writer)` helper powers both paths and bypasses string concatenation entirely. Benchmarks for `fmt.Sprintf("%s", id)` (the common hot path):
+  - String, no brand: 3 allocs / 48B → 2 allocs / 32B (−33%)
+  - String, named brand: 4 allocs / 80B → 2 allocs / 40B (−50%)
+  - Int64, named brand: 4 allocs / 80B → 3 allocs / 40B (−25%)
+  - Direct `String()` calls are unaffected: 0 allocs for unbranded string values, 1 alloc for named brands (inevitable concatenation)
+
+### Fixed
+
+- `nix flake check` build check failed in Nix sandbox: Go build cache could not initialize at the default `$HOME/.cache/go-build` path (`mkdir /homeless-shelter: permission denied`). Now sets `GOCACHE` to a writable `$TMPDIR` subdirectory.
+
 ## [0.3.0] - 2026-05-20
 
 ### Added
