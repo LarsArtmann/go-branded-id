@@ -38,7 +38,7 @@
 | #   | Item                         | Status     | Notes                                                                                         |
 | --- | ---------------------------- | ---------- | --------------------------------------------------------------------------------------------- |
 | B1  | v0.3.0 tag corrected         | ✅ DONE    | Tag now at `044bd67` (correct position with MustValidateID, benchmarks, fuzz tests).          |
-| B2  | v0.3.1 tag                   | ✅ DONE    | Tag `v0.3.1` created at `8b30d92`. Push to trigger CI auto-release.                          |
+| B2  | v0.3.1 tag                   | ✅ DONE    | Tag `v0.3.1` created at `8b30d92`. Push to trigger CI auto-release.                           |
 | B3  | Verify GitHub Release exists | ⏳ BLOCKED | Need to verify release workflow triggers on `v0.3.1` tag push.                                |
 | B4  | Fix `gh` CLI auth            | 🔜 TODO    | User needs to run `gh auth login` if release CI fails. **NOT MY JOB — user action required.** |
 
