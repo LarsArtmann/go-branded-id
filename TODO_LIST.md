@@ -20,27 +20,27 @@
 
 ## Category A: Library Verification ✅
 
-| #   | Item                       | Status  | Notes                    |
-| --- | -------------------------- | ------- | ------------------------ |
-| A1  | Tests pass with `-race`    | ✅ DONE | 262 test cases, 0 failures |
-| A2  | Coverage adequate          | ✅ DONE | 81.8% statement coverage   |
-| A3  | Lint clean (golangci-lint) | ✅ DONE | 0 issues                   |
-| A4  | Build succeeds             | ✅ DONE | `go build ./...` clean     |
-| A5  | Benchmarks run             | ✅ DONE | All 25 benchmarks pass     |
-| A6  | v0.3.0 tag exists          | ✅ DONE | Tag at `044bd67`           |
+| #   | Item                       | Status  | Notes                                  |
+| --- | -------------------------- | ------- | -------------------------------------- |
+| A1  | Tests pass with `-race`    | ✅ DONE | 262 test cases, 0 failures             |
+| A2  | Coverage adequate          | ✅ DONE | 81.8% statement coverage               |
+| A3  | Lint clean (golangci-lint) | ✅ DONE | 0 issues                               |
+| A4  | Build succeeds             | ✅ DONE | `go build ./...` clean                 |
+| A5  | Benchmarks run             | ✅ DONE | All 25 benchmarks pass                 |
+| A6  | v0.3.0 tag exists          | ✅ DONE | Tag at `044bd67`                       |
 | A7  | v0.3.1 release prep        | ✅ DONE | CHANGELOG, README perf data, flake fix |
-| A8  | git status clean           | ✅ DONE | No uncommitted changes     |
+| A8  | git status clean           | ✅ DONE | No uncommitted changes                 |
 
 ---
 
 ## Category B: Release Process
 
-| #   | Item                         | Status     | Notes                                                                                                                                  |
-| --- | ---------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| B1  | v0.3.0 tag corrected         | ✅ DONE   | Tag now at `044bd67` (correct position with MustValidateID, benchmarks, fuzz tests).                                                    |
-| B2  | v0.3.1 tag                   | 🔜 TODO   | Tag `v0.3.1` after CHANGELOG commit is pushed. CI auto-creates GitHub Release.                                                          |
-| B3  | Verify GitHub Release exists | ⏳ BLOCKED | Need to verify release workflow triggers on `v0.3.1` tag push.                                                                          |
-| B4  | Fix `gh` CLI auth            | 🔜 TODO   | User needs to run `gh auth login` if release CI fails. **NOT MY JOB — user action required.**                                          |
+| #   | Item                         | Status     | Notes                                                                                         |
+| --- | ---------------------------- | ---------- | --------------------------------------------------------------------------------------------- |
+| B1  | v0.3.0 tag corrected         | ✅ DONE    | Tag now at `044bd67` (correct position with MustValidateID, benchmarks, fuzz tests).          |
+| B2  | v0.3.1 tag                   | ✅ DONE    | Tag `v0.3.1` created at `8b30d92`. Push to trigger CI auto-release.                          |
+| B3  | Verify GitHub Release exists | ⏳ BLOCKED | Need to verify release workflow triggers on `v0.3.1` tag push.                                |
+| B4  | Fix `gh` CLI auth            | 🔜 TODO    | User needs to run `gh auth login` if release CI fails. **NOT MY JOB — user action required.** |
 
 ---
 

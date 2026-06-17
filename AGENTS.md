@@ -115,6 +115,10 @@ For unnamed brands (no `Name()` method), `BrandName[B]()` returns `fmt.Sprintf("
 
 Binary marshaling uses **little-endian** for all numeric types. `int` is serialized as 8 bytes (uint64). This is an implementation detail but matters for cross-language compatibility.
 
+### Nix Sandbox Build Cache (GOCACHE)
+
+`nix flake check` builds the `checks.build` derivation in a sandbox where `HOME=/homeless-shelter` (read-only). Go's build cache cannot initialize at `$HOME/.cache/go-build`. The flake's `checks.build` sets `GOCACHE=$TMPDIR/go-cache` to work around this. Any Go-based Nix check derivation needs this.
+
 ### No go.work / GOWORK=off
 
 The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspace.
@@ -129,9 +133,13 @@ When making breaking changes, consider the migration impact across:
 
 ## Release Process
 
-- CI creates a GitHub Release automatically on semver tags (`v*.*.*`).
-- Release workflow runs tests with race detector + golangci-lint before creating the release.
+- CI creates a GitHub Release automatically on semver tags (`v*.*.*`) — pattern: `v[0-9]+.[0-9]+.[0-9]+*`.
+- Release workflow (`.github/workflows/release.yml`) runs tests with race detector + golangci-lint before creating the release.
+- Tags must be signed (SSH) and annotated (`git tag -a`).
+- **To release**: update CHANGELOG, commit, tag, push tag: `git push origin v0.3.1`.
 - `git-town.toml` configures `master` as the main branch.
+- BuildFlow pre-commit hook runs 34 checks (Go mode) including golangci-lint, gofumpt, goimports, statix, gitleaks, doc-files-age-check (max 3w freshness), and nix-flake-check.
+- `doc-files-age-check` requires README.md and TODO_LIST.md to be updated within 3 weeks of code changes — SARIF format reveals the specific stale file (`buildflow --step doc-files-age-check --format sarif`).
 
 ## Stale Files to Ignore
 
