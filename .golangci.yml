@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.26.3
+  go: 1.26.4
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -84,6 +84,9 @@ linters:
     exhaustruct:
       exclude:
         - os/exec.Cmd
+    ginkgolinter:
+      forbid-focus-container: true
+      forbid-spec-pollution: true
     gocritic:
       disabled-checks:
         - ifElseChain
@@ -93,6 +96,10 @@ linters:
           name: exported
         - disabled: true
           name: package-comments
+    testifylint:
+      disable:
+        - go-require
+      enable-all: true
   exclusions:
     generated: lax
     rules:
