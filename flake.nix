@@ -85,9 +85,9 @@
               export GOWORK=off
               export GOCACHE="$TMPDIR/go-cache"
               cp -r ${
-                pkgs.lib.fileset.toSource {
+                lib.fileset.toSource {
                   root = ./.;
-                  fileset = pkgs.lib.fileset.gitTracked ./.;
+                  fileset = lib.fileset.gitTracked ./.;
                 }
               } src && chmod -R u+w src && cd src
               ${goPkg}/bin/go build ./...
