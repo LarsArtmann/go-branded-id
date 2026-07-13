@@ -6,7 +6,7 @@ A Go library providing branded, strongly-typed identifiers using phantom types (
 
 ## Essential Commands
 
-All build/test tasks go through the Nix flake. **Do not use `just`** — the `justfile` is deprecated and `CONTRIBUTING.md` references to it are stale.
+All build/test tasks go through the Nix flake. There is no `justfile` (it was removed); `CONTRIBUTING.md` still references `just` and is stale — see "Stale Files to Ignore" below.
 
 | Command                        | Purpose                                                 |
 | ------------------------------ | ------------------------------------------------------- |

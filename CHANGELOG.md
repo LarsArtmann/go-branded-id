@@ -45,6 +45,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [0.2.0] - 2026-05-04
 
+> Note: this version was never tagged as a separate release; the changes below
+> are included in the `v0.3.0` tag. Kept here for chronological accuracy.
+
 ### Added
 
 - `Ptr()` method returning `*ID[B, V]` for optional ID fields
