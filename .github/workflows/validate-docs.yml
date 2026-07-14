@@ -20,6 +20,8 @@ jobs:
 
       - name: Validate code blocks
         run: md-go-validator -f json -o results.json .
+        env:
+          GOEXPERIMENT: jsonv2
 
       - name: Upload results
         if: always()

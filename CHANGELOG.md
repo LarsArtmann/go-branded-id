@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.2] - 2026-07-13
+
+### Fixed
+
+- **CI could not build the library**: `id_json.go` and `id_sql.go` import `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2`. All CI workflows (`go.yml`, `release.yml`, `validate-docs.yml`) and the Nix flake now set `GOEXPERIMENT=jsonv2`. This was the root cause of the missing v0.3.1 GitHub Release — the release workflow's `go test -race ./...` step failed because the build constraints excluded `encoding/json/v2`.
+- Release workflow used `golangci-lint-action@v6` while the CI workflow used `@v7`; both now use `@v7`.
+
+### Changed
+
+- README performance table updated with verified benchmark numbers from Go 1.26.4 (`MarshalJSON` was listed as ~60ns/2allocs, actual is ~200ns/3allocs; `Compare` was ~1.5ns, actual is ~3ns; several other corrections).
+- `CONTRIBUTING.md` rebuilt: removed stale references to `just`, `pkg/errors/`, `go-arch-lint`, and `CONTRIBUTING-setup.sh` (none exist); replaced with accurate Nix-based instructions.
+- Installation instructions now document the `GOEXPERIMENT=jsonv2` prerequisite.
+- `MIGRATION.md` updated: Go version requirement is `1.26+` (not `1.26.2`); added troubleshooting for the `encoding/json/v2` build constraint error.
+
+### Added
+
+- `FEATURES.md` — honest feature inventory with code-verified `file:line` citations (was missing).
+- `ROADMAP.md` — long-term vision (ecosystem adoption, v1.0 stability, tooling).
+- `docs/DOMAIN_LANGUAGE.md` — added `Phantom Type` and `Zero Value` terms; removed inapplicable empty DDD template sections; fixed `.` placeholder.
+- CHANGELOG compare links.
+
 ## [0.3.1] - 2026-06-17
 
 ### Changed
@@ -82,3 +103,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Serialization support: JSON, SQL, Binary, Text, Gob
 - Comparison, equality, and zero-value semantics
 - All integer types: string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64
+
+---
+
+[0.3.2]: https://github.com/larsartmann/go-branded-id/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/larsartmann/go-branded-id/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/larsartmann/go-branded-id/compare/v0.1.0...v0.3.0
+[0.2.0]: https://github.com/larsartmann/go-branded-id/compare/v0.1.0...v0.3.0
+[0.1.0]: https://github.com/larsartmann/go-branded-id/releases/tag/v0.1.0

@@ -8,6 +8,8 @@ A Go library providing branded, strongly-typed identifiers using phantom types (
 
 All build/test tasks go through the Nix flake. There is no `justfile` (it was removed); `CONTRIBUTING.md` still references `just` and is stale — see "Stale Files to Ignore" below.
 
+> **CRITICAL:** This library imports `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2` to be set for ALL Go commands (`build`, `test`, `run`, `vet`, `lint`). Without it, **nothing compiles** (`build constraints exclude all Go files in encoding/json/v2`). The flake sets this automatically in all devShells, checks, and apps. When running `go` commands directly, always prefix with `GOEXPERIMENT=jsonv2`.
+
 | Command                        | Purpose                                                 |
 | ------------------------------ | ------------------------------------------------------- |
 | `nix run .#test`               | Run tests (`go test ./... -count=1`)                    |
@@ -85,6 +87,18 @@ There is no `internal/` or `pkg/` — this is intentionally a flat, single-packa
 
 ## Critical Gotchas
 
+### GOEXPERIMENT=jsonv2 — REQUIRED to build
+
+The library imports `encoding/json/v2` (`id_json.go`, `id_sql.go`). This package is gated behind build constraints in Go 1.26 and requires `GOEXPERIMENT=jsonv2`. Without it, you get:
+
+```
+imports encoding/json/v2: build constraints exclude all Go files in .../encoding/json/v2
+```
+
+**This is why the v0.3.1 GitHub Release never fired** — the CI workflows did not set `GOEXPERIMENT`, so `go test -race ./...` failed in the release workflow. Fixed in this session by adding `GOEXPERIMENT: jsonv2` to all workflow steps.
+
+The `encoding/json/v2` package provides `json.Marshaler` and `json.Unmarshaler` interfaces (same method signatures as v1) but with v2 semantics internally. `MarshalJSON` delegates to `json.Marshal(id.value)` using v2's encoder.
+
 ### String() vs Get() — Know the Difference
 
 `String()` changed behavior in v0.3.0. For named brands it now returns `"Brand:value"`. **Serialization never uses String()** — it always uses `valueString()` internally. But if _user code_ was parsing `String()` output, it will break after adding `Name()` to a brand.
@@ -122,6 +136,10 @@ Binary marshaling uses **little-endian** for all numeric types. `int` is seriali
 ### No go.work / GOWORK=off
 
 The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspace.
+
+### Lint Action Version Mismatch (Fixed)
+
+The release workflow (`release.yml`) used `golangci-lint-action@v6` while `go.yml` used `@v7`. Fixed in this session — both now use `@v7`.
 
 ## Ecosystem Context
 

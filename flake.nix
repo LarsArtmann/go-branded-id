@@ -66,6 +66,7 @@
             ];
 
             GOWORK = "off";
+            GOEXPERIMENT = "jsonv2";
 
             shellHook = ''
               echo "go-branded-id dev shell — $(go version)"
@@ -79,11 +80,13 @@
             ];
 
             GOWORK = "off";
+            GOEXPERIMENT = "jsonv2";
           };
 
           checks = {
             build = pkgs.runCommand "go-branded-id-build" { nativeBuildInputs = [ goPkg ]; } ''
               export GOWORK=off
+              export GOEXPERIMENT=jsonv2
               export GOCACHE="$TMPDIR/go-cache"
               cp -r ${
                 lib.fileset.toSource {
@@ -98,26 +101,32 @@
 
           apps = {
             test = mkApp "test" [ goPkg ] ''
+              export GOEXPERIMENT=jsonv2
               go test ./... -count=1 "$@"
             '';
 
             test-race = mkApp "test-race" [ goPkg ] ''
+              export GOEXPERIMENT=jsonv2
               go test ./... -race -count=1 "$@"
             '';
 
             build = mkApp "build" [ goPkg ] ''
+              export GOEXPERIMENT=jsonv2
               go build ./...
             '';
 
             vet = mkApp "vet" [ goPkg ] ''
+              export GOEXPERIMENT=jsonv2
               go vet ./...
             '';
 
             lint = mkApp "lint" [ pkgs.golangci-lint ] ''
+              export GOEXPERIMENT=jsonv2
               golangci-lint run ./...
             '';
 
             coverage = mkApp "coverage" [ goPkg ] ''
+              export GOEXPERIMENT=jsonv2
               go test ./... -coverprofile=coverage.out -covermode=atomic "$@"
               go tool cover -func=coverage.out
             '';

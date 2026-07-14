@@ -1,7 +1,7 @@
 # TODO List — go-branded-id
 
 > Short-term, actionable, bounded work items, verified against the actual code.
-> For long-term vision and unrefined ideas, see `ROADMAP.md` (not yet created).
+> For long-term vision and unrefined ideas, see `ROADMAP.md`.
 > Items are ranked by impact. Status is verified, not assumed.
 
 ## Status legend
@@ -15,23 +15,24 @@
 
 ## High Impact
 
-| Task                                         | Status       | Impact | Effort | Evidence                                                                                                                                                                 |
-| -------------------------------------------- | ------------ | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Investigate missing v0.3.1 GitHub Release    | 🔴 `TODO`    | High   | 30min  | Tag `v0.3.1` pushed to remote (`8b30d92`) but `gh release view v0.3.1` → "release not found". Release workflow (`.github/workflows/release.yml`) did not fire or failed. |
-| Bump 14 downstream ecosystem repos to v0.3.1 | 🔵 `BLOCKED` | High   | Days   | `Name()` + `.Get()` fixes already applied & pushed to all 14 repos (see "Ecosystem tracking" below); the `go.mod` dependency bump itself is not yet done in any of them. |
+| Task                                             | Status       | Impact | Effort | Evidence                                                                                                                                                        |
+| ------------------------------------------------ | ------------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Re-tag and re-push v0.3.1 after GOEXPERIMENT fix | 🔴 `TODO`    | High   | 10min  | Root cause found: CI failed because `GOEXPERIMENT=jsonv2` was not set. Fixed in `.github/workflows/release.yml`. Re-tag at HEAD and push to trigger release CI. |
+| Bump 14 downstream ecosystem repos to v0.3.1     | 🔵 `BLOCKED` | High   | Days   | Source fixes applied & pushed; `go.mod` bump not done. Blocked until v0.3.1 GitHub Release exists (consumers need `go get @v0.3.1` to resolve).                 |
 
 ## Medium Impact
 
-| Task                                            | Status    | Impact | Effort | Evidence                                                                        |
-| ----------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------------------- |
-| Add CI integration test against ecosystem repos | 🔴 `TODO` | Med    | 2h     | `cmd/namer/main.go` exists; no representative cross-repo compile test in CI yet |
-| Add tests for `cmd/namer` codemod               | 🔴 `TODO` | Med    | 1h     | `cmd/namer/main.go` has 0% coverage (`go test ./cmd/namer/ -cover`)             |
+| Task                                            | Status    | Impact | Effort | Evidence                                                                                                                            |
+| ----------------------------------------------- | --------- | ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Add CI integration test against ecosystem repos | 🔴 `TODO` | Med    | 2h     | `cmd/namer/main.go` exists; no representative cross-repo compile test in CI yet                                                     |
+| Add tests for `cmd/namer` codemod               | 🔴 `TODO` | Med    | 1h     | `cmd/namer/main.go` has 0% coverage (`GOEXPERIMENT=jsonv2 go test ./cmd/namer/ -cover`)                                             |
+| Evaluate json/v2 as long-term choice            | 🔴 `TODO` | Med    | 2h     | `encoding/json/v2` requires `GOEXPERIMENT=jsonv2` in Go 1.26. Consider whether to stay on v2 or fall back to v1 before v1.0 freeze. |
 
 ## Low Impact
 
-| Task                                                 | Status    | Impact | Effort | Evidence                                                                                                              |
-| ---------------------------------------------------- | --------- | ------ | ------ | --------------------------------------------------------------------------------------------------------------------- |
-| Document why go-cqrs-lite marker types skip `Name()` | 🔴 `TODO` | Low    | 15min  | Marker types are internal storage/stream keys; `Name()` would break key format. Add a note in `cmd/namer/` or README. |
+| Task                                                 | Status    | Impact | Effort | Evidence                                                                        |
+| ---------------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------------------- |
+| Document why go-cqrs-lite marker types skip `Name()` | 🔴 `TODO` | Low    | 15min  | Marker types are internal storage/stream keys; `Name()` would break key format. |
 
 ---
 
@@ -52,14 +53,3 @@ BerryBig (test brands only), Cyberdom (no brand types).
 Pre-existing test failures **not** caused by this library: CreditReformBilanzampel
 (BDD undefined step), timesheets (fuzz hours overflow), emeet-pixyd (PipeWire
 state file), Zlota44 (internal/discovery).
-
----
-
-<!-- Guidance for the builder:
-  - Source of truth is the CODE. Verify each item before adding, many
-    documented TODOs are already done.
-  - One task per row. If it takes more than ~2 hours, split it into smaller tasks.
-  - Cite evidence (file:line) so the next person can verify without re-deriving.
-  - DONE items should be REMOVED, not kept. Use CHANGELOG.md for history.
-  - If a task is vague ("improve X"), refine it or move it to ROADMAP.md.
--->

@@ -53,13 +53,13 @@ Computed live from the repo (do not hardcode these numbers):
 > Serialization always uses the raw value (never the brand prefix) via internal
 > `valueString()`. Zero values serialize to `null` / `nil`.
 
-| Feature                                    | Status                | Notes                                                                                 |
-| ------------------------------------------ | --------------------- | ------------------------------------------------------------------------------------- |
-| JSON (`MarshalJSON`/`UnmarshalJSON`)       | 🟢 `FULLY_FUNCTIONAL` | `id_json.go`; zero → `null`; string + all int/uint types                              |
-| SQL (`Scan`/`Value`)                       | 🟢 `FULLY_FUNCTIONAL` | `id_sql.go`; accepts `int64`/`int`/`float64` from drivers, coerces to target int type |
-| Text (`MarshalText`/`UnmarshalText`)       | 🟢 `FULLY_FUNCTIONAL` | `id_text.go`; for XML/TOML                                                            |
-| Binary (`MarshalBinary`/`UnmarshalBinary`) | 🟢 `FULLY_FUNCTIONAL` | `id_binary.go`; little-endian; `int` serialized as 8 bytes (uint64)                   |
-| Gob (`GobEncode`/`GobDecode`)              | 🟢 `FULLY_FUNCTIONAL` | `id_gob.go`; delegates to binary                                                      |
+| Feature                                    | Status                | Notes                                                                                                                                                            |
+| ------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| JSON (`MarshalJSON`/`UnmarshalJSON`)       | 🟢 `FULLY_FUNCTIONAL` | `id_json.go`; uses `encoding/json/v2` (requires `GOEXPERIMENT=jsonv2`); zero → `null`; delegates to `json.Marshal(id.value)`                                     |
+| SQL (`Scan`/`Value`)                       | 🟢 `FULLY_FUNCTIONAL` | `id_sql.go`; `Scan` accepts `string`, `[]byte`, `int64`, `int`, `float64`; `Value` returns `int64` for all int types; `TextMarshaler`/`TextUnmarshaler` fallback |
+| Text (`MarshalText`/`UnmarshalText`)       | 🟢 `FULLY_FUNCTIONAL` | `id_text.go`; `MarshalText` via `valueString()` (all types); `UnmarshalText` parses `string`/`int`/`int64`/`uint64` directly, others via `TextUnmarshaler`       |
+| Binary (`MarshalBinary`/`UnmarshalBinary`) | 🟢 `FULLY_FUNCTIONAL` | `id_binary.go`; little-endian; `int`/`uint` as 8 bytes; `BinaryMarshaler` fallback                                                                               |
+| Gob (`GobEncode`/`GobDecode`)              | 🟢 `FULLY_FUNCTIONAL` | `id_gob.go`; delegates to binary                                                                                                                                 |
 
 ## Formatting & Pointers
 

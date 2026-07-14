@@ -47,9 +47,14 @@ var orderID = id.NewID[OrderBrand]("order-456")
 
 ## Installation
 
+**Prerequisite:** Go 1.26+ with `GOEXPERIMENT=jsonv2` enabled (this library uses `encoding/json/v2`).
+
 ```bash
-go get github.com/larsartmann/go-branded-id
+GOEXPERIMENT=jsonv2 go get github.com/larsartmann/go-branded-id
 ```
+
+You must set `GOEXPERIMENT=jsonv2` for all Go commands (`build`, `test`, `run`, etc.).
+For convenience, add it to your environment or `go.env`.
 
 ## Quick Start
 
@@ -76,7 +81,7 @@ func main() {
 
     fmt.Println(userID)       // User:user-123  (named brand shows prefix)
     fmt.Println(orderID)      // order-456      (unnamed brand, value only)
-    fmt.Printf("%#v\n", userID) // id.User(user-123)
+    fmt.Printf("%#v\n", userID) // id.User(user-123) — display only, not valid Go syntax
 
     // Type-safe comparison
     otherUserID := id.NewID[UserBrand]("user-123")
@@ -110,7 +115,7 @@ userID := id.NewID[UserBrand]("abc123")
 fmt.Println(userID) // User:abc123
 
 // Debug format shows full type info
-fmt.Printf("%#v\n", userID) // id.User(abc123)
+fmt.Printf("%#v\n", userID) // id.User(abc123) — display format, not valid Go syntax
 
 // Validation errors identify the brand
 var empty ID[UserBrand, string]
@@ -221,26 +226,28 @@ sort.Slice(ids, func(i, j int) bool {
 
 ## Performance
 
-Stdlib-only, allocation-conscious implementation (benchmarked on Go 1.26):
+Stdlib-only, allocation-conscious implementation (benchmarked on Go 1.26.4 with `GOEXPERIMENT=jsonv2`):
 
 | Operation           | Typical Latency | Allocations |
 | ------------------- | --------------- | ----------- |
-| `NewID`             | ~0.3 ns/op      | 0           |
+| `NewID`             | ~0.4 ns/op      | 0           |
 | `Get`               | ~1 ns/op        | 0           |
-| `Equal`             | ~0.2 ns/op      | 0           |
-| `Compare`           | ~1.5 ns/op      | 0           |
-| `IsZero`            | ~1.3 ns/op      | 0           |
-| `String` (no brand) | ~4.5 ns/op      | 0           |
-| `String` (named)    | ~20 ns/op       | 1           |
-| `MarshalJSON`       | ~60 ns/op       | 2           |
-| `MarshalBinary`     | ~8 ns/op        | 1           |
-| `Scan` (string)     | ~18 ns/op       | 1           |
+| `Equal`             | ~0.3 ns/op      | 0           |
+| `Compare`           | ~3 ns/op        | 0           |
+| `IsZero`            | ~1.4 ns/op      | 0           |
+| `String` (no brand) | ~5 ns/op        | 0           |
+| `String` (named)    | ~30 ns/op       | 1           |
+| `MarshalJSON`       | ~200 ns/op      | 3           |
+| `MarshalBinary`     | ~22 ns/op       | 1           |
+| `Scan` (string)     | ~44 ns/op       | 1           |
 
 Core operations (`NewID`, `Get`, `Equal`, `Compare`, `IsZero`) and unbranded `String()` are zero-allocation. Named-brand `String()` requires one allocation for the `"Brand:value"` concatenation. `Format()` (via `fmt.Sprintf`) benefits from direct `io.Writer` writes introduced in v0.3.1.
 
+> Numbers from `go test -bench=. -benchmem` on Go 1.26.4 linux/amd64. Rerun with `GOEXPERIMENT=jsonv2 go test -bench=. -benchmem ./...`.
+
 ## Contributing
 
-Contributions are welcome. Please ensure all tests pass (`go test ./... -race`) and lint is clean (`golangci-lint run`) before submitting changes.
+Contributions are welcome. Please ensure all tests pass (`GOEXPERIMENT=jsonv2 go test ./... -race`) and lint is clean (`GOEXPERIMENT=jsonv2 golangci-lint run`) before submitting changes.
 
 ## License
 
