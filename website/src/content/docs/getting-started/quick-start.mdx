@@ -1,0 +1,100 @@
+---
+title: Quick Start
+description: Get started with go-branded-id in under a minute.
+---
+
+## Define Your Brand Types
+
+Brand types are empty structs that exist only as phantom type parameters. They add zero runtime cost.
+
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/larsartmann/go-branded-id"
+)
+
+type UserBrand struct{}
+type OrderBrand struct{}
+
+// Optional: add Name() for debug-visible IDs
+func (UserBrand) Name() string  { return "User" }
+
+type UserID = id.ID[UserBrand, string]
+type OrderID = id.ID[OrderBrand, string]
+```
+
+## Create and Use IDs
+
+```go
+func main() {
+    userID := id.NewID[UserBrand]("user-123")
+    orderID := id.NewID[OrderBrand]("order-456")
+
+    fmt.Println(userID)   // User:user-123 (named brand shows prefix)
+    fmt.Println(orderID)  // order-456    (unnamed brand, value only)
+
+    // Type-safe comparison
+    other := id.NewID[UserBrand]("user-123")
+    fmt.Println(userID.Equal(other)) // true
+
+    // Zero value check
+    var empty UserID
+    fmt.Println(empty.IsZero()) // true
+
+    // Default value with Or
+    fmt.Println(empty.Or(id.NewID[UserBrand]("unknown")).Get()) // unknown
+}
+```
+
+## Compile-Time Safety
+
+The compiler prevents mixing IDs:
+
+```go
+func GetUser(id UserID) error   { return nil }
+func GetOrder(id OrderID) error { return nil }
+
+func main() {
+    userID := id.NewID[UserBrand]("user-123")
+
+    GetUser(userID)     // OK
+    // GetOrder(userID) // COMPILE ERROR: cannot use UserID as OrderID
+}
+```
+
+## Non-String Value Types
+
+IDs work with any comparable type. For numeric types, specify the value type explicitly:
+
+```go
+type ProductBrand struct{}
+
+type ProductID = id.ID[ProductBrand, int64]
+
+productID := id.NewID[ProductBrand, int64](42)
+fmt.Println(productID.Get()) // 42
+```
+
+## Sorting
+
+```go
+ids := []ProductID{
+    id.NewID[ProductBrand, int64](300),
+    id.NewID[ProductBrand, int64](100),
+    id.NewID[ProductBrand, int64](200),
+}
+
+sort.Slice(ids, func(i, j int) bool {
+    cmp, _ := ids[i].Compare(ids[j])
+    return cmp < 0
+})
+```
+
+## Next Steps
+
+- Learn about [Named Brands](/guides/named-brands/) for brand-aware validation
+- See [Serialization](/guides/serialization/) for JSON, SQL, and more
+- Check [Value Types](/guides/value-types/) for all supported types

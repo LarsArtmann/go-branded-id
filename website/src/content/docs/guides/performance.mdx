@@ -1,0 +1,46 @@
+---
+title: Performance
+description: Benchmark results and allocation analysis for branded IDs.
+---
+
+## Zero-Cost Abstraction
+
+Phantom types exist only in the type system. At runtime, `ID[UserBrand, string]` is just a struct wrapping a `string`. The compiler eliminates the brand type entirely.
+
+## Benchmark Results
+
+Benchmarked on Go 1.26.4 with `GOEXPERIMENT=jsonv2`:
+
+| Operation           | Latency | Allocations |
+| ------------------- | ------- | ----------- |
+| `NewID`             | ~0.4 ns | 0           |
+| `Get`               | ~1 ns   | 0           |
+| `Equal`             | ~0.3 ns | 0           |
+| `Compare`           | ~3 ns   | 0           |
+| `IsZero`            | ~1.4 ns | 0           |
+| `String` (no brand) | ~5 ns   | 0           |
+| `String` (named)    | ~30 ns  | 1           |
+| `MarshalJSON`       | ~200 ns | 3           |
+| `MarshalBinary`     | ~22 ns  | 1           |
+| `Scan` (string)     | ~44 ns  | 1           |
+
+Core operations (`NewID`, `Get`, `Equal`, `Compare`, `IsZero`) and unbranded `String()` are **zero-allocation**.
+
+Named-brand `String()` requires one allocation for the `"Brand:value"` concatenation.
+
+## Reproducing
+
+```bash
+GOEXPERIMENT=jsonv2 go test -bench=. -benchmem ./...
+```
+
+## Why So Fast
+
+- **No reflection** — all type handling is via type switches at known boundaries
+- **No boxing** — the underlying value is stored directly
+- **No indirection** — brand types are zero-size, eliminated by the compiler
+- **Direct writes** — `Format()` writes directly to `io.Writer` instead of allocating strings (v0.3.1+)
+
+## Format Optimization
+
+Since v0.3.1, `Format()` (used by `fmt.Sprintf`, `fmt.Printf`, etc.) writes directly to the `fmt.State`'s writer instead of allocating an intermediate string. This means `%s` and `%v` formatting of IDs avoids allocations for unnamed brands.

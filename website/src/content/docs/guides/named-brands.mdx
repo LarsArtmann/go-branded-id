@@ -1,0 +1,76 @@
+---
+title: Named Brands
+description: Adding Name() to brand types for debug visibility and validation.
+---
+
+## What Named Brands Do
+
+By default, brand types are anonymous — `String()` returns just the value. Adding a `Name()` method enables:
+
+- **Debug-visible IDs**: `String()` returns `"User:abc123"` instead of just `"abc123"`
+- **Brand-aware validation**: `ValidateID` errors include the brand name
+- **Runtime introspection**: `BrandName[T]()` for logging and error messages
+
+## Defining a Named Brand
+
+```go
+type UserBrand struct{}
+
+func (UserBrand) Name() string { return "User" }
+```
+
+That's it. The `Name()` method is the entire `BrandNamer` interface.
+
+## String Output
+
+```go
+userID := id.NewID[UserBrand]("abc123")
+fmt.Println(userID)               // User:abc123
+fmt.Printf("%#v\n", userID)       // id.User(abc123)
+
+// Unnamed brand (no Name() method)
+orderID := id.NewID[OrderBrand]("order-456")
+fmt.Println(orderID)              // order-456 (value only)
+```
+
+> `GoString()` and `%#v` output is a display format, not valid Go syntax.
+
+## Validation
+
+```go
+var empty ID[UserBrand, string]
+err := id.ValidateID(empty)
+fmt.Println(err) // id: invalid: User: empty
+
+// With a custom value validator
+err = id.ValidateIDWithValue(userID, func(v string) error {
+    if v == "" { return errors.New("required") }
+    return nil
+})
+
+// Panic variant for init-time checks
+id.MustValidateID(userID)
+```
+
+## Introspection
+
+```go
+fmt.Println(id.BrandName[UserBrand]()) // User
+```
+
+For unnamed brands, `BrandName` falls back to `fmt.Sprintf("%T", brand)` — which includes the package path (e.g., `"main.OrderBrand"`).
+
+## String() vs Get()
+
+| Method     | Returns         | Use Case                      |
+| ---------- | --------------- | ----------------------------- |
+| `String()` | `"User:abc123"` | Display, logging              |
+| `Get()`    | `"abc123"`      | Programmatic value extraction |
+
+> **Serialization never uses `String()`.** JSON, SQL, Text, Binary, and Gob all use the raw value internally. Adding `Name()` does not affect serialized output.
+
+## Adding Name() to Existing Brands
+
+If you add `Name()` to a brand that didn't have it before, `String()` changes behavior. Any code parsing `String()` output will break — but code using `Get()` is unaffected.
+
+**Rule**: Use `Get()` for any programmatic value extraction. Use `String()` only for display and logging.

@@ -1,0 +1,29 @@
+---
+title: Related Tools
+description: Tools and libraries that complement go-branded-id.
+---
+
+## go-atomic-write
+
+[go-atomic-write](https://github.com/larsartmann/go-atomic-write) provides crash-safe, race-free file writes for Go. Uses branded IDs internally for type-safe path handling.
+
+## gogenfilter
+
+[gogenfilter](https://github.com/larsartmann/gogenfilter) detects and filters auto-generated Go code files. Complements go-branded-id in CI pipelines that enforce code quality.
+
+## Go Generics
+
+go-branded-id is built on Go's generics system (1.18+). The phantom type pattern uses type parameters to enforce constraints at compile time without runtime cost.
+
+- [Go Generics Tutorial](https://go.dev/doc/generics)
+- [Type Parameters Proposal](https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md)
+
+## encoding/json/v2
+
+This library uses `encoding/json/v2`, the next-generation JSON encoder for Go. It requires `GOEXPERIMENT=jsonv2` until the API stabilizes.
+
+- [JSON v2 Proposal](https://github.com/golang/go/discussions/71497)
+
+## Ecosystem
+
+go-branded-id was extracted from `go-composable-business-types` and is used across 14+ downstream repositories including InboxClean, CreditReformBilanzampel, ActaFlow, and more.

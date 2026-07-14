@@ -1,0 +1,16 @@
+{
+  "name": "go-branded-id",
+  "short_name": "go-branded-id",
+  "description": "Branded, strongly-typed identifiers for Go",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0a09",
+  "theme_color": "#a855f7",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

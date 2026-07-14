@@ -1,0 +1,83 @@
+---
+title: Contributing
+description: How to contribute to go-branded-id.
+---
+
+## Development Setup
+
+**Requirements:** Go 1.26+, Nix (optional but recommended)
+
+```bash
+git clone https://github.com/larsartmann/go-branded-id.git
+cd go-branded-id
+```
+
+If using Nix:
+
+```bash
+nix develop   # enters dev shell with Go, golangci-lint, gopls
+```
+
+## Building
+
+```bash
+GOEXPERIMENT=jsonv2 go build ./...
+```
+
+Or via Nix:
+
+```bash
+nix run .#build
+```
+
+## Testing
+
+```bash
+# Run all tests
+GOEXPERIMENT=jsonv2 go test ./... -count=1
+
+# With race detector
+GOEXPERIMENT=jsonv2 go test ./... -race -count=1
+
+# Or via Nix
+nix run .#test
+nix run .#test-race
+```
+
+All tests use `t.Parallel()` and the standard `testing` package.
+
+## Linting
+
+Uses golangci-lint v2 with an extremely strict config (`.golangci.yml`):
+
+```bash
+GOEXPERIMENT=jsonv2 golangci-lint run
+
+# Or via Nix
+nix run .#lint
+```
+
+## Code Style
+
+- `gofumpt` (stricter than `gofmt`) + `goimports` + `golines` (120 chars)
+- `t.Parallel()` on all tests
+- Generic test helpers: `test<Name>` or `assert<Cmp><Action>`
+- `nolint` comments with justification rationale are expected
+- Single-letter variables trigger `varnamelen` — use full words
+
+## CI
+
+All pull requests must pass:
+
+- `go build ./...` — compiles cleanly
+- `go test -race ./...` — tests pass with race detection
+- `go vet ./...` — no vet warnings
+- `golangci-lint run ./...` — no lint issues
+
+## Pull Requests
+
+- Ensure all tests pass with `GOEXPERIMENT=jsonv2` set
+- Ensure linting passes
+- Add tests for new functionality
+- Keep changes focused and atomic
+- Consider the 14 downstream repos in the ecosystem when making breaking changes

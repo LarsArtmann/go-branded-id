@@ -1,0 +1,112 @@
+---
+title: Serialization
+description: JSON, SQL, Text, Binary, and Gob serialization for branded IDs.
+---
+
+## Serialization Philosophy
+
+Serialization always uses the **raw value** — never the brand prefix. So `"user-123"`, not `"User:user-123"`.
+
+Zero values serialize to `null` / `nil` across all formats.
+
+## JSON
+
+```go
+type UserBrand struct{}
+func (UserBrand) Name() string { return "User" }
+type UserID = id.ID[UserBrand, string]
+
+// Marshal
+userID := id.NewID[UserBrand]("user-123")
+data, _ := json.Marshal(userID)
+fmt.Println(string(data)) // "user-123"
+
+// Zero value → null
+var empty UserID
+data, _ = json.Marshal(empty)
+fmt.Println(string(data)) // null
+
+// Unmarshal
+var parsed UserID
+json.Unmarshal([]byte(`"user-456"`), &parsed)
+fmt.Println(parsed.Get()) // user-456
+
+// Unmarshal null → zero value
+json.Unmarshal([]byte(`null`), &parsed)
+fmt.Println(parsed.IsZero()) // true
+```
+
+> Uses `encoding/json/v2` — requires `GOEXPERIMENT=jsonv2`.
+
+## SQL
+
+Works directly with `database/sql`:
+
+```go
+// Scan from database
+var userID UserID
+row.Scan(&userID)
+
+// Save to database
+db.Exec("INSERT INTO users (id, name) VALUES (?, ?)", userID, "John")
+
+// Zero value → NULL
+var empty UserID
+db.Exec("INSERT INTO orders (user_id) VALUES (?)", empty) // inserts NULL
+```
+
+`Scan` accepts `string`, `[]byte`, `int64`, `int`, and `float64` from database drivers and casts to the target type. `Value` returns the correct `driver.Value` for the underlying type.
+
+## Text (XML, TOML)
+
+```go
+// Marshal to text
+data, _ := userID.MarshalText()
+fmt.Println(string(data)) // user-123
+
+// Unmarshal from text
+var parsed UserID
+parsed.UnmarshalText([]byte("user-456"))
+```
+
+## Binary
+
+Little-endian encoding for all numeric types. `int` and `uint` are serialized as 8 bytes (uint64).
+
+```go
+// Marshal to binary
+data, _ := userID.MarshalBinary()
+
+// Unmarshal from binary
+var parsed UserID
+parsed.UnmarshalBinary(data)
+```
+
+## Gob
+
+Gob encoding delegates to binary marshaling:
+
+```go
+// Register the type before encoding
+gob.Register(UserID{})
+
+// Encode
+buf := new(bytes.Buffer)
+enc := gob.NewEncoder(buf)
+enc.Encode(userID)
+
+// Decode
+dec := gob.NewDecoder(buf)
+var parsed UserID
+dec.Decode(&parsed)
+```
+
+## Summary
+
+| Format | Interfaces                          | Zero Value          |
+| ------ | ----------------------------------- | ------------------- |
+| JSON   | `MarshalJSON` / `UnmarshalJSON`     | `null`              |
+| SQL    | `Scan` / `Value`                    | `nil`               |
+| Text   | `MarshalText` / `UnmarshalText`     | `nil`               |
+| Binary | `MarshalBinary` / `UnmarshalBinary` | empty bytes         |
+| Gob    | `GobEncode` / `GobDecode`           | delegates to binary |

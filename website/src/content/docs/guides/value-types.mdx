@@ -1,0 +1,76 @@
+---
+title: Value Types
+description: Supported value types for branded IDs.
+---
+
+## The Generic Constraint
+
+```go
+ID[B any, V comparable]
+```
+
+Any comparable type works as `V`. The `comparable` constraint includes all basic types, structs containing only comparable fields, arrays of comparable types, and pointers.
+
+## Full Serialization Support
+
+These types have specialized serialization (JSON, SQL, Text, Binary, Gob):
+
+| Category     | Types                                         |
+| ------------ | --------------------------------------------- |
+| String       | `string`                                      |
+| Signed int   | `int`, `int8`, `int16`, `int32`, `int64`      |
+| Unsigned int | `uint`, `uint8`, `uint16`, `uint32`, `uint64` |
+
+That's 13 types with full serialization.
+
+## Core Operations Only
+
+Other comparable types work for core operations (`Get`, `Equal`, `IsZero`, `Reset`) but lack specialized serialization:
+
+- Arrays of comparable types
+- Structs with comparable fields
+- Pointers to comparable types
+
+```go
+type TokenBrand struct{}
+type Token = id.ID[TokenBrand, [16]byte] // works for Get/Equal/IsZero
+
+token := id.NewID[TokenBrand]([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
+fmt.Println(token.Get()) // [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16]
+```
+
+## Creating IDs
+
+For strings, the value type is inferred:
+
+```go
+id.NewID[UserBrand]("user-123") // V inferred as string
+```
+
+For numeric types, specify the value type explicitly:
+
+```go
+id.NewID[ProductBrand, int64](42)
+id.NewID[SessionBrand, uint32](1000)
+```
+
+## Compare Limitations
+
+`Compare()` supports ordered types only: `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `string`.
+
+Returns `ErrNotOrdered` for anything else. There is no generic constraint enforcing this at compile time — it's a runtime check via type switch.
+
+```go
+id1 := id.NewID[UserBrand, int64](100)
+id2 := id.NewID[UserBrand, int64](200)
+
+cmp, err := id1.Compare(id2) // cmp = -1, err = nil
+```
+
+## SQL Type Coercion
+
+`Scan` accepts `int64`, `int`, and `float64` from database drivers and casts them to the target integer type. This is necessary because different SQL drivers return different Go types. The casts have `gosec G115` suppressions documenting that they are safe serialization boundaries.
+
+## Binary Serialization Endianness
+
+Binary marshaling uses **little-endian** for all numeric types. `int` is serialized as 8 bytes (uint64). This is an implementation detail but matters for cross-language compatibility.

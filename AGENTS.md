@@ -39,6 +39,7 @@ The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.26, golangci-l
 ├── id_binary.go       # MarshalBinary / UnmarshalBinary (little-endian)
 ├── id_gob.go          # GobEncode / GobDecode (delegates to binary)
 ├── cmd/namer/         # Standalone codemod tool: scans Go files for brand types missing Name() method
+├── website/           # Astro + Starlight documentation website (deployed to Firebase Hosting)
 └── *_test.go          # Tests, benchmarks, fuzz tests, example tests
 ```
 
@@ -158,6 +159,21 @@ When making breaking changes, consider the migration impact across:
 - `git-town.toml` configures `master` as the main branch.
 - BuildFlow pre-commit hook runs 34 checks (Go mode) including golangci-lint, gofumpt, goimports, statix, gitleaks, doc-files-age-check (max 3w freshness), and nix-flake-check.
 - `doc-files-age-check` requires README.md and TODO_LIST.md to be updated within 3 weeks of code changes — SARIF format reveals the specific stale file (`buildflow --step doc-files-age-check --format sarif`).
+
+## Website
+
+The `website/` directory contains an Astro + Starlight documentation site deployed to Firebase Hosting.
+
+- **Live URL**: `https://branded-id.lars.software` (custom domain, DNS pending `terraform apply` in `domains/` repo)
+- **Temporary URL**: `https://brandedid.web.app` (Firebase default, works now)
+- **Firebase project**: `lars-software`
+- **Hosting target**: `brandedid`
+- **Color theme**: Violet (#a855f7)
+- **DNS**: CNAME `branded-id.lars.software` → `brandedid.web.app` (in `domains/lars.software.tf`, needs `terraform apply`)
+- **Build**: `nix run .#build` (from `website/`) or `npm run build`
+- **Dev**: `nix run .#dev` (from `website/`) or `npm run dev`
+- **Deploy**: `nix run .#deploy` (from `website/`) — builds and runs `firebase deploy --only hosting`
+- The website has its own `flake.nix`, `package.json`, and `firebase.json` — independent from the Go library's flake
 
 ## Stale Files to Ignore
 

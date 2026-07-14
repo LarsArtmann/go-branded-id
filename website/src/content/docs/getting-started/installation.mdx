@@ -1,0 +1,65 @@
+---
+title: Installation
+description: Install go-branded-id in your Go project.
+---
+
+## Requirements
+
+- Go 1.26 or later
+- `GOEXPERIMENT=jsonv2` enabled (this library uses `encoding/json/v2`)
+- An active Go module (`go.mod`)
+
+## Install
+
+Run this in your project directory:
+
+```bash
+GOEXPERIMENT=jsonv2 go get github.com/larsartmann/go-branded-id
+```
+
+## Enable GOEXPERIMENT=jsonv2
+
+This library imports `encoding/json/v2`, which requires the `jsonv2` experiment flag. Set it for all Go commands:
+
+```bash
+export GOEXPERIMENT=jsonv2
+```
+
+For a permanent setup, add it to your shell profile (`~/.bashrc`, `~/.zshrc`) or to `go env`:
+
+```bash
+go env -w GOEXPERIMENT=jsonv2
+```
+
+## Quick Usage
+
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/larsartmann/go-branded-id"
+)
+
+type UserBrand struct{}
+
+type UserID = id.ID[UserBrand, string]
+
+func main() {
+    userID := id.NewID[UserBrand]("user-123")
+    fmt.Println(userID.Get()) // user-123
+}
+```
+
+## Verify Installation
+
+```bash
+GOEXPERIMENT=jsonv2 go list -m github.com/larsartmann/go-branded-id
+```
+
+## Next Steps
+
+- Follow the [Quick Start](/getting-started/quick-start/) for complete examples
+- Learn about [Named Brands](/guides/named-brands/) for debug-visible IDs
+- See [Serialization](/guides/serialization/) for JSON, SQL, and more

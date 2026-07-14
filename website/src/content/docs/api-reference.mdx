@@ -1,0 +1,183 @@
+---
+title: API Reference
+description: Public API for go-branded-id.
+---
+
+## Core Type
+
+### ID
+
+A branded identifier wrapping a value of type `V`, branded by phantom type `B`.
+
+```go
+type ID[B any, V comparable] struct {
+    // contains filtered or unexported fields
+}
+```
+
+## Constructors
+
+### NewID
+
+Creates a new branded ID. For strings, the value type is inferred.
+
+```go
+func NewID[B any, V comparable](v V) ID[B, V]
+```
+
+## Core Methods
+
+### Get
+
+Returns the underlying value.
+
+```go
+func (id ID[B, V]) Get() V
+```
+
+### IsZero
+
+Returns true if the ID has its zero value (unset).
+
+```go
+func (id ID[B, V]) IsZero() bool
+```
+
+### Reset
+
+Sets the ID to its zero value.
+
+```go
+func (id ID[B, V]) Reset()
+```
+
+### Equal
+
+Returns true if both IDs have the same value. Both must be the same brand and value type.
+
+```go
+func (id ID[B, V]) Equal(other ID[B, V]) bool
+```
+
+### Compare
+
+Returns -1, 0, or 1 for ordered comparison. Only supports ordered types (int/uint/string families). Returns `ErrNotOrdered` for other types.
+
+```go
+func (id ID[B, V]) Compare(other ID[B, V]) (int, error)
+```
+
+### Or
+
+Returns the ID itself if not zero, otherwise returns the provided default.
+
+```go
+func (id ID[B, V]) Or(defaultID ID[B, V]) ID[B, V]
+```
+
+## Formatting
+
+### String
+
+Returns `"Brand:value"` for named brands, or just the value for unnamed brands. For display only.
+
+```go
+func (id ID[B, V]) String() string
+```
+
+### GoString
+
+Returns `id.Brand(value)` for debugging. Display format, not valid Go syntax.
+
+```go
+func (id ID[B, V]) GoString() string
+```
+
+## Optional Fields
+
+### Ptr
+
+Returns a pointer to the ID. Useful for optional struct fields.
+
+```go
+func (id ID[B, V]) Ptr() *ID[B, V]
+```
+
+### FromPtr
+
+Dereferences a pointer to an ID. Returns zero value if the pointer is nil.
+
+```go
+func FromPtr[B any, V comparable](ptr *ID[B, V]) ID[B, V]
+```
+
+## Serialization
+
+| Method                    | Interface                    |
+| ------------------------- | ---------------------------- |
+| `MarshalJSON()`           | `json.Marshaler`             |
+| `UnmarshalJSON([]byte)`   | `json.Unmarshaler`           |
+| `MarshalText()`           | `encoding.TextMarshaler`     |
+| `UnmarshalText([]byte)`   | `encoding.TextUnmarshaler`   |
+| `MarshalBinary()`         | `encoding.BinaryMarshaler`   |
+| `UnmarshalBinary([]byte)` | `encoding.BinaryUnmarshaler` |
+| `GobEncode()`             | `gob.GobEncoder`             |
+| `GobDecode([]byte)`       | `gob.GobDecoder`             |
+| `Scan(any)`               | `sql.Scanner`                |
+| `Value()`                 | `driver.Valuer`              |
+
+## Brand Utilities
+
+### BrandName
+
+Returns the brand name. Calls `Name()` if the brand implements `BrandNamer`, otherwise returns `fmt.Sprintf("%T", brand)`.
+
+```go
+func BrandName[B any]() string
+```
+
+### ValidateID
+
+Returns an error if the ID is zero. Error message includes the brand name for named brands.
+
+```go
+func ValidateID[B any, V comparable](id ID[B, V]) error
+```
+
+### ValidateIDWithValue
+
+Validates that the ID is non-zero, then calls the provided validator function on the value.
+
+```go
+func ValidateIDWithValue[B any, V comparable](id ID[B, V], validate func(V) error) error
+```
+
+### MustValidateID
+
+Panics if the ID is zero. For init-time checks.
+
+```go
+func MustValidateID[B any, V comparable](id ID[B, V])
+```
+
+## API Summary
+
+| Symbol                        | Description              |
+| ----------------------------- | ------------------------ |
+| `ID[B, V]`                    | Phantom-typed identifier |
+| `NewID[B, V](v)`              | Constructor              |
+| `Get()`                       | Raw value accessor       |
+| `IsZero()` / `Reset()`        | Zero value semantics     |
+| `Equal(other)`                | Type-safe equality       |
+| `Compare(other)`              | Ordered comparison       |
+| `Or(default)`                 | Fallback for zero values |
+| `String()` / `GoString()`     | Display formatting       |
+| `Ptr()` / `FromPtr()`         | Optional field helpers   |
+| `BrandName[B]()`              | Brand name introspection |
+| `ValidateID(id)`              | Zero-value validation    |
+| `ValidateIDWithValue(id, fn)` | Custom value validation  |
+| `MustValidateID(id)`          | Panicking validation     |
+
+## Full API on pkg.go.dev
+
+For the complete, always-up-to-date API documentation, see [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/go-branded-id).

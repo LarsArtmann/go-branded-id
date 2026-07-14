@@ -1,0 +1,58 @@
+---
+title: Changelog
+description: All notable changes to go-branded-id.
+---
+
+## [0.3.2] — 2026-07-13
+
+### Fixed
+
+- **CI build failure**: `id_json.go` and `id_sql.go` import `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2`. All CI workflows and the Nix flake now set this environment variable. This was the root cause of the missing v0.3.1 GitHub Release.
+
+### Changed
+
+- README performance table corrected with verified benchmark numbers from Go 1.26.4.
+- Installation instructions now document the `GOEXPERIMENT=jsonv2` prerequisite.
+- `CONTRIBUTING.md` rebuilt with accurate Nix-based instructions.
+
+### Added
+
+- `FEATURES.md` — honest feature inventory with code-verified citations.
+- `ROADMAP.md` — long-term vision.
+- `docs/DOMAIN_LANGUAGE.md` — added `Phantom Type` and `Zero Value` terms.
+
+## [0.3.1] — 2026-06-17
+
+### Changed
+
+- `Format()` writes directly to `fmt.State`'s writer instead of allocating strings — reduces allocations for `%s` and `%v` formatting.
+
+## [0.3.0] — 2026-06-10
+
+### Added
+
+- **Named brands**: optional `Name()` method on brand types enables `"User:abc123"` display strings.
+- `BrandName[B]()` for runtime brand introspection.
+- `ValidateID`, `ValidateIDWithValue`, `MustValidateID` for brand-aware validation.
+- `Ptr()` and `FromPtr()` for optional ID fields.
+
+### Changed
+
+- `String()` now returns `"Brand:value"` for named brands (was value-only for all brands). Serialization unaffected — still uses raw values.
+
+## [0.2.0] — 2026-05-15
+
+### Added
+
+- Full serialization suite: JSON, SQL, Text, Binary, Gob.
+- `Compare()` method for ordered types.
+- `Or()` for zero-value fallbacks.
+- SQL `Scan` type coercion for all driver types.
+
+## [0.1.0] — 2026-04-20
+
+### Added
+
+- `ID[B any, V comparable]` phantom-typed identifier.
+- `NewID`, `Get`, `IsZero`, `Reset`, `Equal`.
+- Initial extraction from `go-composable-business-types`.
