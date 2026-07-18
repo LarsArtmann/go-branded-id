@@ -3,7 +3,6 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/larsartmann/go-branded-id?logo=go&logoColor=white)](go.mod)
 [![CI](https://github.com/larsartmann/go-branded-id/actions/workflows/go.yml/badge.svg)](https://github.com/larsartmann/go-branded-id/actions/workflows/go.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/go-branded-id.svg)](https://pkg.go.dev/github.com/larsartmann/go-branded-id)
-[![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/go-branded-id)](https://goreportcard.com/report/github.com/larsartmann/go-branded-id)
 [![GitHub stars](https://img.shields.io/github/stars/larsartmann/go-branded-id?style=flat)](https://github.com/larsartmann/go-branded-id/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-branded--id.lars.software-8b5cf6)](https://branded-id.lars.software)
