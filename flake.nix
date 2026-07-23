@@ -17,7 +17,6 @@
   outputs =
     inputs@{
       self,
-      nixpkgs,
       flake-parts,
       treefmt-nix,
       systems,
@@ -34,7 +33,6 @@
           config,
           lib,
           pkgs,
-          system,
           ...
         }:
         let

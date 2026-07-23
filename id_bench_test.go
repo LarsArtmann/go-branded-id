@@ -2,7 +2,7 @@ package id
 
 import (
 	"database/sql/driver"
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"math"
 	"testing"
@@ -15,6 +15,7 @@ const benchIDValue = "test-id-12345"
 
 func addInt64FuzzCases(f *testing.F) {
 	f.Helper()
+
 	for _, tc := range []int64{0, 1, -1, 42, math.MaxInt64, math.MinInt64} {
 		f.Add(tc)
 	}
@@ -336,7 +337,7 @@ func benchmarkJSONRoundTrip[B, V comparable](b *testing.B, id ID[B, V]) {
 	b.Helper()
 
 	for b.Loop() {
-		data, _ := json.Marshal(id) //nolint:errchkjson // Benchmark: error check not needed
+		data, _ := json.Marshal(id)
 
 		var restored ID[B, V]
 
@@ -528,6 +529,7 @@ func ExampleValidateIDWithValue() {
 		if len(v) < 3 {
 			return fmt.Errorf("too short: got %d chars", len(v))
 		}
+
 		return nil
 	})
 	fmt.Println(err)
@@ -536,6 +538,7 @@ func ExampleValidateIDWithValue() {
 
 func ExampleBrandName_unnamed() {
 	type MyBrand struct{}
+
 	fmt.Println(BrandName[MyBrand]())
 	// Output: id.MyBrand
 }

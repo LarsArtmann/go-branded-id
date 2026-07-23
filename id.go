@@ -197,6 +197,7 @@ func (id ID[B, V]) writeTo(w io.Writer) {
 		_, _ = io.WriteString(w, name)
 		_, _ = io.WriteString(w, ":")
 	}
+
 	_, _ = io.WriteString(w, id.valueString())
 }
 

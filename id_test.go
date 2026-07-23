@@ -100,9 +100,11 @@ func TestNewID(t *testing.T) {
 func TestNewIDNumeric(t *testing.T) {
 	t.Parallel()
 
-	const testNameInt64 = "int64"
-	const testNameInt32 = "int32"
-	const testNameUint64 = "uint64"
+	const (
+		testNameInt64  = "int64"
+		testNameInt32  = "int32"
+		testNameUint64 = "uint64"
+	)
 
 	tests := []struct {
 		name     string
@@ -217,9 +219,11 @@ func testIDCompareGeneric[B any, V comparable](
 func TestIDCompare(t *testing.T) {
 	t.Parallel()
 
-	const testNameLess = "less"
-	const testNameEqual = "equal"
-	const testNameGreater = "greater"
+	const (
+		testNameLess    = "less"
+		testNameEqual   = "equal"
+		testNameGreater = "greater"
+	)
 
 	tests := []struct {
 		name     string
@@ -319,8 +323,8 @@ func TestIDCompareFloat64ReturnsErrNotOrdered(t *testing.T) {
 	type FloatBrand struct{}
 
 	id := NewID[FloatBrand, float64](1.5)
-	_, err := id.Compare(NewID[FloatBrand, float64](2.5))
 
+	_, err := id.Compare(NewID[FloatBrand, float64](2.5))
 	if err == nil {
 		t.Fatal("expected error for float64 Compare")
 	}
@@ -392,6 +396,7 @@ func TestIDGoString(t *testing.T) {
 	t.Parallel()
 
 	id := NewID[StringBrand](testIDValue)
+
 	expected := "id.id.StringBrand(" + testIDValue + ")"
 	if id.GoString() != expected {
 		t.Errorf("expected %s, got %s", expected, id.GoString())
@@ -543,6 +548,7 @@ func TestPtr(t *testing.T) {
 		t.Parallel()
 
 		var id ID[StringBrand, string]
+
 		p := id.Ptr()
 
 		if p == nil {
@@ -562,6 +568,7 @@ func TestFromPtr(t *testing.T) {
 		t.Parallel()
 
 		var p *ID[StringBrand, string]
+
 		id := FromPtr(p)
 
 		if !id.IsZero() {

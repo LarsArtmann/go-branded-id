@@ -106,7 +106,7 @@ The `encoding/json/v2` package provides `json.Marshaler` and `json.Unmarshaler` 
 
 **Rule**: Use `Get()` for any programmatic value extraction. Use `String()` only for display/logging.
 
-### BrandName[B]() Fallback
+### BrandName[B](<>) Fallback
 
 For unnamed brands (no `Name()` method), `BrandName[B]()` returns `fmt.Sprintf("%T", brand)` — this includes the package path (e.g., `"id.Int64Brand"` or `"main.UserBrand"`). `GoString()` and `%#v` always call `BrandName[B]()`, so unnamed brands show full package-qualified names in debug output.
 

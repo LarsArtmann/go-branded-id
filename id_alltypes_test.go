@@ -1,7 +1,7 @@
 package id
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"math"
 	"testing"
 )
@@ -78,9 +78,11 @@ func testCompareOrdered[B any, V comparable](t *testing.T, a, b V, expected int)
 func TestStringAllTypes(t *testing.T) {
 	t.Parallel()
 
-	const expectedInt32Str = "42"
-	const expectedInt64Str = "42"
-	const expectedUint64Str = "42"
+	const (
+		expectedInt32Str  = "42"
+		expectedInt64Str  = "42"
+		expectedUint64Str = "42"
+	)
 
 	tests := []struct {
 		name     string
