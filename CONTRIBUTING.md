@@ -17,7 +17,7 @@ nix run .#test
 nix run .#lint
 ```
 
-> This library dual-supports `encoding/json` (v1, default) and `encoding/json/v2` (optional).
+> This library supports both `encoding/json` (v1, default) and `encoding/json/v2` (optional).
 > No special environment variables are required. Set `GOEXPERIMENT=jsonv2` only if you want v2 semantics.
 
 ## Development Setup
