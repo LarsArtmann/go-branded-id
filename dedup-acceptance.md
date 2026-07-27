@@ -19,3 +19,27 @@ architecture.
 Extracting a helper like `resetIfEmpty(id, data) bool` would add 5+ lines and
 obscure the early-return control flow — a net loss in readability for no
 maintenance benefit. Both are standard Go empty-input guards.
+
+## Decision: No Code Generation for the JSON File Pairs
+
+**Considered:** generating `id_json_v{1,2}.go` and `json_helpers_v{1,2}_test.go`
+from a single template to eliminate the duplication mechanically.
+
+**Decision:** keep the files hand-written. The duplication is accepted.
+
+**Rationale:**
+1. Each pair is ~25-58 lines. A generator (templating tool, `go generate`,
+   build-time script) adds a build step, a template file, and generated-file
+   hygiene rules (`exhaustruct`/`nolint` markers, formatter exceptions) — more
+   moving parts than the code it would replace.
+2. `TestDualJSONContract_StructuralParity` in `id_json_contract_test.go` now
+   **enforces** that each v1/v2 pair is byte-identical after normalizing the two
+   intentional differences (build constraint + json import path). Any edit that
+   diverges the pair fails CI in both modes. The duplication is therefore
+   *guarded*, not *unguarded*.
+3. `TestDualJSONContract_Imports` additionally locks the import split, catching
+   the goimports corruption hazard that previously broke the default build mode.
+
+**Revisit if:** a third json variant is ever needed (e.g. a v3), or the per-file
+logic grows past ~100 lines. At two small files, manual + parity-test is the
+lower-complexity choice.

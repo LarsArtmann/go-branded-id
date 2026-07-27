@@ -6,9 +6,9 @@ A Go library providing branded, strongly-typed identifiers using phantom types (
 
 ## Essential Commands
 
-All build/test tasks go through the Nix flake. There is no `justfile` (it was removed); `CONTRIBUTING.md` still references `just` and is stale — see "Stale Files to Ignore" below.
+All build/test tasks go through the Nix flake. There is no `justfile` and no `Makefile` — all automation is in `flake.nix`.
 
-Standard `go build`/`go test` commands work without any special environment variables. The library **dual-supports** `encoding/json` (v1, default) and `encoding/json/v2` (when `GOEXPERIMENT=jsonv2` is set) via build tags — see "Dual JSON v1/v2 Support" in Critical Gotchas below.
+Standard `go build`/`go test` commands work without any special environment variables. The library supports both `encoding/json` (v1, default) and `encoding/json/v2` (when `GOEXPERIMENT=jsonv2` is set) via build tags — see "Dual JSON v1/v2 Support" in Critical Gotchas below.
 
 | Command                        | Purpose                                                 |
 | ------------------------------ | ------------------------------------------------------- |
@@ -190,7 +190,3 @@ The `website/` directory contains an Astro + Starlight documentation site deploy
 - **Dev**: `nix run .#dev` (from `website/`) or `npm run dev`
 - **Deploy**: `nix run .#deploy` (from `website/`) — builds and runs `firebase deploy --only hosting`
 - The website has its own `flake.nix`, `package.json`, and `firebase.json` — independent from the Go library's flake
-
-## Stale Files to Ignore
-
-- `CONTRIBUTING.md` — references `just`, `pkg/errors/`, `go-arch-lint`, and a directory structure that does not exist in this repo. Do not follow its instructions.

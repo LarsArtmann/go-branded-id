@@ -137,7 +137,10 @@
             '';
 
             lint = mkApp "lint" [ pkgs.golangci-lint ] ''
+              echo "=== Linting json v1 ==="
               golangci-lint run ./...
+              echo "=== Linting json v2 ==="
+              golangci-lint run --build-tags goexperiment.jsonv2 ./...
             '';
 
             coverage = mkApp "coverage" [ goPkg ] ''
