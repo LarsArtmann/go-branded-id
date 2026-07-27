@@ -62,11 +62,12 @@ func TestSuggestName(t *testing.T) {
 		{"strips Brand suffix", "UserBrand", "User"},
 		{"strips ID suffix", "OrderID", "Order"},
 		{"strips T prefix", "TProduct", "Product"},
-		{"strips ID but not preceding Brand", "EventBrandID", "EventBrand"},
+		{"strips Brand and ID suffixes", "EventBrandID", "Event"},
 		{"strips T prefix and Brand suffix", "TCategoryBrand", "Category"},
 		{"returns original when result empty", "Brand", "Brand"},
 		{"returns original when only suffix", "ID", "ID"},
-		{"returns original when no suffixes", "Tenant", "Tenant"},
+		{"preserves T when part of word", "Tenant", "Tenant"},
+		{"returns original when no suffixes", "Product", "Product"},
 		{"handles empty string", "", ""},
 	}
 

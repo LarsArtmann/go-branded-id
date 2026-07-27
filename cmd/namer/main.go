@@ -411,8 +411,6 @@ func parseNameReturnValue(fn *ast.FuncDecl) string {
 	return lit.Value
 }
 
-// suggestName suggests a Name() return value based on the brand type name.
-// Strips common suffixes.
 // suggestName derives a suggested Name() return value from a brand type name
 // by repeatedly stripping the "Brand" and "ID" suffixes and a leading "T"
 // generic-type prefix (only when followed by an uppercase letter, so "TProduct"
@@ -424,6 +422,7 @@ func suggestName(brandName string) string {
 		prev := name
 		name = strings.TrimSuffix(name, "Brand")
 		name = strings.TrimSuffix(name, "ID")
+
 		if name == prev {
 			break
 		}

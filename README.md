@@ -41,13 +41,11 @@ The brand types (`UserBrand`, `OrderBrand`) are empty structs that exist only as
 
 ## Installation
 
-**Prerequisite:** Go 1.26+ with `GOEXPERIMENT=jsonv2` enabled (this library uses `encoding/json/v2`).
+**Prerequisite:** Go 1.26+
 
 ```bash
-GOEXPERIMENT=jsonv2 go get github.com/larsartmann/go-branded-id
+go get github.com/larsartmann/go-branded-id
 ```
-
-> Set `GOEXPERIMENT=jsonv2` for all Go commands. For convenience, add it to your `go.env` or shell profile.
 
 ## Quick Start
 
@@ -88,7 +86,7 @@ func main() {
 | ---------------------------- | ------------------------------------------------------------------------------------------- |
 | **Compile-time type safety** | Phantom types prevent mixing `UserID` with `OrderID` at the compiler level                  |
 | **Zero allocations**         | Core operations (`NewID`, `Get`, `Equal`, `Compare`, `IsZero`) allocate nothing             |
-| **Stdlib-only**              | No third-party dependencies. Uses `encoding/json/v2` from the Go standard library           |
+| **Stdlib-only**              | No third-party dependencies. Uses only the Go standard library                                |
 | **Full serialization**       | JSON, SQL, Text (XML/TOML), Binary, Gob — all implemented                                   |
 | **Named brands**             | Optional `Name()` method enables `"User:abc123"` display strings and brand-aware validation |
 | **Any comparable type**      | `ID[Brand, V comparable]` works with strings, ints, and any comparable type                 |
@@ -179,8 +177,8 @@ Core operations are zero-allocation. Named-brand `String()` requires one allocat
 Contributions are welcome. Ensure all tests pass and lint is clean:
 
 ```bash
-GOEXPERIMENT=jsonv2 go test ./... -race
-GOEXPERIMENT=jsonv2 golangci-lint run
+go test ./... -race
+golangci-lint run
 ```
 
 ## License

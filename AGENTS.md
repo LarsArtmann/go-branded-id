@@ -8,7 +8,7 @@ A Go library providing branded, strongly-typed identifiers using phantom types (
 
 All build/test tasks go through the Nix flake. There is no `justfile` (it was removed); `CONTRIBUTING.md` still references `just` and is stale — see "Stale Files to Ignore" below.
 
-> **CRITICAL:** This library imports `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2` to be set for ALL Go commands (`build`, `test`, `run`, `vet`, `lint`). Without it, **nothing compiles** (`build constraints exclude all Go files in encoding/json/v2`). The flake sets this automatically in all devShells, checks, and apps. When running `go` commands directly, always prefix with `GOEXPERIMENT=jsonv2`.
+Standard `go build`/`go test` commands work without any special environment variables. The library previously required `GOEXPERIMENT=jsonv2` (when it used `encoding/json/v2`), but has since switched back to `encoding/json` (v1) — see "json/v2 → v1 Migration" in Critical Gotchas below.
 
 | Command                        | Purpose                                                 |
 | ------------------------------ | ------------------------------------------------------- |
