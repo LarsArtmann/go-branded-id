@@ -2,7 +2,7 @@ package id
 
 import (
 	"database/sql/driver"
-	"encoding/json/v2"
+	"encoding/json"
 	"fmt"
 	"math"
 	"testing"

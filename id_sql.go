@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding"
-	"encoding/json/v2"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
