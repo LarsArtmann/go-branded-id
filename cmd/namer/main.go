@@ -38,43 +38,54 @@ type BrandInfo struct {
 }
 
 func main() {
+	code := run(os.Args[1:], os.Stdout, os.Stderr)
+	os.Exit(code)
+}
+
+// run is the testable entry point. It parses flags, scans paths, and prints
+// results. Returns the process exit code.
+func run(args []string, stdout, stderr *os.File) int {
 	dryRun := flag.Bool("dry-run", true, "Print fixes without writing files")
 	write := flag.Bool("write", false, "Write Name() stubs to files (disables dry-run)")
 	verbose := flag.Bool("v", false, "Verbose output")
 	_ = verbose
 
-	flag.Parse()
+	flag.CommandLine.Parse(args) //nolint:errcheck,gosec // G104: flag.Parse never errors in practice
 
 	if *write {
 		*dryRun = false
 	}
 
-	args := flag.Args()
-	if len(args) < 1 {
-		_, _ = fmt.Fprintln(os.Stderr, "Usage: namer [flags] <path>...")
-		_, _ = fmt.Fprintln(os.Stderr, "")
-		_, _ = fmt.Fprintln(os.Stderr,
-			"Scans Go files for brand types missing Name() string method.")
-		_, _ = fmt.Fprintln(os.Stderr, "")
-		_, _ = fmt.Fprintln(os.Stderr,
-			"A brand type is an empty struct used with id.ID[Brand, Value].")
-		_, _ = fmt.Fprintln(os.Stderr, "")
-		_, _ = fmt.Fprintln(os.Stderr, "Flags:")
+	remaining := flag.Args()
+	if len(remaining) < 1 {
+		printUsage(stderr)
 
-		flag.PrintDefaults()
-		os.Exit(1)
+		return 1
 	}
 
-	r := &Result{
-		brands: []BrandInfo{},
-	}
-	for _, path := range args {
-		if err := scanPath(path, r); err != nil {
-			log.Printf("error scanning %s: %v", path, err)
+	result := &Result{brands: []BrandInfo{}}
+
+	for _, path := range remaining {
+		if err := scanPath(path, result); err != nil {
+			_, _ = fmt.Fprintf(stderr, "error scanning %s: %v\n", path, err)
 		}
 	}
 
-	printResults(os.Stdout, r.brands, *dryRun)
+	printResults(stdout, result.brands, *dryRun)
+
+	return 0
+}
+
+func printUsage(w *os.File) {
+	_, _ = fmt.Fprintln(w, "Usage: namer [flags] <path>...")
+	_, _ = fmt.Fprintln(w, "")
+	_, _ = fmt.Fprintln(w, "Scans Go files for brand types missing Name() string method.")
+	_, _ = fmt.Fprintln(w, "")
+	_, _ = fmt.Fprintln(w, "A brand type is an empty struct used with id.ID[Brand, Value].")
+	_, _ = fmt.Fprintln(w, "")
+	_, _ = fmt.Fprintln(w, "Flags:")
+
+	flag.PrintDefaults()
 }
 
 func printResults(w *os.File, brands []BrandInfo, dryRun bool) {
