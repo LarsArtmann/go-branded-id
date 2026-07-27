@@ -19,7 +19,7 @@ func TestRun_NoArgs(t *testing.T) {
 		t.Fatalf("os.Pipe failed: %v", err)
 	}
 
-	code := run([]string{}, w, r)
+	code := run([]string{}, w, w)
 	_ = w.Close()
 
 	if code != 1 {
@@ -44,7 +44,7 @@ func TestRun_ScanTestData(t *testing.T) {
 		t.Fatalf("os.Pipe failed: %v", err)
 	}
 
-	code := run([]string{filepath.Join("testdata", "missing_name.go")}, w, r)
+	code := run([]string{filepath.Join("testdata", "missing_name.go")}, w, w)
 	_ = w.Close()
 
 	if code != 0 {

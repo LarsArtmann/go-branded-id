@@ -45,20 +45,25 @@ func main() {
 // run is the testable entry point. It parses flags, scans paths, and prints
 // results. Returns the process exit code.
 func run(args []string, stdout, stderr *os.File) int {
-	dryRun := flag.Bool("dry-run", true, "Print fixes without writing files")
-	write := flag.Bool("write", false, "Write Name() stubs to files (disables dry-run)")
-	verbose := flag.Bool("v", false, "Verbose output")
+	flagSet := flag.NewFlagSet("namer", flag.ContinueOnError)
+	flagSet.SetOutput(stderr)
+
+	dryRun := flagSet.Bool("dry-run", true, "Print fixes without writing files")
+	write := flagSet.Bool("write", false, "Write Name() stubs to files (disables dry-run)")
+	verbose := flagSet.Bool("v", false, "Verbose output")
 	_ = verbose
 
-	flag.CommandLine.Parse(args) //nolint:errcheck,gosec // G104: flag.Parse never errors in practice
+	if err := flagSet.Parse(args); err != nil {
+		return 1
+	}
 
 	if *write {
 		*dryRun = false
 	}
 
-	remaining := flag.Args()
+	remaining := flagSet.Args()
 	if len(remaining) < 1 {
-		printUsage(stderr)
+		printUsage(stderr, flagSet)
 
 		return 1
 	}
@@ -76,16 +81,15 @@ func run(args []string, stdout, stderr *os.File) int {
 	return 0
 }
 
-func printUsage(w *os.File) {
+func printUsage(w *os.File, flagSet *flag.FlagSet) {
 	_, _ = fmt.Fprintln(w, "Usage: namer [flags] <path>...")
 	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(w, "Scans Go files for brand types missing Name() string method.")
 	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(w, "A brand type is an empty struct used with id.ID[Brand, Value].")
-	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(w, "Flags:")
 
-	flag.PrintDefaults()
+	flagSet.PrintDefaults()
 }
 
 func printResults(w *os.File, brands []BrandInfo, dryRun bool) {
