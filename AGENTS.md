@@ -104,6 +104,8 @@ The `goexperiment.jsonv2` build tag is set automatically by the Go toolchain whe
 
 **Historical note:** Previously the library hard-required `GOEXPERIMENT=jsonv2`, which caused the v0.3.1 release to fail (CI didn't set it). The dual-mode approach eliminates this class of problem entirely.
 
+**CRITICAL: goimports corrupts v1 files.** Running `nix fmt` or any `goimports`-based formatter will silently rewrite `"encoding/json"` to `"encoding/json/v2"` in `id_json_v1.go` and `json_helpers_v1_test.go` (because goimports sees `json.Marshal` calls and picks the v2 package). This breaks the v1 build entirely — `go build ./...` without `GOEXPERIMENT` fails with `build constraints exclude all Go files in encoding/json/v2`. **Always run `go build ./...` (no GOEXPERIMENT) after any formatting pass** and manually fix the imports back if corrupted. This has happened multiple times.
+
 ### String() vs Get() — Know the Difference
 
 `String()` changed behavior in v0.3.0. For named brands it now returns `"Brand:value"`. **Serialization never uses String()** — it always uses `valueString()` internally. But if _user code_ was parsing `String()` output, it will break after adding `Name()` to a brand.
