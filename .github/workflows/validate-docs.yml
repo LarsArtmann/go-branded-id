@@ -8,8 +8,6 @@ on:
 jobs:
   validate-markdown:
     runs-on: ubuntu-latest
-    env:
-      GOEXPERIMENT: jsonv2
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +20,6 @@ jobs:
 
       - name: Validate code blocks
         run: md-go-validator -f json -o results.json .
-        env:
-          GOEXPERIMENT: jsonv2
 
       - name: Upload results
         if: always()
