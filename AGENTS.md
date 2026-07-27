@@ -154,6 +154,16 @@ When making breaking changes, consider the migration impact across:
 
 - InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI, smart-configs, StopTube, universal-workflow, Zlota44, timesheets, complaints-mcp, cqrs-htmx, emeet-pixyd
 
+### Brands That Deliberately Skip `Name()`
+
+Not all brand types should implement `Name()`. The `cmd/namer` tool may flag these, but they are correct as-is:
+
+- **go-cqrs-lite marker types** — These brands serve as event/stream type identifiers in the CQRS framework. Their `String()` output is used directly as storage keys and stream names. Adding `Name()` would change `String()` from `"TypeName"` to `"HumanReadable:TypeName"`, breaking the key format in event stores and breaking existing data.
+- **BerryBig** — Test brands only, no production impact.
+- **Cyberdom** — No brand types at all.
+
+**Rule**: If a brand's `String()` output is used as a data key (storage, stream name, routing key), do NOT add `Name()`. The `cmd/namer` tool flags them, but the flag is a false positive in this context.
+
 ## Release Process
 
 - CI creates a GitHub Release automatically on semver tags (`v*.*.*`) — pattern: `v[0-9]+.[0-9]+.[0-9]+*`.
