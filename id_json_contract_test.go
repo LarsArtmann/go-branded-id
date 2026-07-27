@@ -105,8 +105,8 @@ func TestDualJSONContract_StructuralParity(t *testing.T) {
 	t.Parallel()
 
 	pairs := []struct {
-		name        string
-		v1, v2      string
+		name         string
+		v1, v2       string
 		v1Tag, v2Tag string
 	}{
 		{"implementation files", jsonV1ImplFile, jsonV2ImplFile, jsonV1BuildConstrnt, jsonV2BuildConstrnt},
@@ -259,6 +259,7 @@ func assertBytes(t *testing.T, got, want []byte) {
 // readSource loads a source file as a string for content assertions. Tests run
 // from the package directory, so relative paths resolve correctly.
 func readSource(filename string) (string, error) {
+	//nolint:gosec // G304: filename is a hard-coded test fixture path, not user input
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return "", fmt.Errorf("read source %s: %w", filename, err)

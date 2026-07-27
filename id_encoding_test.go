@@ -150,6 +150,8 @@ func testIDRoundTrip[B any, V comparable](
 }
 
 func TestIDBinary(t *testing.T) {
+	t.Parallel()
+
 	testIDAllTypesRoundTrip(t, binaryRoundTripTest{})
 
 	t.Run("zero ID", func(t *testing.T) {

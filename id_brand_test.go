@@ -243,6 +243,7 @@ func ExampleValidateID() {
 	if err := ValidateID(userID); err != nil {
 		fmt.Println(err)
 	}
+	// Output:
 }
 
 func ExampleValidateID_zero() {
