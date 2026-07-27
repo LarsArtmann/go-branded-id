@@ -199,7 +199,11 @@ func TestTypeNameExtraction(t *testing.T) {
 		want string
 	}{
 		{"ident extracts name", &ast.Ident{Name: "UserBrand"}, "UserBrand"},
-		{"star expr extracts inner name", &ast.StarExpr{X: &ast.Ident{Name: "UserBrand"}}, "UserBrand"},
+		{
+			"star expr extracts inner name",
+			&ast.StarExpr{X: &ast.Ident{Name: "UserBrand"}},
+			"UserBrand",
+		},
 		{"unsupported returns empty", &ast.BasicLit{Kind: token.STRING, Value: "\"foo\""}, ""},
 	}
 

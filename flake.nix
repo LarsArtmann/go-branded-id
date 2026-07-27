@@ -91,21 +91,45 @@
                 }
               } src && chmod -R u+w src && cd src
               ${goPkg}/bin/go build ./...
+              GOEXPERIMENT=jsonv2 ${goPkg}/bin/go build ./...
+              touch $out
+            '';
+
+            test = pkgs.runCommand "go-branded-id-test" { nativeBuildInputs = [ goPkg ]; } ''
+              export GOWORK=off
+              export GOCACHE="$TMPDIR/go-cache"
+              cp -r ${
+                lib.fileset.toSource {
+                  root = ./.;
+                  fileset = lib.fileset.gitTracked ./.;
+                }
+              } src && chmod -R u+w src && cd src
+              ${goPkg}/bin/go test ./... -count=1
+              GOEXPERIMENT=jsonv2 ${goPkg}/bin/go test ./... -count=1
               touch $out
             '';
           };
 
           apps = {
             test = mkApp "test" [ goPkg ] ''
+              echo "=== Testing json v1 ==="
               go test ./... -count=1 "$@"
+              echo "=== Testing json v2 ==="
+              GOEXPERIMENT=jsonv2 go test ./... -count=1 "$@"
             '';
 
             test-race = mkApp "test-race" [ goPkg ] ''
+              echo "=== Race testing json v1 ==="
               go test ./... -race -count=1 "$@"
+              echo "=== Race testing json v2 ==="
+              GOEXPERIMENT=jsonv2 go test ./... -race -count=1 "$@"
             '';
 
             build = mkApp "build" [ goPkg ] ''
+              echo "=== Building json v1 ==="
               go build ./...
+              echo "=== Building json v2 ==="
+              GOEXPERIMENT=jsonv2 go build ./...
             '';
 
             vet = mkApp "vet" [ goPkg ] ''
