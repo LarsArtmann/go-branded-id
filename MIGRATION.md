@@ -212,3 +212,47 @@ file, the contract test will catch it. Run:
 ```bash
 go test -run TestDualJSONContract ./...
 ```
+
+## Bumping Downstream Repositories
+
+The library has 14 downstream repos in the ecosystem. After a new release, each
+needs to be bumped. The process is mechanical and identical for each repo.
+
+### Affected Repos
+
+InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI,
+smart-configs, StopTube, universal-workflow, Zlota44, timesheets,
+complaints-mcp, cqrs-htmx, emeet-pixyd
+
+### Bump Procedure (per repo)
+
+```bash
+# 1. Bump the dependency
+go get github.com/larsartmann/go-branded-id@latest
+go mod tidy
+
+# 2. Build and test (both json modes)
+go build ./...
+go test ./... -race -count=1
+
+# 3. Run the namer tool to check for brands missing Name()
+go run github.com/larsartmann/go-branded-id/cmd/namer@latest ./...
+
+# 4. If namer flags brands that SHOULD have Name(), add the method:
+#    func (YourBrand) Name() string { return "YourBrandName" }
+
+# 5. Verify String() output hasn't changed for any named brands
+#    (only relevant if you parse String() output — use Get() instead)
+```
+
+### Brands That Deliberately Skip Name()
+
+Not all brands should implement `Name()`. If a brand's `String()` output is
+used as a data key (storage key, stream name, routing key), do NOT add
+`Name()`. The namer tool will flag these as false positives.
+
+Known examples:
+- **go-cqrs-lite marker types** — `String()` output is used directly as
+  storage/stream keys
+- **BerryBig** — test brands only
+- **Cyberdom** — no brand types at all

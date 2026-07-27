@@ -12,6 +12,7 @@ Zero values serialize to `null` / `nil` across all formats.
 ## JSON
 
 ```go
+// skip-validate: illustrative snippet mixing decls and statements
 type UserBrand struct{}
 func (UserBrand) Name() string { return "User" }
 type UserID = id.ID[UserBrand, string]

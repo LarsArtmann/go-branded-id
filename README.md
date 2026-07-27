@@ -16,6 +16,7 @@
 In Go, `string` and `int64` provide no compile-time safety against mixing IDs:
 
 ```go
+// skip-validate: illustrative snippet mixing decls and statements
 func GetUser(id string) error { return nil }
 func GetOrder(id string) error { return nil }
 
@@ -25,6 +26,7 @@ GetOrder(userID) // Compiles. Silent bug.
 With branded IDs, the compiler catches it:
 
 ```go
+// skip-validate: illustrative snippet mixing decls and statements
 type UserBrand struct{}
 type OrderBrand struct{}
 
@@ -98,6 +100,7 @@ func main() {
 Adding a `Name()` method to your brand type enables debug-visible IDs, brand-aware validation errors, and runtime introspection:
 
 ```go
+// skip-validate: illustrative snippet mixing decls and statements
 type UserBrand struct{}
 func (UserBrand) Name() string { return "User" }
 
