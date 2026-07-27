@@ -37,7 +37,7 @@ func (id *ID[B, V]) UnmarshalText(data []byte) error {
 	case string:
 		v, ok := any(string(data)).(V)
 		if !ok {
-			return errors.New("id: internal error: type assertion failed for string")
+			return errors.New("id: internal error: type assertion failed for string") //nolint:err113 // unreachable
 		}
 
 		*id = ID[B, V]{value: v}
@@ -51,7 +51,7 @@ func (id *ID[B, V]) UnmarshalText(data []byte) error {
 
 		v, ok := any(n).(V)
 		if !ok {
-			return errors.New("id: internal error: type assertion failed for int")
+			return errors.New("id: internal error: type assertion failed for int") //nolint:err113 // unreachable
 		}
 
 		*id = ID[B, V]{value: v}
@@ -82,7 +82,7 @@ func (id *ID[B, V]) UnmarshalText(data []byte) error {
 			return nil
 		}
 
-		return fmt.Errorf(
+		return fmt.Errorf( //nolint:err113 // diagnostic embeds type
 			"id: cannot unmarshal text into %T (only string and numeric IDs supported, got data=%q)",
 			zero,
 			string(data),

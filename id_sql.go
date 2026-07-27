@@ -34,7 +34,7 @@ func scanIntegerLikeID[B any, V comparable](
 
 		return nil
 	default:
-		return fmt.Errorf(
+		return fmt.Errorf( //nolint:err113 // diagnostic embeds type
 			"id: cannot scan %T into %s-based ID (targetType=%T)",
 			src,
 			targetTypeName,
@@ -67,7 +67,7 @@ func scanIntegerID[B any, V comparable](
 //nolint:cyclop,funlen // exhaustive type switch over numeric types
 func (id *ID[B, V]) Scan(src any) error {
 	if id == nil {
-		return errors.New("id: scan: receiver is nil")
+		return errors.New("id: scan: receiver is nil") //nolint:err113 // nil-receiver contract
 	}
 
 	if src == nil {
@@ -90,7 +90,7 @@ func (id *ID[B, V]) Scan(src any) error {
 
 			return nil
 		default:
-			return fmt.Errorf("id: cannot scan %T into string-based ID (src=%T)", src, src)
+			return fmt.Errorf("id: cannot scan %T into string-based ID (src=%T)", src, src) //nolint:err113 // diagnostic %T
 		}
 
 	case int:
@@ -194,7 +194,7 @@ func (id *ID[B, V]) Scan(src any) error {
 			case []byte:
 				text = v
 			default:
-				return fmt.Errorf(
+				return fmt.Errorf( //nolint:err113 // diagnostic embeds type
 					"id: cannot scan %T into text-unmarshalable ID (targetType=%T)",
 					src,
 					zero,
@@ -211,7 +211,7 @@ func (id *ID[B, V]) Scan(src any) error {
 			return nil
 		}
 
-		return fmt.Errorf("id: unsupported target type %T for SQL scanning (src=%T)", *new(V), src)
+		return fmt.Errorf("id: unsupported target type %T for SQL scanning (src=%T)", *new(V), src) //nolint:err113 // diagnostic %T
 	}
 }
 
@@ -262,7 +262,7 @@ func (id ID[B, V]) Value() (driver.Value, error) {
 			return string(text), nil
 		}
 
-		return nil, fmt.Errorf("id: unsupported type %T for SQL value", id.value)
+		return nil, fmt.Errorf("id: unsupported type %T for SQL value", id.value) //nolint:err113 // diagnostic %T
 	}
 }
 

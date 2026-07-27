@@ -25,7 +25,7 @@ func readBinary[V, I any](
 	var zero V
 
 	if len(data) < byteSize {
-		return zero, fmt.Errorf(
+		return zero, fmt.Errorf( //nolint:err113 // diagnostic embeds type
 			"id: insufficient data for %s: got %d bytes, want %d",
 			typeName,
 			len(data),
@@ -124,7 +124,7 @@ func (id ID[B, V]) MarshalBinary() ([]byte, error) {
 			return data, nil
 		}
 
-		return nil, fmt.Errorf("id: unsupported type %T for binary marshaling", id.value)
+		return nil, fmt.Errorf("id: unsupported type %T for binary marshaling", id.value) //nolint:err113
 	}
 }
 
@@ -328,7 +328,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			return nil
 		}
 
-		return fmt.Errorf("id: unsupported type %T for binary unmarshaling (data=%x)", zero, data)
+		return fmt.Errorf("id: unsupported type %T for binary unmarshaling (data=%x)", zero, data) //nolint:err113 // diagnostic %T
 	}
 }
 

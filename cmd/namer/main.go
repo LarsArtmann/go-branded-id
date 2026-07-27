@@ -20,6 +20,14 @@ import (
 	"strings"
 )
 
+const (
+	// methodNamePlaceholder is used when Name() has a non-literal return value
+	// that cannot be statically resolved from the AST.
+	methodNamePlaceholder = "(method on T)"
+	// stringTypeName is the Go AST identifier for the built-in string type.
+	stringTypeName = "string"
+)
+
 // BrandInfo represents a discovered brand type.
 type BrandInfo struct {
 	TypeName  string // Brand type name (e.g., "UserBrand")
@@ -226,7 +234,7 @@ func collectBrandTypes(
 				TypeName: ts.Name.Name,
 				File:     pos.Filename,
 				Line:     pos.Line,
-				HasName: nameValue != "" && nameValue != "(method on T)" &&
+				HasName: nameValue != "" && nameValue != methodNamePlaceholder &&
 					nameValue != "(method on *T)",
 				NameValue: nameValue,
 			})
@@ -310,7 +318,7 @@ func typeNameFromExpr(e ast.Expr) string {
 // isStringType returns true if the type expression resolves to string.
 func isStringType(e ast.Expr) bool {
 	if ident, ok := e.(*ast.Ident); ok {
-		return ident.Name == "string"
+		return ident.Name == stringTypeName
 	}
 
 	if star, ok := e.(*ast.StarExpr); ok {
@@ -342,7 +350,7 @@ func collectNameMethods(f *ast.File) map[string]string {
 			continue
 		}
 
-		result[typeName] = "(method on T)"
+		result[typeName] = methodNamePlaceholder
 	}
 
 	return result
