@@ -29,6 +29,6 @@ export const features: Feature[] = [
   {
     icon: "database",
     title: "Stdlib-Only",
-    desc: "No third-party dependencies. Uses encoding/json/v2 from the Go standard library. Nothing to audit, nothing to break.",
+    desc: "No third-party dependencies. Uses only the Go standard library (dual json v1/v2 support). Nothing to audit, nothing to break.",
   },
 ];

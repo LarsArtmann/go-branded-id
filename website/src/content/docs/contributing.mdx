@@ -21,7 +21,7 @@ nix develop   # enters dev shell with Go, golangci-lint, gopls
 ## Building
 
 ```bash
-GOEXPERIMENT=jsonv2 go build ./...
+go build ./...
 ```
 
 Or via Nix:
@@ -34,10 +34,10 @@ nix run .#build
 
 ```bash
 # Run all tests
-GOEXPERIMENT=jsonv2 go test ./... -count=1
+go test ./... -count=1
 
 # With race detector
-GOEXPERIMENT=jsonv2 go test ./... -race -count=1
+go test ./... -race -count=1
 
 # Or via Nix
 nix run .#test
@@ -51,7 +51,7 @@ All tests use `t.Parallel()` and the standard `testing` package.
 Uses golangci-lint v2 with an extremely strict config (`.golangci.yml`):
 
 ```bash
-GOEXPERIMENT=jsonv2 golangci-lint run
+golangci-lint run
 
 # Or via Nix
 nix run .#lint
@@ -76,7 +76,7 @@ All pull requests must pass:
 
 ## Pull Requests
 
-- Ensure all tests pass with `GOEXPERIMENT=jsonv2` set
+- Ensure all tests pass with `` set
 - Ensure linting passes
 - Add tests for new functionality
 - Keep changes focused and atomic

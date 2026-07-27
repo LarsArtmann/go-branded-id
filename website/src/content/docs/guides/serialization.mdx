@@ -36,7 +36,7 @@ json.Unmarshal([]byte(`null`), &parsed)
 fmt.Println(parsed.IsZero()) // true
 ```
 
-> Uses `encoding/json/v2` — requires `GOEXPERIMENT=jsonv2`.
+> Uses `encoding/json` by default; `encoding/json/v2` supported via `GOEXPERIMENT=jsonv2`.
 
 ## SQL
 

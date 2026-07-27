@@ -9,7 +9,7 @@ Phantom types exist only in the type system. At runtime, `ID[UserBrand, string]`
 
 ## Benchmark Results
 
-Benchmarked on Go 1.26.4 with `GOEXPERIMENT=jsonv2`:
+Benchmarked on Go 1.26.4 with ``:
 
 | Operation           | Latency | Allocations |
 | ------------------- | ------- | ----------- |
@@ -31,7 +31,7 @@ Named-brand `String()` requires one allocation for the `"Brand:value"` concatena
 ## Reproducing
 
 ```bash
-GOEXPERIMENT=jsonv2 go test -bench=. -benchmem ./...
+go test -bench=. -benchmem ./...
 ```
 
 ## Why So Fast

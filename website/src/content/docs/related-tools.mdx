@@ -18,9 +18,9 @@ go-branded-id is built on Go's generics system (1.18+). The phantom type pattern
 - [Go Generics Tutorial](https://go.dev/doc/generics)
 - [Type Parameters Proposal](https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md)
 
-## encoding/json/v2
+## encoding/json (dual v1/v2)
 
-This library uses `encoding/json/v2`, the next-generation JSON encoder for Go. It requires `GOEXPERIMENT=jsonv2` until the API stabilizes.
+This library dual-supports both `encoding/json` (v1, default) and `encoding/json/v2` (optional, via build tags). No special setup required.
 
 - [JSON v2 Proposal](https://github.com/golang/go/discussions/71497)
 

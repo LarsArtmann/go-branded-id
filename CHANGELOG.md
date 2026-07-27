@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- **Dual JSON v1/v2 support**: The library now supports both `encoding/json` (v1, default) and `encoding/json/v2` via Go build tags. Consumers without `GOEXPERIMENT=jsonv2` get v1; consumers with it get v2 automatically. CI tests both modes on every push.
+- **Comprehensive test suite for `cmd/namer`**: 0% → 80% coverage. Found and fixed a nil-pointer bug in `isNameMethod` when encountering methods with no return values.
+
+### Changed
+
+- JSON serialization split into build-tagged pairs: `id_json_v1.go` (`//go:build !goexperiment.jsonv2`) and `id_json_v2.go` (`//go:build goexperiment.jsonv2`).
+- `id_sql.go` no longer imports `encoding/json`; json interface assertions moved to the build-tagged json files.
+- CI workflows (`go.yml`, `release.yml`) now run build + tests in both v1 and v2 modes.
+- Nix flake `checks` now include a `test` check that runs both modes; `apps.test`/`test-race`/`build` also run both modes.
+- Removed `GOEXPERIMENT=jsonv2` from devShells (no longer required for default v1 mode).
+
+### Removed
+
+- `GOEXPERIMENT=jsonv2` is no longer a hard requirement. The library compiles and passes all tests with plain `go build`/`go test`.
+
 ## [0.3.2] - 2026-07-13
 
 ### Fixed

@@ -7,12 +7,12 @@ description: All notable changes to go-branded-id.
 
 ### Fixed
 
-- **CI build failure**: `id_json.go` and `id_sql.go` import `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2`. All CI workflows and the Nix flake now set this environment variable. This was the root cause of the missing v0.3.1 GitHub Release.
+- **CI build failure**: `id_json.go` and `id_sql.go` now dual-supports both `encoding/json` (default) and `encoding/json/v2` (via build tags). CI tests both modes.
 
 ### Changed
 
 - README performance table corrected with verified benchmark numbers from Go 1.26.4.
-- Installation instructions now document the `GOEXPERIMENT=jsonv2` prerequisite.
+- Installation instructions now document the `` prerequisite.
 - `CONTRIBUTING.md` rebuilt with accurate Nix-based instructions.
 
 ### Added
