@@ -2,6 +2,7 @@ package id
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -260,7 +261,7 @@ func assertBytes(t *testing.T, got, want []byte) {
 func readSource(filename string) (string, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("read source %s: %w", filename, err)
 	}
 
 	return string(content), nil
