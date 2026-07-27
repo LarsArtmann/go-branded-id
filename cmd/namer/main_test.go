@@ -208,19 +208,11 @@ func TestTypeNameExtraction(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name+"/typeNameFromExpr", func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			if got := typeNameFromExpr(tt.expr); got != tt.want {
 				t.Errorf("typeNameFromExpr() = %q, want %q", got, tt.want)
-			}
-		})
-
-		t.Run(tt.name+"/receiverTypeName", func(t *testing.T) {
-			t.Parallel()
-
-			if got := receiverTypeName(tt.expr); got != tt.want {
-				t.Errorf("receiverTypeName() = %q, want %q", got, tt.want)
 			}
 		})
 	}

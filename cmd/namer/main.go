@@ -307,18 +307,6 @@ func typeNameFromExpr(e ast.Expr) string {
 	}
 }
 
-// receiverTypeName extracts the type name from a receiver expression.
-func receiverTypeName(e ast.Expr) string {
-	switch v := e.(type) {
-	case *ast.Ident:
-		return v.Name
-	case *ast.StarExpr:
-		return typeNameFromExpr(v.X)
-	default:
-		return ""
-	}
-}
-
 // isStringType returns true if the type expression resolves to string.
 func isStringType(e ast.Expr) bool {
 	if ident, ok := e.(*ast.Ident); ok {
@@ -381,7 +369,7 @@ func isNameMethod(fn *ast.FuncDecl) (string, bool) {
 
 	recv := fn.Recv.List[0].Type
 
-	typeName := receiverTypeName(recv)
+	typeName := typeNameFromExpr(recv)
 	if typeName == "" {
 		return "", false
 	}
