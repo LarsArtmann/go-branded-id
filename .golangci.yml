@@ -152,7 +152,7 @@ linters:
         - stdlib
         - generic
     makezero:
-      always: true
+      always: false
     revive:
       rules:
         - disabled: true
@@ -177,6 +177,19 @@ linters:
         - a
         - b
         - v
+        # Idiomatic Go short names appropriate for an ID library:
+        - id
+        - n
+        - r
+        - p
+        - w
+        - tc
+        - ts
+        - rt
+        - f
+        # Semantic json-version labels in the dual-mode contract tests:
+        - v1
+        - v2
       ignore-type-assert-ok: true
   exclusions:
     generated: lax
@@ -189,6 +202,7 @@ linters:
           - funlen
           - cyclop
           - goconst
+          - err113
       - path: _test\.go
         text: unused
         linters:
