@@ -194,9 +194,9 @@ func TestTypeNameExtraction(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name   string
-		expr   ast.Expr
-		want   string
+		name string
+		expr ast.Expr
+		want string
 	}{
 		{"ident extracts name", &ast.Ident{Name: "UserBrand"}, "UserBrand"},
 		{"star expr extracts inner name", &ast.StarExpr{X: &ast.Ident{Name: "UserBrand"}}, "UserBrand"},

@@ -22,8 +22,13 @@ jobs:
           go-version: "1.26"
           cache: true
 
-      - name: Run tests
+      - name: Run tests (json v1)
         run: go test -race ./...
+
+      - name: Run tests (json v2)
+        run: go test -race ./...
+        env:
+          GOEXPERIMENT: jsonv2
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v7
