@@ -198,7 +198,7 @@ func testIDAllTypesUnmarshalJSON(t *testing.T, ut jsonUnmarshalTest) {
 	t.Run("uint64 ID", ut.TestUint64)
 }
 
-func TestIDJSONRoundTrip(t *testing.T) {
+func TestIDJSONRoundTrip(t *testing.T) { //nolint:tparallel // subtests run t.Parallel via jsonRoundTripTest impl methods
 	t.Parallel()
 
 	testIDAllTypesRoundTrip(t, jsonRoundTripTest{})
