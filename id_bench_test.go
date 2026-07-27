@@ -2,7 +2,6 @@ package id
 
 import (
 	"database/sql/driver"
-	"encoding/json"
 	"fmt"
 	"math"
 	"testing"
@@ -40,14 +39,14 @@ func FuzzIDJSONString(f *testing.F) {
 
 		id := NewID[StringBrand](orig)
 
-		data, err := json.Marshal(id)
+		data, err := marshalJSON(id)
 		if err != nil {
 			t.Fatalf("Marshal failed: %v", err)
 		}
 
 		var restored ID[StringBrand, string]
 
-		err = json.Unmarshal(data, &restored)
+		err = unmarshalJSON(data, &restored)
 		if err != nil {
 			t.Fatalf("Unmarshal failed: %v", err)
 		}
@@ -62,14 +61,14 @@ func FuzzIDJSONInt64(f *testing.F) {
 	f.Fuzz(func(t *testing.T, orig int64) {
 		id := NewID[Int64Brand, int64](orig)
 
-		data, err := json.Marshal(id)
+		data, err := marshalJSON(id)
 		if err != nil {
 			t.Fatalf("Marshal failed: %v", err)
 		}
 
 		var restored ID[Int64Brand, int64]
 
-		err = json.Unmarshal(data, &restored)
+		err = unmarshalJSON(data, &restored)
 		if err != nil {
 			t.Fatalf("Unmarshal failed: %v", err)
 		}
@@ -337,11 +336,11 @@ func benchmarkJSONRoundTrip[B, V comparable](b *testing.B, id ID[B, V]) {
 	b.Helper()
 
 	for b.Loop() {
-		data, _ := json.Marshal(id)
+		data, _ := marshalJSON(id)
 
 		var restored ID[B, V]
 
-		_ = json.Unmarshal(data, &restored)
+		_ = unmarshalJSON(data, &restored)
 	}
 }
 

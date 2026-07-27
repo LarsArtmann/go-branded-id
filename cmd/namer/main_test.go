@@ -190,76 +190,36 @@ func TestIsIDSelector(t *testing.T) {
 	})
 }
 
-func TestTypeNameFromExpr(t *testing.T) {
+func TestTypeNameExtraction(t *testing.T) {
 	t.Parallel()
 
-	t.Run("extracts name from identifier", func(t *testing.T) {
-		t.Parallel()
+	tests := []struct {
+		name   string
+		expr   ast.Expr
+		want   string
+	}{
+		{"ident extracts name", &ast.Ident{Name: "UserBrand"}, "UserBrand"},
+		{"star expr extracts inner name", &ast.StarExpr{X: &ast.Ident{Name: "UserBrand"}}, "UserBrand"},
+		{"unsupported returns empty", &ast.BasicLit{Kind: token.STRING, Value: "\"foo\""}, ""},
+	}
 
-		expr := &ast.Ident{Name: "UserBrand"}
+	for _, tt := range tests {
+		t.Run(tt.name+"/typeNameFromExpr", func(t *testing.T) {
+			t.Parallel()
 
-		if got := typeNameFromExpr(expr); got != "UserBrand" {
-			t.Errorf("expected 'UserBrand', got %q", got)
-		}
-	})
+			if got := typeNameFromExpr(tt.expr); got != tt.want {
+				t.Errorf("typeNameFromExpr() = %q, want %q", got, tt.want)
+			}
+		})
 
-	t.Run("extracts name from star expression", func(t *testing.T) {
-		t.Parallel()
+		t.Run(tt.name+"/receiverTypeName", func(t *testing.T) {
+			t.Parallel()
 
-		expr := &ast.StarExpr{
-			X: &ast.Ident{Name: "UserBrand"},
-		}
-
-		if got := typeNameFromExpr(expr); got != "UserBrand" {
-			t.Errorf("expected 'UserBrand', got %q", got)
-		}
-	})
-
-	t.Run("returns empty for unsupported expression", func(t *testing.T) {
-		t.Parallel()
-
-		expr := &ast.BasicLit{Kind: token.STRING, Value: "\"foo\""}
-
-		if got := typeNameFromExpr(expr); got != "" {
-			t.Errorf("expected empty string, got %q", got)
-		}
-	})
-}
-
-func TestReceiverTypeName(t *testing.T) {
-	t.Parallel()
-
-	t.Run("extracts from value receiver", func(t *testing.T) {
-		t.Parallel()
-
-		recv := &ast.Ident{Name: "UserBrand"}
-
-		if got := receiverTypeName(recv); got != "UserBrand" {
-			t.Errorf("expected 'UserBrand', got %q", got)
-		}
-	})
-
-	t.Run("extracts from pointer receiver", func(t *testing.T) {
-		t.Parallel()
-
-		recv := &ast.StarExpr{
-			X: &ast.Ident{Name: "UserBrand"},
-		}
-
-		if got := receiverTypeName(recv); got != "UserBrand" {
-			t.Errorf("expected 'UserBrand', got %q", got)
-		}
-	})
-
-	t.Run("returns empty for unsupported", func(t *testing.T) {
-		t.Parallel()
-
-		recv := &ast.BasicLit{Kind: token.INT, Value: "42"}
-
-		if got := receiverTypeName(recv); got != "" {
-			t.Errorf("expected empty, got %q", got)
-		}
-	})
+			if got := receiverTypeName(tt.expr); got != tt.want {
+				t.Errorf("receiverTypeName() = %q, want %q", got, tt.want)
+			}
+		})
+	}
 }
 
 func TestIsStringType(t *testing.T) {

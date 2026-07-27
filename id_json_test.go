@@ -1,7 +1,6 @@
 package id
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -12,7 +11,7 @@ func assertUnmarshalError[B any, V comparable](t *testing.T, data string) {
 
 	var id ID[B, V]
 
-	err := json.Unmarshal([]byte(data), &id)
+	err := unmarshalJSON([]byte(data), &id)
 	if err == nil {
 		t.Error("expected error for unmarshaling")
 	}
@@ -23,7 +22,7 @@ func testMarshalZeroID[B any, V comparable](t *testing.T) {
 
 	var id ID[B, V]
 
-	data, err := json.Marshal(id)
+	data, err := marshalJSON(id)
 	if err != nil {
 		t.Fatalf("MarshalJSON failed: %v", err)
 	}
@@ -38,7 +37,7 @@ func testMarshalNonZeroID[B any, V comparable](t *testing.T, value V, format str
 
 	id := NewID[B, V](value)
 
-	data, err := json.Marshal(id)
+	data, err := marshalJSON(id)
 	if err != nil {
 		t.Fatalf("MarshalJSON failed: %v", err)
 	}
@@ -54,7 +53,7 @@ func testUnmarshalNonZeroID[B any, V comparable](t *testing.T, jsonData string, 
 
 	var id ID[B, V]
 
-	err := json.Unmarshal([]byte(jsonData), &id)
+	err := unmarshalJSON([]byte(jsonData), &id)
 	if err != nil {
 		t.Fatalf("UnmarshalJSON failed: %v", err)
 	}
@@ -104,7 +103,7 @@ func TestIDUnmarshalJSON(
 
 		var id ID[StringBrand, string]
 
-		err := json.Unmarshal([]byte(`"test-id"`), &id)
+		err := unmarshalJSON([]byte(`"test-id"`), &id)
 		if err != nil {
 			t.Fatalf("UnmarshalJSON failed: %v", err)
 		}
@@ -117,7 +116,7 @@ func TestIDUnmarshalJSON(
 
 		var id ID[StringBrand, string]
 
-		err := json.Unmarshal([]byte("null"), &id)
+		err := unmarshalJSON([]byte("null"), &id)
 		if err != nil {
 			t.Fatalf("UnmarshalJSON failed: %v", err)
 		}
@@ -212,8 +211,8 @@ func (j jsonRoundTripTest) TestString(t *testing.T) {
 	testIDRoundTrip(
 		t,
 		testIDValue,
-		func(id ID[StringBrand, string]) ([]byte, error) { return json.Marshal(id) },
-		func(id *ID[StringBrand, string], data []byte) error { return json.Unmarshal(data, id) },
+		func(id ID[StringBrand, string]) ([]byte, error) { return marshalJSON(id) },
+		func(id *ID[StringBrand, string], data []byte) error { return unmarshalJSON(data, id) },
 	)
 }
 
@@ -222,8 +221,8 @@ func (j jsonRoundTripTest) TestInt64(t *testing.T) {
 	testIDRoundTrip(
 		t,
 		int64(42),
-		func(id ID[Int64Brand, int64]) ([]byte, error) { return json.Marshal(id) },
-		func(id *ID[Int64Brand, int64], data []byte) error { return json.Unmarshal(data, id) },
+		func(id ID[Int64Brand, int64]) ([]byte, error) { return marshalJSON(id) },
+		func(id *ID[Int64Brand, int64], data []byte) error { return unmarshalJSON(data, id) },
 	)
 }
 
@@ -232,8 +231,8 @@ func (j jsonRoundTripTest) TestInt32(t *testing.T) {
 	testIDRoundTrip(
 		t,
 		int32(42),
-		func(id ID[Int32Brand, int32]) ([]byte, error) { return json.Marshal(id) },
-		func(id *ID[Int32Brand, int32], data []byte) error { return json.Unmarshal(data, id) },
+		func(id ID[Int32Brand, int32]) ([]byte, error) { return marshalJSON(id) },
+		func(id *ID[Int32Brand, int32], data []byte) error { return unmarshalJSON(data, id) },
 	)
 }
 
@@ -242,7 +241,7 @@ func (j jsonRoundTripTest) TestUint64(t *testing.T) {
 	testIDRoundTrip(
 		t,
 		uint64(42),
-		func(id ID[Uint64Brand, uint64]) ([]byte, error) { return json.Marshal(id) },
-		func(id *ID[Uint64Brand, uint64], data []byte) error { return json.Unmarshal(data, id) },
+		func(id ID[Uint64Brand, uint64]) ([]byte, error) { return marshalJSON(id) },
+		func(id *ID[Uint64Brand, uint64], data []byte) error { return unmarshalJSON(data, id) },
 	)
 }
