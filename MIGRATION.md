@@ -135,3 +135,80 @@ Run `go mod tidy` and ensure no files still import the old path:
 ```bash
 grep -r "go-composable-business-types/id" --include="*.go" .
 ```
+
+## v0.4.0: Dual JSON v1/v2 Support
+
+v0.4.0 introduces a **dual-mode JSON architecture**. The library now works with
+both `encoding/json` (v1, default) and `encoding/json/v2` (experimental) using
+build tags. **No special environment variables are required.**
+
+### What changed for consumers
+
+**Nothing.** If you were on v0.3.x, upgrading to v0.4.0 is a drop-in change:
+
+```bash
+go get github.com/larsartmann/go-branded-id@v0.4.0
+go mod tidy
+```
+
+The public API is identical. JSON, SQL, Text, Binary, and Gob serialization
+all produce byte-identical output to v0.3.x.
+
+### Why dual-mode?
+
+v0.3.1 hard-required `GOEXPERIMENT=jsonv2`, which broke every consumer that
+didn't set the flag. v0.4.0 eliminates this requirement entirely:
+
+| Mode | When | `GOEXPERIMENT` needed? |
+| --- | --- | --- |
+| v1 (default) | Always | No |
+| v2 | When you set `GOEXPERIMENT=jsonv2` | Yes (opt-in) |
+
+In Go 1.27+, json/v2 becomes the default and the v2 code path is used
+automatically — no action needed.
+
+### If you want v2 semantics
+
+Set the environment variable in your dev shell, CI, or `.envrc`:
+
+```bash
+export GOEXPERIMENT=jsonv2
+```
+
+The library detects this via build tags and uses `encoding/json/v2` internally.
+This is entirely optional — v1 mode is fully functional.
+
+### Verification
+
+The library includes contract tests (`id_json_contract_test.go`) that verify:
+
+1. **Import split** — v1 files import `encoding/json`, v2 files import `encoding/json/v2`
+2. **Build tags** — correct `//go:build` constraints on each file pair
+3. **Structural parity** — the v1 and v2 files are byte-identical after normalization
+4. **Byte equivalence** — `MarshalJSON` produces identical bytes in both modes
+
+CI runs the full test suite in **both** modes (matrix strategy), so any
+divergence between v1 and v2 behavior is caught immediately.
+
+### Troubleshooting
+
+#### Build error: "build constraints exclude all Go files in encoding/json/v2"
+
+This means you have `GOEXPERIMENT=jsonv2` set but your Go toolchain doesn't
+support it (Go < 1.24), OR you don't have it set but something is importing
+`encoding/json/v2` directly. Since v0.4.0, the library never requires the flag.
+Remove it:
+
+```bash
+unset GOEXPERIMENT
+go build ./...
+```
+
+#### goimports corrupted the import
+
+If `goimports` rewrote `"encoding/json"` to `"encoding/json/v2"` in a v1-tagged
+file, the contract test will catch it. Run:
+
+```bash
+go test -run TestDualJSONContract ./...
+```

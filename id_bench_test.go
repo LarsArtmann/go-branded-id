@@ -344,6 +344,50 @@ func benchmarkJSONRoundTrip[B, V comparable](b *testing.B, id ID[B, V]) {
 	}
 }
 
+// Dual JSON v1/v2 comparison benchmarks.
+//
+// These benchmarks measure the overhead of ID[B,V] marshaling relative to raw
+// json.Marshal of the underlying value. To compare v1 vs v2 performance, run the
+// suite in both modes and diff the results:
+//
+//	go test -bench='BenchmarkJSONDual' -benchmem -count=5 ./... > v1.txt
+//	GOEXPERIMENT=jsonv2 go test -bench='BenchmarkJSONDual' -benchmem -count=5 ./... > v2.txt
+//	benchstat v1.txt v2.txt
+
+func BenchmarkJSONDualMarshalString(b *testing.B) {
+	id := NewID[StringBrand, string](benchIDValue)
+	for b.Loop() {
+		_, _ = id.MarshalJSON()
+	}
+}
+
+func BenchmarkJSONDualMarshalInt64(b *testing.B) {
+	id := NewID[Int64Brand, int64](123456789)
+	for b.Loop() {
+		_, _ = id.MarshalJSON()
+	}
+}
+
+func BenchmarkJSONDualUnmarshalString(b *testing.B) {
+	data := []byte(`"` + benchIDValue + `"`)
+
+	for b.Loop() {
+		var id ID[StringBrand, string]
+
+		_ = id.UnmarshalJSON(data)
+	}
+}
+
+func BenchmarkJSONDualUnmarshalInt64(b *testing.B) {
+	data := []byte(`123456789`)
+
+	for b.Loop() {
+		var id ID[Int64Brand, int64]
+
+		_ = id.UnmarshalJSON(data)
+	}
+}
+
 // Example functions for godoc
 
 func ExampleNewID() {
