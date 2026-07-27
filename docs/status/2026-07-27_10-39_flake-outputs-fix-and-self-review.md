@@ -46,15 +46,15 @@ Added `...` to the pattern (`flake.nix:23`):
 
 ### Verification (all green)
 
-| Check                         | Result                                                              |
-| ----------------------------- | ------------------------------------------------------------------- |
-| `nix flake check --no-build`  | all checks passed                                                   |
-| `nix build .#checks.x86_64-linux.build` | succeeds                                                    |
-| `nix fmt`                     | 0 changed (already formatted)                                       |
-| `buildflow -s nix-fmt`        | exit 0                                                              |
-| `buildflow -s nix-hash-fix`   | passed (1/1)                                                        |
-| `buildflow -s nix-build-verify` | cascade-only step — no longer triggers (was only failing because `nix-fmt` failed) |
-| **`buildflow` (full suite)**  | **37/38 passed, 0 failed, 1 skipped by config (`gitleaks`)**        |
+| Check                                   | Result                                                                             |
+| --------------------------------------- | ---------------------------------------------------------------------------------- |
+| `nix flake check --no-build`            | all checks passed                                                                  |
+| `nix build .#checks.x86_64-linux.build` | succeeds                                                                           |
+| `nix fmt`                               | 0 changed (already formatted)                                                      |
+| `buildflow -s nix-fmt`                  | exit 0                                                                             |
+| `buildflow -s nix-hash-fix`             | passed (1/1)                                                                       |
+| `buildflow -s nix-build-verify`         | cascade-only step — no longer triggers (was only failing because `nix-fmt` failed) |
+| **`buildflow` (full suite)**            | **37/38 passed, 0 failed, 1 skipped by config (`gitleaks`)**                       |
 
 ---
 
@@ -76,7 +76,7 @@ Nothing. The fix itself is complete and verified.
 
 ## c) NOT STARTED
 
-1. **AGENTS.md update** — the "Critical Gotchas" section should document: *"The `outputs` pattern must include `...` if it doesn't name every input. Nix passes all declared inputs; a strict pattern without `...` breaks the entire flake."* This is textbook "hard to discover from code alone" context.
+1. **AGENTS.md update** — the "Critical Gotchas" section should document: _"The `outputs` pattern must include `...` if it doesn't name every input. Nix passes all declared inputs; a strict pattern without `...` breaks the entire flake."_ This is textbook "hard to discover from code alone" context.
 2. **Commit message quality** — see section (d) below. The auto-git daemon committed the fix with a generic message.
 3. **Root-cause of the root-cause** — WHY did `530702f` remove those lines? Was it an agent refactor? A linter suggestion? Understanding this prevents the same class of bug recurring.
 
@@ -115,7 +115,7 @@ By not committing, I ceded the commit message to the daemon. **Lesson: for a fix
 ### What I forgot during the session
 
 1. **Did not check `website/flake.nix` during the fix** — only checked it just now for this report. If the same bug had been there, the website build would still be broken. I got lucky; the website already used `...`.
-2. **Did not update AGENTS.md** — direct violation of my own "Aggressive Update Protocol" which states: *"Update at the moment of discovery, not end of session."* I discovered a non-obvious gotcha and walked away without recording it.
+2. **Did not update AGENTS.md** — direct violation of my own "Aggressive Update Protocol" which states: _"Update at the moment of discovery, not end of session."_ I discovered a non-obvious gotcha and walked away without recording it.
 3. **Did not investigate the human/agent intent behind `530702f`** — I treated the symptom (bad pattern) without asking why the lines were removed. If this was an agent making "improvements," the same agent will break the next flake it touches.
 
 ---

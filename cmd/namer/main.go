@@ -370,7 +370,8 @@ func isNameMethod(fn *ast.FuncDecl) (string, bool) {
 	}
 
 	sig := fn.Type
-	if len(sig.Params.List) != 0 || len(sig.Results.List) != 1 {
+	if sig.Params != nil && len(sig.Params.List) != 0 ||
+		sig.Results == nil || len(sig.Results.List) != 1 {
 		return "", false
 	}
 

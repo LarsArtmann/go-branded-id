@@ -1,5 +1,7 @@
 package testdata
 
+import id "github.com/larsartmann/go-branded-id"
+
 // ProductBrand has Name() — should not be flagged.
 type ProductBrand struct{}
 
@@ -15,8 +17,8 @@ type SessionBrand struct{}
 type NotABrand struct{}
 
 func exampleMixed() {
-	var _ = id.ID[ProductBrand, string]{}
-	var _ = id.ID[TenantBrand, string]{}
-	var _ = id.ID[SessionBrand, int]{}
+	_ = id.ID[ProductBrand, string]{}
+	_ = id.ID[TenantBrand, string]{}
+	_ = id.ID[SessionBrand, int]{}
 	_ = NotABrand{}
 }

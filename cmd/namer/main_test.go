@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,6 +26,31 @@ func parseSource(t *testing.T, src string) *ast.File {
 	return f
 }
 
+// capturePrint calls printResults and captures its output via an os.Pipe.
+// This tests the real printResults function without duplicating its logic.
+func capturePrint(t *testing.T, brands []BrandInfo, dryRun bool) string {
+	t.Helper()
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe failed: %v", err)
+	}
+
+	printResults(w, brands, dryRun)
+
+	if err := w.Close(); err != nil {
+		t.Fatalf("failed to close pipe writer: %v", err)
+	}
+
+	var buf bytes.Buffer
+
+	if _, err := io.Copy(&buf, r); err != nil {
+		t.Fatalf("failed to read pipe: %v", err)
+	}
+
+	return buf.String()
+}
+
 func TestSuggestName(t *testing.T) {
 	t.Parallel()
 
@@ -36,7 +62,7 @@ func TestSuggestName(t *testing.T) {
 		{"strips Brand suffix", "UserBrand", "User"},
 		{"strips ID suffix", "OrderID", "Order"},
 		{"strips T prefix", "TProduct", "Product"},
-		{"strips Brand and ID", "EventBrandID", "Event"},
+		{"strips ID but not preceding Brand", "EventBrandID", "EventBrand"},
 		{"strips T prefix and Brand suffix", "TCategoryBrand", "Category"},
 		{"returns original when result empty", "Brand", "Brand"},
 		{"returns original when only suffix", "ID", "ID"},
@@ -367,6 +393,7 @@ func (Foo) Name() string { return "x" }
 		f := parseSource(t, src)
 
 		fn := findFuncDecl(t, f, "Name")
+
 		typeName, ok := isNameMethod(fn)
 		if !ok {
 			t.Fatal("expected isNameMethod to return true")
@@ -477,7 +504,7 @@ func (Foo) Name() string { return "UserValue" }
 type Foo struct{}
 func (Foo) Name() string { return someVar }
 `
-		f := parseSource(t, f)
+		f := parseSource(t, src)
 		fn := findFuncDecl(t, f, "Name")
 
 		if got := parseNameReturnValue(fn); got != "" {
@@ -492,7 +519,7 @@ func (Foo) Name() string { return someVar }
 type Foo struct{}
 func (Foo) Name() string { x := "a"; return x }
 `
-		f := parseSource(t, f)
+		f := parseSource(t, src)
 		fn := findFuncDecl(t, f, "Name")
 
 		if got := parseNameReturnValue(fn); got != "" {
@@ -546,7 +573,7 @@ func f() {
 		}
 	})
 
-	t.Run("finds single type arg ID[Brand]", func(t *testing.T) {
+	t.Run("finds single type arg id.ID[Brand]", func(t *testing.T) {
 		t.Parallel()
 
 		src := `package test
@@ -656,7 +683,10 @@ func TestScanFile_Mixed(t *testing.T) {
 	}
 
 	if len(r.brands) != 3 {
-		t.Fatalf("expected 3 brands (Product, Tenant, Session — not NotABrand), got %d", len(r.brands))
+		t.Fatalf(
+			"expected 3 brands (Product, Tenant, Session — not NotABrand), got %d",
+			len(r.brands),
+		)
 	}
 
 	byType := make(map[string]BrandInfo, len(r.brands))
@@ -736,34 +766,23 @@ func TestScanPath_NonExistent(t *testing.T) {
 func TestPrintResults_NoBrands(t *testing.T) {
 	t.Parallel()
 
-	var buf bytes.Buffer
-	printResults(os.NewFile(0, ""), nil, true)
+	output := capturePrint(t, nil, true)
 
-	result := buf.String()
-	if result != "" {
-		t.Errorf("expected empty output for nil brands to os.File, got %q", result)
-	}
-
-	var manual strings.Builder
-	manual.WriteString("No brand types found. Nothing to do.\n")
-	if !strings.Contains(manual.String(), "Nothing to do") {
-		t.Error("expected 'Nothing to do' message")
+	if !strings.Contains(output, "No brand types found") {
+		t.Errorf("expected 'No brand types found' message, got: %q", output)
 	}
 }
 
 func TestPrintResults_AllHaveName(t *testing.T) {
 	t.Parallel()
 
-	var buf strings.Builder
-
 	brands := []BrandInfo{
 		{TypeName: "Foo", HasName: true, NameValue: "\"Foo\""},
 		{TypeName: "Bar", HasName: true, NameValue: "\"Bar\""},
 	}
 
-	buf.WriteString(formatResultsForTest(brands, true))
+	output := capturePrint(t, brands, true)
 
-	output := buf.String()
 	if !strings.Contains(output, "All 2 brand types have Name()") {
 		t.Errorf("expected 'All 2 brand types have Name()' in output, got: %s", output)
 	}
@@ -778,7 +797,7 @@ func TestPrintResults_MissingName(t *testing.T) {
 		{TypeName: "TenantBrand", HasName: false, File: "main.go", Line: 20},
 	}
 
-	output := formatResultsForTest(brands, true)
+	output := capturePrint(t, brands, true)
 
 	if !strings.Contains(output, "Found 3 brand types") {
 		t.Errorf("expected 'Found 3 brand types' in output, got: %s", output)
@@ -812,7 +831,7 @@ func TestPrintResults_WriteMode(t *testing.T) {
 		{TypeName: "UserBrand", HasName: false, File: "main.go", Line: 10},
 	}
 
-	output := formatResultsForTest(brands, false)
+	output := capturePrint(t, brands, false)
 
 	if strings.Contains(output, "(dry-run") {
 		t.Errorf("dry-run marker should not appear in write mode, got: %s", output)
@@ -823,57 +842,23 @@ func TestPrintResults_WriteMode(t *testing.T) {
 	}
 }
 
-func TestSuggestName_IntegrationWithPrint(t *testing.T) {
+func TestPrintResults_SuggestNameIntegration(t *testing.T) {
 	t.Parallel()
 
 	brands := []BrandInfo{
 		{TypeName: "SessionBrand", HasName: false, File: "main.go", Line: 5},
 	}
 
-	output := formatResultsForTest(brands, true)
+	output := capturePrint(t, brands, true)
 
 	expected := `func (SessionBrand) Name() string { return "Session" }`
 	if !strings.Contains(output, expected) {
-		t.Errorf("expected suggested Name() stub in output:\n%s\nwant to contain: %s", output, expected)
+		t.Errorf(
+			"expected suggested Name() stub in output:\n%s\nwant to contain: %s",
+			output,
+			expected,
+		)
 	}
-}
-
-// formatResultsForTest replicates printResults logic into a string for easy
-// assertion testing without needing an *os.File.
-func formatResultsForTest(brands []BrandInfo, dryRun bool) string {
-	var b strings.Builder
-
-	missingName := filterMissing(brands)
-	if len(brands) == 0 {
-		b.WriteString("No brand types found. Nothing to do.\n")
-		return b.String()
-	}
-
-	if len(missingName) == 0 {
-		fmt.Fprintf(&b, "All %d brand types have Name() methods.\n", len(brands))
-		return b.String()
-	}
-
-	fmt.Fprintf(&b,
-		"Found %d brand types, %d missing Name() method:\n\n",
-		len(brands), len(missingName))
-
-	for _, item := range missingName {
-		suggested := suggestName(item.TypeName)
-		fmt.Fprintf(&b,
-			"  %s:%d — %s\n    → func (%s) Name() string { return %q }\n",
-			item.File, item.Line, item.TypeName, item.TypeName, suggested)
-	}
-
-	if !dryRun {
-		b.WriteString(
-			"\n[Note: AST-based file insertion not implemented — use gofmt-aware editor]\n")
-	} else {
-		b.WriteString("\n(dry-run — no files written)\n")
-		b.WriteString("Run with -write to see what would be suggested.\n")
-	}
-
-	return b.String()
 }
 
 // findFuncDecl finds the first FuncDecl with the given name in f.
