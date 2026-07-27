@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding"
-	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -272,14 +271,6 @@ var (
 	_ fmt.Stringer     = ID[struct{}, string]{value: ""}
 	_ fmt.GoStringer   = ID[struct{}, string]{value: ""}
 	_ fmt.Formatter    = ID[struct{}, string]{value: ""}
-	_ json.Marshaler   = ID[struct{}, string]{value: ""}
-	_ json.Unmarshaler = (*ID[struct{}, string])(nil)
-	_ json.Marshaler   = ID[struct{}, int64]{value: 0}
-	_ json.Unmarshaler = (*ID[struct{}, int64])(nil)
-	_ json.Marshaler   = ID[struct{}, int32]{value: 0}
-	_ json.Unmarshaler = (*ID[struct{}, int32])(nil)
-	_ json.Marshaler   = ID[struct{}, uint64]{value: 0}
-	_ json.Unmarshaler = (*ID[struct{}, uint64])(nil)
 	_ sql.Scanner      = (*ID[struct{}, string])(nil)
 	_ sql.Scanner      = (*ID[struct{}, int64])(nil)
 	_ sql.Scanner      = (*ID[struct{}, int32])(nil)

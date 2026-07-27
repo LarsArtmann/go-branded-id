@@ -86,7 +86,7 @@ func main() {
 | ---------------------------- | ------------------------------------------------------------------------------------------- |
 | **Compile-time type safety** | Phantom types prevent mixing `UserID` with `OrderID` at the compiler level                  |
 | **Zero allocations**         | Core operations (`NewID`, `Get`, `Equal`, `Compare`, `IsZero`) allocate nothing             |
-| **Stdlib-only**              | No third-party dependencies. Uses only the Go standard library                                |
+| **Stdlib-only**              | No third-party dependencies. Uses only the Go standard library                              |
 | **Full serialization**       | JSON, SQL, Text (XML/TOML), Binary, Gob — all implemented                                   |
 | **Named brands**             | Optional `Name()` method enables `"User:abc123"` display strings and brand-aware validation |
 | **Any comparable type**      | `ID[Brand, V comparable]` works with strings, ints, and any comparable type                 |

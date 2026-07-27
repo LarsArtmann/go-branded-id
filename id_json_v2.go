@@ -1,7 +1,9 @@
+//go:build goexperiment.jsonv2
+
 package id
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 )
 
@@ -41,3 +43,15 @@ func (id *ID[B, V]) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+// Compile-time assertions that ID implements the json interfaces.
+var (
+	_ json.Marshaler   = ID[struct{}, string]{value: ""}
+	_ json.Unmarshaler = (*ID[struct{}, string])(nil)
+	_ json.Marshaler   = ID[struct{}, int64]{value: 0}
+	_ json.Unmarshaler = (*ID[struct{}, int64])(nil)
+	_ json.Marshaler   = ID[struct{}, int32]{value: 0}
+	_ json.Unmarshaler = (*ID[struct{}, int32])(nil)
+	_ json.Marshaler   = ID[struct{}, uint64]{value: 0}
+	_ json.Unmarshaler = (*ID[struct{}, uint64])(nil)
+)
