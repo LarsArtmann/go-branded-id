@@ -9,7 +9,8 @@ The `id/` directory no longer exists in `go-composable-business-types` — migra
 ## Prerequisites
 
 - **Go 1.26+** (see [`go.mod`](go.mod))
-- **`GOEXPERIMENT=jsonv2`** — this library uses `encoding/json/v2`. Set it for all Go commands: `export GOEXPERIMENT=jsonv2`
+- No special environment variables required. The library uses `encoding/json` by default.
+  Set `GOEXPERIMENT=jsonv2` only if you want to use `encoding/json/v2` internally.
 
 ## Migration Steps
 
@@ -108,14 +109,14 @@ Ensure your project's `go.mod` has `go 1.26` or later. This library uses modern 
 
 ### `go get` or `go build` fails with "build constraints exclude all Go files in encoding/json/v2"
 
-Set `GOEXPERIMENT=jsonv2`:
+This should no longer happen — the library uses `encoding/json` (v1) by default. If you previously set `GOEXPERIMENT=jsonv2`, remove it:
 
 ```bash
-export GOEXPERIMENT=jsonv2
+unset GOEXPERIMENT
 go build ./...
 ```
 
-This is required because the library uses `encoding/json/v2` (Go's new JSON v2 package).
+If you **want** v2 semantics, set `GOEXPERIMENT=jsonv2` and the library will automatically use `encoding/json/v2` internally via build tags.
 
 ### `replace` directive pointing at the old package
 

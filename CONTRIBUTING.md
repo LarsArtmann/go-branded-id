@@ -17,9 +17,8 @@ nix run .#test
 nix run .#lint
 ```
 
-> **CRITICAL:** This library uses `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2`.
-> The Nix flake sets this automatically. If you run `go` commands outside the Nix shell,
-> always set it: `export GOEXPERIMENT=jsonv2`.
+> This library dual-supports `encoding/json` (v1, default) and `encoding/json/v2` (optional).
+> No special environment variables are required. Set `GOEXPERIMENT=jsonv2` only if you want v2 semantics.
 
 ## Development Setup
 
@@ -50,7 +49,7 @@ references to these in older documentation, they are stale.
 
 ## Testing
 
-- All tests run via `nix run .#test` (or `GOEXPERIMENT=jsonv2 go test ./... -count=1`)
+- All tests run via `nix run .#test` (or `go test ./... -count=1`)
 - Tests use generic helpers: `testIDRoundTrip[B any, V comparable](t *testing.T, ...)`
 - Benchmarks use `b.Loop()` (Go 1.24+ pattern)
 - Fuzz tests cover JSON and Binary round-trips

@@ -16,7 +16,7 @@ without the `go.mod` dependency bump. Full ecosystem migration is the path to v1
 
 Before tagging v1.0, the API surface should be frozen and audited:
 
-- Evaluate whether `encoding/json/v2` is the right long-term choice (currently requires `GOEXPERIMENT=jsonv2`)
+- ~~Evaluate whether `encoding/json/v2` is the right long-term choice~~ Done: dual-supports both v1 and v2 via build tags
 - Consider compile-time constraint for `Compare` (currently runtime `ErrNotOrdered`)
 - API review: are there methods that should not exist? Are there missing methods users keep asking for?
 - Stability guarantee: once v1.0 ships, breaking changes require v2.0

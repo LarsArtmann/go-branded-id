@@ -55,7 +55,7 @@ Computed live from the repo (do not hardcode these numbers):
 
 | Feature                                    | Status                | Notes                                                                                                                                                            |
 | ------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| JSON (`MarshalJSON`/`UnmarshalJSON`)       | 🟢 `FULLY_FUNCTIONAL` | `id_json.go`; uses `encoding/json/v2` (requires `GOEXPERIMENT=jsonv2`); zero → `null`; delegates to `json.Marshal(id.value)`                                     |
+| JSON (`MarshalJSON`/`UnmarshalJSON`)       | 🟢 `FULLY_FUNCTIONAL` | `id_json_v1.go`/`id_json_v2.go`; dual-supports `encoding/json` (default) and `encoding/json/v2` (build-tagged); zero → `null`; delegates to `json.Marshal(id.value)` |
 | SQL (`Scan`/`Value`)                       | 🟢 `FULLY_FUNCTIONAL` | `id_sql.go`; `Scan` accepts `string`, `[]byte`, `int64`, `int`, `float64`; `Value` returns `int64` for all int types; `TextMarshaler`/`TextUnmarshaler` fallback |
 | Text (`MarshalText`/`UnmarshalText`)       | 🟢 `FULLY_FUNCTIONAL` | `id_text.go`; `MarshalText` via `valueString()` (all types); `UnmarshalText` parses `string`/`int`/`int64`/`uint64` directly, others via `TextUnmarshaler`       |
 | Binary (`MarshalBinary`/`UnmarshalBinary`) | 🟢 `FULLY_FUNCTIONAL` | `id_binary.go`; little-endian; `int`/`uint` as 8 bytes; `BinaryMarshaler` fallback                                                                               |

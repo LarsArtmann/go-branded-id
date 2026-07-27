@@ -8,7 +8,7 @@ A Go library providing branded, strongly-typed identifiers using phantom types (
 
 All build/test tasks go through the Nix flake. There is no `justfile` (it was removed); `CONTRIBUTING.md` still references `just` and is stale — see "Stale Files to Ignore" below.
 
-Standard `go build`/`go test` commands work without any special environment variables. The library previously required `GOEXPERIMENT=jsonv2` (when it used `encoding/json/v2`), but has since switched back to `encoding/json` (v1) — see "json/v2 → v1 Migration" in Critical Gotchas below.
+Standard `go build`/`go test` commands work without any special environment variables. The library **dual-supports** `encoding/json` (v1, default) and `encoding/json/v2` (when `GOEXPERIMENT=jsonv2` is set) via build tags — see "Dual JSON v1/v2 Support" in Critical Gotchas below.
 
 | Command                        | Purpose                                                 |
 | ------------------------------ | ------------------------------------------------------- |
@@ -33,7 +33,8 @@ The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.26, golangci-l
 ├── id.go              # Core ID type, NewID, Get, IsZero, Equal, Compare, Or, String, GoString, Format
 ├── id_brand.go        # BrandNamer interface, BrandName, ValidateID, ValidateIDWithValue, MustValidateID
 ├── id_ptr.go          # Ptr(), FromPtr() for optional ID fields
-├── id_json.go         # MarshalJSON / UnmarshalJSON (zero → null)
+├── id_json_v1.go      # MarshalJSON / UnmarshalJSON (encoding/json, default)
+├── id_json_v2.go      # MarshalJSON / UnmarshalJSON (encoding/json/v2, build-tagged)
 ├── id_sql.go          # Scan / Value for database/sql (all int/uint/string types)
 ├── id_text.go         # MarshalText / UnmarshalText (XML, TOML)
 ├── id_binary.go       # MarshalBinary / UnmarshalBinary (little-endian)
@@ -56,7 +57,8 @@ There is no `internal/` or `pkg/` — this is intentionally a flat, single-packa
 
 ## Naming Conventions
 
-- Source files: `id_<feature>.go` (e.g., `id_json.go`, `id_binary.go`)
+- Source files: `id_<feature>.go` (e.g., `id_json_v1.go`, `id_binary.go`)
+- Build-tagged pairs: `id_<feature>_v{1,2}.go` with `//go:build goexperiment.jsonv2` / `!goexperiment.jsonv2`
 - Test files: `id_<feature>_test.go` or `id_<scope>_test.go` (e.g., `id_brand_test.go`, `id_alltypes_test.go`)
 - Test brand types in `_test.go` files: `StringBrand`, `Int64Brand`, etc. (PascalCase, no `test` prefix except `testUserBrand` in `id_brand_test.go`)
 - Generic test helpers: `test<Name>` or `assert<Cmp><Action>` (e.g., `testIDRoundTrip`, `assertCmpEqual`)
@@ -88,17 +90,19 @@ There is no `internal/` or `pkg/` — this is intentionally a flat, single-packa
 
 ## Critical Gotchas
 
-### GOEXPERIMENT=jsonv2 — REQUIRED to build
+### Dual JSON v1/v2 Support — Build Tags
 
-The library imports `encoding/json/v2` (`id_json.go`, `id_sql.go`). This package is gated behind build constraints in Go 1.26 and requires `GOEXPERIMENT=jsonv2`. Without it, you get:
+The library supports both `encoding/json` (v1) and `encoding/json/v2` via Go build tags:
 
-```
-imports encoding/json/v2: build constraints exclude all Go files in .../encoding/json/v2
-```
+- `id_json_v1.go` (`//go:build !goexperiment.jsonv2`) — uses `encoding/json`, compiled by default
+- `id_json_v2.go` (`//go:build goexperiment.jsonv2`) — uses `encoding/json/v2`, compiled when consumer sets `GOEXPERIMENT=jsonv2`
+- `json_helpers_v{1,2}_test.go` — same pattern for test helpers
 
-**This is why the v0.3.1 GitHub Release never fired** — the CI workflows did not set `GOEXPERIMENT`, so `go test -race ./...` failed in the release workflow. Fixed in this session by adding `GOEXPERIMENT: jsonv2` to all workflow steps.
+The `goexperiment.jsonv2` build tag is set automatically by the Go toolchain when `GOEXPERIMENT=jsonv2` is active (Go 1.25–1.26). In Go 1.27+, json/v2 becomes the default and the tag is always true.
 
-The `encoding/json/v2` package provides `json.Marshaler` and `json.Unmarshaler` interfaces (same method signatures as v1) but with v2 semantics internally. `MarshalJSON` delegates to `json.Marshal(id.value)` using v2's encoder.
+**CI tests both modes** — every workflow runs build + tests in both v1 (no flag) and v2 (`GOEXPERIMENT=jsonv2`) modes.
+
+**Historical note:** Previously the library hard-required `GOEXPERIMENT=jsonv2`, which caused the v0.3.1 release to fail (CI didn't set it). The dual-mode approach eliminates this class of problem entirely.
 
 ### String() vs Get() — Know the Difference
 
