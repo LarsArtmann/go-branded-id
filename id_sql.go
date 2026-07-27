@@ -90,7 +90,7 @@ func (id *ID[B, V]) Scan(src any) error {
 
 			return nil
 		default:
-			return fmt.Errorf("id: cannot scan %T into string-based ID (src=%T)", src, src) //nolint:err113 // diagnostic %T
+			return fmt.Errorf("id: cannot scan %T into string-based ID (src=%T)", src, src) //nolint:err113
 		}
 
 	case int:
@@ -211,7 +211,7 @@ func (id *ID[B, V]) Scan(src any) error {
 			return nil
 		}
 
-		return fmt.Errorf("id: unsupported target type %T for SQL scanning (src=%T)", *new(V), src) //nolint:err113 // diagnostic %T
+		return fmt.Errorf("id: unsupported target type %T for SQL scanning (src=%T)", *new(V), src) //nolint:err113
 	}
 }
 

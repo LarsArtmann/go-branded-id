@@ -23,8 +23,6 @@ func (id ID[B, V]) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler for text-based decoding (e.g., XML, TOML).
-//
-//nolint:funlen // exhaustive type switch over supported types
 func (id *ID[B, V]) UnmarshalText(data []byte) error {
 	if len(data) == 0 {
 		id.Reset()
