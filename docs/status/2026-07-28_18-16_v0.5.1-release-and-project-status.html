@@ -603,13 +603,13 @@
             <div class="stat-value">26</div>
             <div class="stat-label">BuildFlow Structural Findings</div>
           </div>
-          <div class="stat-card stat-warn">
-            <div class="stat-value">17</div>
-            <div class="stat-label">Unpinned GitHub Actions</div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Unpinned GitHub Actions (resolved)</div>
           </div>
-          <div class="stat-card stat-warn">
-            <div class="stat-value">5</div>
-            <div class="stat-label">Sentinel Errors Without <code>errors.Is</code> Tests</div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Sentinel Errors Without <code>errors.Is</code> Tests (resolved)</div>
           </div>
         </div>
 
@@ -1107,6 +1107,43 @@
             We have competing high-value streams: (A) Dependabot + action pinning +
             <code>nix flake check</code> CI, or (B) sentinel-error tests + website docs + downstream
             bumps. Which stream do you want tackled first?
+          </p>
+        </div>
+
+        <div class="card card-solution" id="resolution">
+          <h4>Resolution (2026-07-28)</h4>
+          <p>
+            Several "smoldering" items flagged in this snapshot were extinguished by the
+            subsequent <code>2026-07-28_23-01</code> session. The summary cards above have been
+            corrected inline; the details:
+          </p>
+          <ul>
+            <li>
+              <strong>Sentinel error tests (was 5 open):</strong> all 9 sentinels now have
+              <code>errors.Is</code> coverage in <code>id_errors_test.go</code> (25 subtests).
+              <code>ErrMarshal</code> and <code>ErrUnmarshal</code> were also added.
+            </li>
+            <li>
+              <strong>Unpinned GitHub Actions (was 17):</strong> all actions across
+              <code>go.yml</code>, <code>release.yml</code>, <code>validate-docs.yml</code> pinned
+              to commit SHAs.
+            </li>
+            <li>
+              <strong>Website changelog:</strong> <code>changelog.mdx</code> gained v0.4.0, v0.5.0,
+              v0.5.1 entries (previously stopped at v0.3.2). Error Handling and Namer Tool guides
+              added.
+            </li>
+            <li>
+              <strong>Validate Docs CI:</strong> install path fixed to
+              <code>cmd/md-go-validator</code>.
+            </li>
+          </ul>
+          <p>
+            <strong>Still open:</strong> the 2 Dependabot vulnerabilities have
+            <code>package.json</code> overrides set but the <code>package-lock.json</code> was never
+            regenerated (npm unavailable), so the alerts persist; the website was never built to
+            verify the new <code>.mdx</code> guides compile. Both are now in
+            <code>TODO_LIST.md</code>.
           </p>
         </div>
 

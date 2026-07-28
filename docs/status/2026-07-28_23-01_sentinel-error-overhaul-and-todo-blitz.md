@@ -305,3 +305,34 @@ The `website/` has its own `flake.nix` and `package.json`. I couldn't run `npm i
 **CI (3):** `go.yml`, `release.yml`, `validate-docs.yml`
 **Docs (8):** `README.md`, `CHANGELOG.md`, `FEATURES.md`, `TODO_LIST.md`, `AGENTS.md`, `error-handling.mdx` (new), `namer-tool.mdx` (new), `api-reference.mdx`, `changelog.mdx`
 **Config (4):** `astro.config.mjs`, `website/package.json`, `scripts/pre-push-dual-test.sh` (new), `.git/hooks/pre-push`
+
+---
+
+## Resolution (2026-07-28)
+
+**Section (D).1 — "never ran `golangci-lint`" — resolved.** The new test files
+introduced 12 lint issues (10 `wsl_v5` missing-blank-line in `id_errors_test.go`,
+2 `gosmopolitan` on the Japanese fuzz seeds in `id_bench_test.go`). A later pass
+fixed all 12: blank lines added above each `err :=` statement; the unicode fuzz
+seeds moved to their own line with `//nolint:gosmopolitan` justification.
+`golangci-lint run ./...` now reports **0 issues in both v1 and v2 modes**.
+
+**Release status:** this session's work is committed but **not yet tagged**. It
+lives in `CHANGELOG.md` `[Unreleased]`. The version-number decision (v0.5.2 vs
+v0.6.0 — open question Q2) is a design call still pending.
+
+**Section (D) items still open** (now in `TODO_LIST.md`):
+
+- D4 / D5: website `package-lock.json` not regenerated and site not built (npm
+  was unavailable). The `package.json` overrides are correct; the lockfile still
+  holds the vulnerable `astro`/`fast-uri` versions.
+- E5: `ErrMarshal` SQL `Value()` TextMarshaler path has no failing-marshaler test
+  (only `MarshalBinary` is proven for `ErrMarshal`).
+- D3: `nix flake check` not run locally (the CI job was added but never verified
+  locally).
+
+**Docs brought current:** `TODO_LIST.md` was rebuilt to hold only open work (the
+14 `DONE` rows this session left behind were removed — completed work lives in
+`CHANGELOG.md`). `FEATURES.md` coverage corrected from 81.6% → **85.6%**
+(actual). `ROADMAP.md` Theme 2 updated: the sentinel `errors.Is` coverage and
+`fmt.Errorf` audit it listed as open are now done.
