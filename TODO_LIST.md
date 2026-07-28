@@ -23,7 +23,7 @@
 
 | Task                                            | Status    | Impact | Effort | Evidence                                                                                               |
 | ----------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------------------------------------------ |
-| Add CI integration test against ecosystem repos | 🔴 `TODO` | Med    | 2h     | `cmd/namer/main.go` exists with 80% test coverage; no representative cross-repo compile test in CI yet |
+| Add CI integration test against ecosystem repos | 🔴 `TODO` | Med    | 2h     | `cmd/namer/main.go` exists with 93% test coverage; no representative cross-repo compile test in CI yet |
 
 ## Low Impact
 
@@ -38,7 +38,7 @@
 | Task                                             | Status    | Evidence                                                                                   |
 | ------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------ |
 | Re-tag and re-push v0.3.1 after GOEXPERIMENT fix | 🟢 `DONE` | Tags v0.3.1–v0.4.0 exist on remote. Release CI fires successfully.                         |
-| Add tests for `cmd/namer` codemod                | 🟢 `DONE` | 80% coverage (was 0%). Found and fixed nil-pointer bug in `isNameMethod`.                  |
+| Add tests for `cmd/namer` codemod                | 🟢 `DONE` | 93% coverage (was 0%). Found and fixed nil-pointer bug in `isNameMethod`.                  |
 | Evaluate json/v2 as long-term choice             | 🟢 `DONE` | Dual-supports both v1 and v2 via build tags. CI tests both modes. See `id_json_v{1,2}.go`. |
 
 ---
