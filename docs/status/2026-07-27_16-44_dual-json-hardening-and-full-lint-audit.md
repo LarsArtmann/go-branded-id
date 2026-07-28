@@ -16,41 +16,41 @@
 
 ### Critical Bug Fix (Not on Original List)
 
-| What | Detail |
-| --- | --- |
-| **goimports corruption** | `id_json_v1.go` and `json_helpers_v1_test.go` both imported `encoding/json/v2` instead of `encoding/json`. This was committed in `4f38f16` ("fix(json): resolve critical import bug") — the commit that *introduced* the bug it claimed to fix. The default build mode (`go build ./...` without `GOEXPERIMENT`) was completely broken. Fixed by correcting both import paths. |
+| What                     | Detail                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **goimports corruption** | `id_json_v1.go` and `json_helpers_v1_test.go` both imported `encoding/json/v2` instead of `encoding/json`. This was committed in `4f38f16` ("fix(json): resolve critical import bug") — the commit that _introduced_ the bug it claimed to fix. The default build mode (`go build ./...` without `GOEXPERIMENT`) was completely broken. Fixed by correcting both import paths. |
 
 ### Original TODOs
 
-| # | Task | What was done |
-| --- | --- | --- |
-| **1** | JSON byte-identical equivalence test | `TestJSONByteEquivalence` in `id_json_contract_test.go` — asserts exact bytes for string/int64/uint64/int32 marshal + null for zero values. Runs in both CI modes. |
-| **2** | Structural parity meta-test | `TestDualJSONContract_Imports`, `TestDualJSONContract_BuildTags`, `TestDualJSONContract_StructuralParity` — locks the import split, build-tag split, and byte-level parity of both file pairs after normalization. |
-| **3** | md-go-validator on .mdx code blocks | Fixed 5 validation errors by adding `// skip-validate` to illustrative snippets in README.md (3 blocks), `value-types.mdx` (1), `serialization.mdx` (1). Result: 39 valid, 5 skipped, **0 errors**. |
-| **4** | changelog.mdx grammar | "dual-supports" → "support" in both website changelog and CONTRIBUTING.md. |
-| **5** | Website builds | Verified `nix run .#build` from `website/` — 12 pages built successfully in ~2.5s. |
-| **6** | AGENTS.md stale files | Removed entire "Stale Files to Ignore" section (CONTRIBUTING.md is current). Also fixed "dual-supports" in line 11 and the stale justfile reference in line 9. |
-| **7** | CI lint v2 mode | Removed `goexperiment.jsonv2` from `.golangci.yml` build-tags (so default lint covers v1). CI workflow now runs lint with `--build-tags goexperiment.jsonv2` in a separate matrix leg. |
-| **8** | CI matrix strategy | Rewrote `go.yml` and `release.yml` with `matrix: [v1, v2]` for build, test, and lint jobs. Release workflow now gates on both verify+lint jobs before creating the GitHub release. |
-| **10** | v0.4.0 migration guide | Added comprehensive "v0.4.0: Dual JSON v1/v2 Support" section to MIGRATION.md covering what changed, why dual-mode, how to opt into v2, troubleshooting. |
-| **11** | Fuzz test for cmd/namer scanFile | `FuzzScanFile` in `coverage_test.go` — 8 seed inputs (valid Go, invalid Go, empty, garbage). Verifies scanFile never panics on arbitrary input. |
-| **12** | testdata: pointer receiver | `testdata/pointer_receiver.go` — `PointerBrand` with `func (*PointerBrand) Name() string`. `TestScanFile_PointerReceiver` verifies HasName=true. |
-| **13** | walkFn error path | `TestWalkFn_ErrorPath` — feeds a simulated walk error into `walkFn` and verifies it wraps the error correctly. |
-| **14** | Refactor main() → testable run() | Extracted `run(args, stdout, stderr) int` using a per-call `flag.NewFlagSet` (avoids global flag redefinition panic in tests). `TestRun_NoArgs` and `TestRun_ScanTestData` verify the full CLI flow. |
-| **15** | v1 vs v2 benchmark | 4 benchmarks: `BenchmarkJSONDualMarshalString/Int64`, `BenchmarkJSONDualUnmarshalString/Int64`. Includes benchstat workflow in doc comment. |
-| **16** | tparallel fixes | `TestIDBinary`: added `t.Parallel()` (real fix). `TestIDJSONRoundTrip`: added `//nolint:tparallel` with justification (subtests run via interface indirection). |
-| **17** | ExampleValidateID output | Added `// Output:` to make the example testable. |
-| **18** | isIDSelector default case | `TestIsIDSelector_DefaultCase` — covers BinaryExpr, CallExpr, BasicLit (all return false). |
-| **19** | isEmptyStructBrand non-struct | `TestIsEmptyStructBrand_NonStructType` — covers InterfaceType, non-empty struct, Ident, empty struct not in brandsUsedWithID, plus positive case. |
-| **20** | Codegen decision documented | Added "Decision: No Code Generation for the JSON File Pairs" section to `dedup-acceptance.md` with rationale (parity test guards it, generator adds more complexity than it saves). |
-| **21** | Lint audit (82 → 0) | Config-level: added `id`, `n`, `r`, `p`, `w`, `tc`, `ts`, `rt`, `f`, `v1`, `v2` to varnamelen ignore-names; set `makezero: always: false`; added `err113` to test-file exclusions. Code-level: 12 `//nolint:err113` on diagnostic errors embedding `%T`; 2 goconst constants extracted in cmd/namer; removed stale `//nolint:funlen` from id_text.go. |
+| #      | Task                                 | What was done                                                                                                                                                                                                                                                                                                                                         |
+| ------ | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1**  | JSON byte-identical equivalence test | `TestJSONByteEquivalence` in `id_json_contract_test.go` — asserts exact bytes for string/int64/uint64/int32 marshal + null for zero values. Runs in both CI modes.                                                                                                                                                                                    |
+| **2**  | Structural parity meta-test          | `TestDualJSONContract_Imports`, `TestDualJSONContract_BuildTags`, `TestDualJSONContract_StructuralParity` — locks the import split, build-tag split, and byte-level parity of both file pairs after normalization.                                                                                                                                    |
+| **3**  | md-go-validator on .mdx code blocks  | Fixed 5 validation errors by adding `// skip-validate` to illustrative snippets in README.md (3 blocks), `value-types.mdx` (1), `serialization.mdx` (1). Result: 39 valid, 5 skipped, **0 errors**.                                                                                                                                                   |
+| **4**  | changelog.mdx grammar                | "dual-supports" → "support" in both website changelog and CONTRIBUTING.md.                                                                                                                                                                                                                                                                            |
+| **5**  | Website builds                       | Verified `nix run .#build` from `website/` — 12 pages built successfully in ~2.5s.                                                                                                                                                                                                                                                                    |
+| **6**  | AGENTS.md stale files                | Removed entire "Stale Files to Ignore" section (CONTRIBUTING.md is current). Also fixed "dual-supports" in line 11 and the stale justfile reference in line 9.                                                                                                                                                                                        |
+| **7**  | CI lint v2 mode                      | Removed `goexperiment.jsonv2` from `.golangci.yml` build-tags (so default lint covers v1). CI workflow now runs lint with `--build-tags goexperiment.jsonv2` in a separate matrix leg.                                                                                                                                                                |
+| **8**  | CI matrix strategy                   | Rewrote `go.yml` and `release.yml` with `matrix: [v1, v2]` for build, test, and lint jobs. Release workflow now gates on both verify+lint jobs before creating the GitHub release.                                                                                                                                                                    |
+| **10** | v0.4.0 migration guide               | Added comprehensive "v0.4.0: Dual JSON v1/v2 Support" section to MIGRATION.md covering what changed, why dual-mode, how to opt into v2, troubleshooting.                                                                                                                                                                                              |
+| **11** | Fuzz test for cmd/namer scanFile     | `FuzzScanFile` in `coverage_test.go` — 8 seed inputs (valid Go, invalid Go, empty, garbage). Verifies scanFile never panics on arbitrary input.                                                                                                                                                                                                       |
+| **12** | testdata: pointer receiver           | `testdata/pointer_receiver.go` — `PointerBrand` with `func (*PointerBrand) Name() string`. `TestScanFile_PointerReceiver` verifies HasName=true.                                                                                                                                                                                                      |
+| **13** | walkFn error path                    | `TestWalkFn_ErrorPath` — feeds a simulated walk error into `walkFn` and verifies it wraps the error correctly.                                                                                                                                                                                                                                        |
+| **14** | Refactor main() → testable run()     | Extracted `run(args, stdout, stderr) int` using a per-call `flag.NewFlagSet` (avoids global flag redefinition panic in tests). `TestRun_NoArgs` and `TestRun_ScanTestData` verify the full CLI flow.                                                                                                                                                  |
+| **15** | v1 vs v2 benchmark                   | 4 benchmarks: `BenchmarkJSONDualMarshalString/Int64`, `BenchmarkJSONDualUnmarshalString/Int64`. Includes benchstat workflow in doc comment.                                                                                                                                                                                                           |
+| **16** | tparallel fixes                      | `TestIDBinary`: added `t.Parallel()` (real fix). `TestIDJSONRoundTrip`: added `//nolint:tparallel` with justification (subtests run via interface indirection).                                                                                                                                                                                       |
+| **17** | ExampleValidateID output             | Added `// Output:` to make the example testable.                                                                                                                                                                                                                                                                                                      |
+| **18** | isIDSelector default case            | `TestIsIDSelector_DefaultCase` — covers BinaryExpr, CallExpr, BasicLit (all return false).                                                                                                                                                                                                                                                            |
+| **19** | isEmptyStructBrand non-struct        | `TestIsEmptyStructBrand_NonStructType` — covers InterfaceType, non-empty struct, Ident, empty struct not in brandsUsedWithID, plus positive case.                                                                                                                                                                                                     |
+| **20** | Codegen decision documented          | Added "Decision: No Code Generation for the JSON File Pairs" section to `dedup-acceptance.md` with rationale (parity test guards it, generator adds more complexity than it saves).                                                                                                                                                                   |
+| **21** | Lint audit (82 → 0)                  | Config-level: added `id`, `n`, `r`, `p`, `w`, `tc`, `ts`, `rt`, `f`, `v1`, `v2` to varnamelen ignore-names; set `makezero: always: false`; added `err113` to test-file exclusions. Code-level: 12 `//nolint:err113` on diagnostic errors embedding `%T`; 2 goconst constants extracted in cmd/namer; removed stale `//nolint:funlen` from id_text.go. |
 
 ---
 
 ## b) PARTIALLY DONE (1 item)
 
-| # | Task | Status | What remains |
-| --- | --- | --- | --- |
+| #     | Task                               | Status                          | What remains                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----- | ---------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **9** | Bump 14 downstream repos to v0.4.0 | **Documented but not executed** | The bump procedure is fully documented in MIGRATION.md ("Bumping Downstream Repositories"). The 14 repos (InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI, smart-configs, StopTube, universal-workflow, Zlota44, timesheets, complaints-mcp, cqrs-htmx, emeet-pixyd) require access to each repo. Cannot be done autonomously — requires cloning each, running `go get`, testing, committing, PR. |
 
 ---
@@ -74,6 +74,7 @@ imports encoding/json/v2: build constraints exclude all Go files in .../encoding
 ```
 
 **Why it was so insidious:**
+
 - `go list` showed the correct `GoFiles` (the v1 file IS included) — only the resolved `Imports` list revealed the v2 leak
 - The v2 build mode worked fine, so testing only in v2 mode hid the bug
 - The commit message claimed to fix an import bug, not introduce one
@@ -89,7 +90,7 @@ imports encoding/json/v2: build constraints exclude all Go files in .../encoding
 
 ### Architectural
 
-1. **The goimports corruption will recur.** The contract test catches it *after* it happens. The root cause is that goimports has no build-tag awareness and picks `encoding/json/v2` when re-adding the json import from scratch. A pre-commit hook or a `goimports -local` configuration that pins the import would be more preventive. The contract test is a safety net, not a cure.
+1. **The goimports corruption will recur.** The contract test catches it _after_ it happens. The root cause is that goimports has no build-tag awareness and picks `encoding/json/v2` when re-adding the json import from scratch. A pre-commit hook or a `goimports -local` configuration that pins the import would be more preventive. The contract test is a safety net, not a cure.
 
 2. **The dual-mode file pairs are a maintenance liability.** Every logic change must be made in both files. The parity test catches divergence, but the duplication remains. If a third mode is ever needed, code generation becomes worth the complexity.
 
@@ -198,20 +199,20 @@ The CHANGELOG.md has an `[Unreleased]` section but no `v0.4.0` header. The websi
 
 ## Verification Snapshot
 
-| Check | v1 (default) | v2 (GOEXPERIMENT=jsonv2) |
-| --- | --- | --- |
-| `go build ./...` | ✅ rc=0 | ✅ rc=0 |
-| `go test -race ./...` | ✅ pass | ✅ pass |
-| `golangci-lint run` | ✅ 0 issues | ✅ 0 issues |
-| `md-go-validator .` | ✅ 0 errors (39 valid, 5 skipped) | — |
-| `nix run .#build` (website) | ✅ 12 pages | — |
+| Check                       | v1 (default)                      | v2 (GOEXPERIMENT=jsonv2) |
+| --------------------------- | --------------------------------- | ------------------------ |
+| `go build ./...`            | ✅ rc=0                           | ✅ rc=0                  |
+| `go test -race ./...`       | ✅ pass                           | ✅ pass                  |
+| `golangci-lint run`         | ✅ 0 issues                       | ✅ 0 issues              |
+| `md-go-validator .`         | ✅ 0 errors (39 valid, 5 skipped) | —                        |
+| `nix run .#build` (website) | ✅ 12 pages                       | —                        |
 
-| Metric | Before | After |
-| --- | --- | --- |
-| Lint issues (v1) | 82 | **0** |
-| Lint issues (v2) | not checked | **0** |
-| Default build | **BROKEN** | ✅ works |
-| Tests (both modes) | v1 broken | ✅ both pass |
-| Docs validation | 5 errors | **0** |
-| Contract tests | 0 | 4 (imports, buildtags, parity, byte-equivalence) |
-| namer test coverage | partial | +8 tests (run, fuzz, coverage, pointer, walkFn) |
+| Metric              | Before      | After                                            |
+| ------------------- | ----------- | ------------------------------------------------ |
+| Lint issues (v1)    | 82          | **0**                                            |
+| Lint issues (v2)    | not checked | **0**                                            |
+| Default build       | **BROKEN**  | ✅ works                                         |
+| Tests (both modes)  | v1 broken   | ✅ both pass                                     |
+| Docs validation     | 5 errors    | **0**                                            |
+| Contract tests      | 0           | 4 (imports, buildtags, parity, byte-equivalence) |
+| namer test coverage | partial     | +8 tests (run, fuzz, coverage, pointer, walkFn)  |

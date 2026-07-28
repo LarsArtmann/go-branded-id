@@ -28,6 +28,7 @@ from a single template to eliminate the duplication mechanically.
 **Decision:** keep the files hand-written. The duplication is accepted.
 
 **Rationale:**
+
 1. Each pair is ~25-58 lines. A generator (templating tool, `go generate`,
    build-time script) adds a build step, a template file, and generated-file
    hygiene rules (`exhaustruct`/`nolint` markers, formatter exceptions) — more
@@ -36,7 +37,7 @@ from a single template to eliminate the duplication mechanically.
    **enforces** that each v1/v2 pair is byte-identical after normalizing the two
    intentional differences (build constraint + json import path). Any edit that
    diverges the pair fails CI in both modes. The duplication is therefore
-   *guarded*, not *unguarded*.
+   _guarded_, not _unguarded_.
 3. `TestDualJSONContract_Imports` additionally locks the import split, catching
    the goimports corruption hazard that previously broke the default build mode.
 

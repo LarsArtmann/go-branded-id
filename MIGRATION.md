@@ -159,10 +159,10 @@ all produce byte-identical output to v0.3.x.
 v0.3.1 hard-required `GOEXPERIMENT=jsonv2`, which broke every consumer that
 didn't set the flag. v0.4.0 eliminates this requirement entirely:
 
-| Mode | When | `GOEXPERIMENT` needed? |
-| --- | --- | --- |
-| v1 (default) | Always | No |
-| v2 | When you set `GOEXPERIMENT=jsonv2` | Yes (opt-in) |
+| Mode         | When                               | `GOEXPERIMENT` needed? |
+| ------------ | ---------------------------------- | ---------------------- |
+| v1 (default) | Always                             | No                     |
+| v2           | When you set `GOEXPERIMENT=jsonv2` | Yes (opt-in)           |
 
 In Go 1.27+, json/v2 becomes the default and the v2 code path is used
 automatically — no action needed.
@@ -252,6 +252,7 @@ used as a data key (storage key, stream name, routing key), do NOT add
 `Name()`. The namer tool will flag these as false positives.
 
 Known examples:
+
 - **go-cqrs-lite marker types** — `String()` output is used directly as
   storage/stream keys
 - **BerryBig** — test brands only

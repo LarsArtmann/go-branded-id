@@ -72,8 +72,8 @@ Computed live from the repo (do not hardcode these numbers):
 
 ## Tooling
 
-| Feature                                      | Status                    | Notes                                                                                             |
-| -------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------- |
+| Feature                                      | Status                | Notes                                                                                          |
+| -------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------- |
 | `cmd/namer` codemod (brand `Name()` scanner) | 🟢 `FULLY_FUNCTIONAL` | `cmd/namer/main.go`; AST scanner + optional stub writer; 93% test coverage; dry-run by default |
 
 ---
