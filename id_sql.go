@@ -94,7 +94,7 @@ func (id *ID[B, V]) Scan(src any) error {
 				"id: cannot scan %T into string-based ID (src=%T)",
 				src,
 				src,
-			) //nolint:err113
+			)
 		}
 
 	case int:
@@ -219,7 +219,7 @@ func (id *ID[B, V]) Scan(src any) error {
 			"id: unsupported target type %T for SQL scanning (src=%T)",
 			*new(V),
 			src,
-		) //nolint:err113
+		)
 	}
 }
 
@@ -273,7 +273,7 @@ func (id ID[B, V]) Value() (driver.Value, error) {
 		return nil, fmt.Errorf(
 			"id: unsupported type %T for SQL value",
 			id.value,
-		) //nolint:err113 // diagnostic %T
+		)
 	}
 }
 

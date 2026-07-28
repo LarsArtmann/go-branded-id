@@ -37,7 +37,7 @@ func (id *ID[B, V]) UnmarshalText(data []byte) error {
 		if !ok {
 			return errors.New(
 				"id: internal error: type assertion failed for string",
-			) //nolint:err113 // unreachable
+			)
 		}
 
 		*id = ID[B, V]{value: v}
@@ -53,7 +53,7 @@ func (id *ID[B, V]) UnmarshalText(data []byte) error {
 		if !ok {
 			return errors.New(
 				"id: internal error: type assertion failed for int",
-			) //nolint:err113 // unreachable
+			)
 		}
 
 		*id = ID[B, V]{value: v}

@@ -127,7 +127,7 @@ func (id ID[B, V]) MarshalBinary() ([]byte, error) {
 		return nil, fmt.Errorf(
 			"id: unsupported type %T for binary marshaling",
 			id.value,
-		) //nolint:err113
+		)
 	}
 }
 
@@ -335,7 +335,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 			"id: unsupported type %T for binary unmarshaling (data=%x)",
 			zero,
 			data,
-		) //nolint:err113
+		)
 	}
 }
 
