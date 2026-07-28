@@ -22,7 +22,7 @@
 Computed live from the repo (do not hardcode these numbers):
 
 - Test subtests: `go test ./... -count=1 -v \| grep -cE '^\s*=== RUN'` → 427
-- Statement coverage (library package): `go test ./... -cover` → 81.6%
+- Statement coverage (library package): `go test ./... -cover` → 85.6%
 - Statement coverage (`cmd/namer`): `go test -cover ./cmd/namer/` → 93.2%
 - Benchmark functions: `grep -c '^func Benchmark' id_bench_test.go` → 29
 - Fuzz functions: `grep -c '^func Fuzz' id_bench_test.go` → 10
@@ -78,7 +78,7 @@ Computed live from the repo (do not hardcode these numbers):
 | `ErrInsufficientData` | 🟢 `FULLY_FUNCTIONAL` | `errors.go:25`; returned when binary data is too short. Tested via `errors.Is` in `id_errors_test.go`.                              |
 | `ErrInternal`         | 🟢 `FULLY_FUNCTIONAL` | `errors.go:29`; returned for unreachable internal errors. Defensive only — verified in `id_errors_test.go`.                         |
 | `ErrNilReceiver`      | 🟢 `FULLY_FUNCTIONAL` | `errors.go:32`; returned when a method is called on nil pointer. Tested via `errors.Is` in `id_errors_test.go`.                     |
-| `ErrMarshal`          | 🟢 `FULLY_FUNCTIONAL` | `errors.go:36`; wraps marshaler failures (JSON, binary, SQL text). Tested via `errors.Is` in `id_errors_test.go`.                   |
+| `ErrMarshal`          | 🟢 `FULLY_FUNCTIONAL` | `errors.go:37`; wraps marshaler failures (JSON, binary, SQL text). Tested via `errors.Is` in `id_errors_test.go`.                   |
 | `ErrUnmarshal`        | 🟢 `FULLY_FUNCTIONAL` | `errors.go:42`; wraps unmarshaler failures (JSON, text). Tested via `errors.Is` in `id_errors_test.go`.                             |
 
 ## Formatting & Pointers

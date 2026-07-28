@@ -383,3 +383,35 @@ living docs?
 | Library coverage         | 81.6%                                                             |
 | `cmd/namer` coverage     | 93.2%                                                             |
 | Process stumbles         | 2 (GOCACHE corruption, fix-on-sight violations)                   |
+
+---
+
+## Resolution (2026-07-28)
+
+The 4 "fix-on-sight violations" flagged in section (d).2 are **all DONE**, closed
+by the subsequent `2026-07-28_23-01` session:
+
+| Item flagged here                          | Resolution                                                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Tracked `namer` binary                     | Removed in `c29a034`, `/namer` gitignored, shipped in **v0.5.1** (source archive dropped ~10x).  |
+| Restore `ErrNotOrdered` full message       | Restored at `errors.go:14`; message is `"id: Compare requires an ordered type (int, uint, or string)"`. |
+| `outputs` pattern gotcha in AGENTS.md      | Added ("Flake `outputs` Must Include `...`" in Critical Gotchas).                                |
+| `validate-docs.yml` install path           | Fixed to `github.com/larsartmann/md-go-validator/cmd/md-go-validator@latest`.                    |
+
+Section (f) high-impact items also resolved by later work: 9/9 sentinel errors
+now have `errors.Is` tests (`id_errors_test.go`); GitHub Actions pinned to SHA
+hashes; `nix flake check` CI job added (`go.yml`); website `changelog.mdx`
+gained v0.4.0/v0.5.0/v0.5.1 entries.
+
+**The TODO_LIST trophy case this session created** (12 items kept with `DONE`
+status instead of removed) was rebuilt in a later docs-health pass: completed
+items now live only in `CHANGELOG.md`, and `TODO_LIST.md` holds open work only.
+
+**Still open** (now in `TODO_LIST.md`): website `package-lock.json` regeneration
+(`npm install` in `website/` — npm was unavailable in both sessions); website
+build verification; `ErrMarshal`/`ErrUnmarshal` delegate-path test coverage
+(only `MarshalBinary` proven for `ErrMarshal`).
+
+**Coverage note:** the 81.6% figure above was superseded — actual statement
+coverage is **85.6%** after the 23:01 session added sentinel error tests
+(`id_errors_test.go`). `FEATURES.md` now reflects 85.6%.
