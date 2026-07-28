@@ -100,3 +100,19 @@ Neither caused lasting damage. Both were self-caught and self-fixed before compl
 2. **Strip order / algorithm intent.** The iterative loop strips `Brand` then `ID` each pass. Is that the intended canonical order for _your_ ecosystem's brand naming, or should it be longest-suffix-first / order-independent? I can verify against downstream repos, but the _intent_ is a design call only you can confirm.
 
 3. **Commit message hygiene for daemon commits.** The auto-git daemon committed this work as `03028c7` "feat(namer): enhance namer CLI with improved functionality and documentation" — a message that does **not** mention the regression fix and mislabels a bug fix as `feat`. Do you want me to amend it (needs your OK per the no-rewrite-safety rule), or leave daemon commits untouched as a policy?
+
+---
+
+## Resolution (2026-07-28)
+
+The `suggestName` fix is **permanent** and shipped in **v0.5.0**. `cmd/namer`
+coverage reached **93%** (was 80% at time of writing) after the 16:44 session
+added fuzz tests, pointer-receiver testdata, `walkFn` error path coverage, and
+the `run()` extraction.
+
+**Items from section (c) addressed:** CHANGELOG entry added (v0.5.0); fuzz test
+for `scanFile` added (`FuzzScanFile`); `main()` refactored to testable `run()`.
+
+**Still open:** `TestSuggestName_IntegrationWithPrint` not restored;
+`printResults` test asserting the suggested name string not added;
+`doc-files-age-check` freshness not verified.

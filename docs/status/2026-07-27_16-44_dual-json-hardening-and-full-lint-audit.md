@@ -216,3 +216,22 @@ The CHANGELOG.md has an `[Unreleased]` section but no `v0.4.0` header. The websi
 | Docs validation     | 5 errors    | **0**                                            |
 | Contract tests      | 0           | 4 (imports, buildtags, parity, byte-equivalence) |
 | namer test coverage | partial     | +8 tests (run, fuzz, coverage, pointer, walkFn)  |
+
+---
+
+## Resolution (2026-07-28)
+
+This session's work shipped as **v0.5.0** (tagged 2026-07-28, SSH-signed,
+annotated). CI Release workflow succeeded. The sentinel error refactor
+(`errors.go`, 7 exported sentinels, 12 `//nolint:err113` eliminated) was done
+during the v0.5.0 release session — see
+`docs/status/2026-07-28_12-31_v0.5.0-release-and-sentinel-error-refactor.md`.
+
+**Still open** from section (f): bumping 14 downstream repos to v0.5.0
+(externally blocked — requires per-repo access), `nix flake check` in CI,
+pre-commit dual-mode hook, website changelog.mdx missing 0.4.0/0.5.0 entries.
+
+**Recurring hazard confirmed:** the goimports import corruption described in
+section (d) recurred again post-release (working-tree only, not in committed
+code). The contract tests added in this session (`TestDualJSONContract_Imports`)
+guard CI but do not prevent local re-corruption.

@@ -216,3 +216,20 @@ It committed broken code (the goimports corruption) and creates garbage commit m
 ### 3. Should I squash the 16 unpushed commits before pushing?
 
 The commit history includes garbage messages from the auto-commit daemon (`for v1 ID format`, `): improve JSON...`). Squashing would clean the history but lose granular tracking. Alternatively, an interactive rebase to fix just the bad messages. This is a git-hygiene preference.
+
+---
+
+## Resolution (2026-07-28)
+
+The goimports corruption described in section (a).1 **recurred twice more**
+after this fix: once in the 16:44 hardening session (same day) and once in the
+working tree post-v0.5.0-release (2026-07-28). The committed code at HEAD was
+correct each time; the corruption re-enters on any `goimports`/`nix fmt` pass.
+
+**Guard added:** `TestDualJSONContract_Imports` in `id_json_contract_test.go`
+(added in the 16:44 session) asserts v1 files import `encoding/json` and NOT
+`encoding/json/v2`, running in both CI modes. This catches the corruption in
+CI but does not prevent local re-corruption.
+
+The dedup review and all accepted clones shipped in **v0.5.0**. The
+`dedup-acceptance.md` rationale document is current.

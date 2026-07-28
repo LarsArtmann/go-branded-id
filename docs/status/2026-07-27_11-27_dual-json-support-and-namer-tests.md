@@ -257,3 +257,27 @@ The auto-commit daemon committed my work ~10 times during this session, sometime
 - **Bugs found and fixed:** 1 (nil-pointer in `isNameMethod`)
 - **Near-disasters:** 2 (v1 file corruption caught by test verification; rushed sed leaving broken backticks)
 - **Verification:** `go test` passes in both v1 and v2 modes; `nix flake check` passes.
+
+---
+
+## Resolution (2026-07-28)
+
+The dual JSON v1/v2 feature shipped in **v0.5.0**. The version question (G.1)
+was answered: **v0.5.0** was chosen. `cmd/namer` coverage reached **93%**
+(was 80% at time of writing).
+
+**Critical note:** The goimports corruption documented in section (D).1 was NOT
+permanently fixed at this point. It recurred in the next session (11:35) and
+again post-v0.5.0-release. The contract test `TestDualJSONContract_Imports`
+(added in the 16:44 session) guards CI. See the
+`2026-07-27_11-35_dedup-review-and-critical-import-bugfix.md` and
+`2026-07-27_16-44_dual-json-hardening-and-full-lint-audit.md` reports for the
+full recurrence history.
+
+**Key items from section (F) addressed by later sessions:** JSON byte-equivalence
+test (#1), structural parity meta-test (#2), website build verification (#5),
+CI matrix strategy (#8), v0.4.0 migration guide (#10), fuzz test for scanFile
+(#11), `main()` → `run()` refactor (#14), full lint audit (82→0).
+
+**Still open:** bump 14 downstream repos to v0.5.0; website `changelog.mdx`
+missing 0.4.0/0.5.0 entries.

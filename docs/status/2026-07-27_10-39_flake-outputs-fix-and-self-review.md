@@ -222,3 +222,19 @@ Ranked by impact (Pareto: top ~5 deliver 80% of value).
 **What went poorly:** I violated my own "update memory immediately" rule by not recording the gotcha in AGENTS.md. I let the auto-git daemon write a lying commit message by not committing first. I didn't check `website/flake.nix` during the session (only in this report). I treated the symptom without investigating the intent behind `530702f`.
 
 **Grade:** B-. The fix is an A; the surrounding process hygiene is a C.
+
+---
+
+## Resolution (2026-07-28)
+
+The flake fix is **permanent** — `flake.nix:23` retains the `...` pattern.
+BuildFlow passes (37/38, `gitleaks` skipped by config).
+
+**Items from section (f) addressed by later sessions:**
+- CONTRIBUTING.md stale references (`just`, `pkg/errors/`) — fixed in v0.3.2
+- goimports corruption hazard — documented in AGENTS.md + contract test added
+  (see `2026-07-27_11-35` and `2026-07-27_16-44` reports)
+
+**Still open:** `nix flake check --no-build` not in CI or pre-commit; `gitleaks`
+skip reason undocumented; AGENTS.md lacks the `outputs` pattern gotcha (the
+goimports gotcha was documented instead). All work culminated in **v0.5.0**.
