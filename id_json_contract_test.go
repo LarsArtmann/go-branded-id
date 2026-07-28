@@ -59,7 +59,11 @@ func TestDualJSONContract_Imports(t *testing.T) {
 			}
 
 			if strings.Contains(content, tc.mustOmit) {
-				t.Errorf("%s must NOT contain %s (goimports corruption hazard)", tc.filename, tc.mustOmit)
+				t.Errorf(
+					"%s must NOT contain %s (goimports corruption hazard)",
+					tc.filename,
+					tc.mustOmit,
+				)
 			}
 		})
 	}
@@ -109,8 +113,20 @@ func TestDualJSONContract_StructuralParity(t *testing.T) {
 		v1, v2       string
 		v1Tag, v2Tag string
 	}{
-		{"implementation files", jsonV1ImplFile, jsonV2ImplFile, jsonV1BuildConstrnt, jsonV2BuildConstrnt},
-		{"test helper files", jsonV1HelperTest, jsonV2HelperTest, jsonV1BuildConstrnt, jsonV2BuildConstrnt},
+		{
+			"implementation files",
+			jsonV1ImplFile,
+			jsonV2ImplFile,
+			jsonV1BuildConstrnt,
+			jsonV2BuildConstrnt,
+		},
+		{
+			"test helper files",
+			jsonV1HelperTest,
+			jsonV2HelperTest,
+			jsonV1BuildConstrnt,
+			jsonV2BuildConstrnt,
+		},
 	}
 
 	for _, pair := range pairs {
@@ -133,7 +149,10 @@ func TestDualJSONContract_StructuralParity(t *testing.T) {
 			if normalizedV1 != normalizedV2 {
 				t.Errorf(
 					"%s and %s diverged after normalization (build tag + json import):\n--- v1 ---\n%s\n--- v2 ---\n%s",
-					pair.v1, pair.v2, normalizedV1, normalizedV2,
+					pair.v1,
+					pair.v2,
+					normalizedV1,
+					normalizedV2,
 				)
 			}
 		})

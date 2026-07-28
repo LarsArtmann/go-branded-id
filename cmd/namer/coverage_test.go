@@ -120,7 +120,11 @@ func TestIsEmptyStructBrand_NonStructType(t *testing.T) {
 			}}},
 		}, false},
 		{"ident type returns false", &ast.Ident{Name: "int"}, false},
-		{"empty struct NOT in brandsUsedWithID returns false", &ast.StructType{Fields: &ast.FieldList{}}, false},
+		{
+			"empty struct NOT in brandsUsedWithID returns false",
+			&ast.StructType{Fields: &ast.FieldList{}},
+			false,
+		},
 	}
 
 	for _, tt := range tests {
