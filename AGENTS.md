@@ -31,6 +31,7 @@ The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.26, golangci-l
 ```
 .
 ├── id.go              # Core ID type, NewID, Get, IsZero, Equal, Compare, Or, String, GoString, Format
+├── errors.go          # Sentinel errors (ErrInvalidID, ErrNotOrdered, ErrUnsupportedType, etc.)
 ├── id_brand.go        # BrandNamer interface, BrandName, ValidateID, ValidateIDWithValue, MustValidateID
 ├── id_ptr.go          # Ptr(), FromPtr() for optional ID fields
 ├── id_json_v1.go      # MarshalJSON / UnmarshalJSON (encoding/json, default)
