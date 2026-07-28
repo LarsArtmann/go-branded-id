@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-07-28
+
+### Fixed
+
+- **Removed accidentally tracked `namer` binary**: The `cmd/namer` build artifact was committed to the repository at `v0.5.0` and shipped in the auto-generated source archives. It has been removed from tracking and `/namer` is now gitignored so release archives for `v0.5.1` contain only source code.
+
 ## [0.5.0] - 2026-07-28
 
 ### Added
@@ -142,6 +148,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+[0.5.1]: https://github.com/larsartmann/go-branded-id/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/larsartmann/go-branded-id/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/larsartmann/go-branded-id/compare/v0.3.3...v0.4.0
 [0.3.3]: https://github.com/larsartmann/go-branded-id/compare/v0.3.2...v0.3.3

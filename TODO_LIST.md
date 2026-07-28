@@ -19,7 +19,7 @@
 | ----------------------------------------------------- | --------- | ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Add `errors.Is` tests for 5 new sentinel errors       | 🔴 `TODO` | High   | 1h     | Only `ErrNotOrdered` has an `errors.Is` test (`id_test.go:332`). `ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver` have zero coverage. |
 | Fix Validate Docs CI failure                          | 🔴 `TODO` | High   | 30min  | `validate-docs.yml` fails: `md-go-validator@latest` module v1.2.0 exists but root package doesn't. Needs install path corrected (likely `cmd/md-go-validator`).                    |
-| Remove tracked `namer` binary and add to `.gitignore` | 🔴 `TODO` | High   | 5min   | `git ls-files namer` confirms binary is tracked at repo root. BuildFlow flags it. Should be gitignored, not committed.                                                             |
+| Remove tracked `namer` binary and add to `.gitignore` | 🟢 `DONE` | High   | 5min   | Binary removed in `c29a034` and `/namer` is gitignored. Released in v0.5.1 so source archives no longer contain the artifact.                                                      |
 | Investigate Dependabot vulnerabilities                | 🔴 `TODO` | High   | 30min  | GitHub reported 2 vulnerabilities (1 high, 1 moderate) on v0.5.0 push. Not investigated. Run `gh api repos/LarsArtmann/go-branded-id/dependabot/alerts`.                           |
 
 ## Medium Impact
