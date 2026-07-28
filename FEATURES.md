@@ -22,37 +22,38 @@
 Computed live from the repo (do not hardcode these numbers):
 
 - Test subtests: `go test ./... -count=1 -v \| grep -cE '^\s*=== RUN'` → 370
-- Statement coverage (library package): `go test ./... -cover` → 81.8%
+- Statement coverage (library package): `go test ./... -cover` → 81.6%
 - Statement coverage (`cmd/namer`): `go test -cover ./cmd/namer/` → 93.2%
 - Benchmark functions: `grep -c '^func Benchmark' id_bench_test.go` → 29
+- Lint issues (both modes): `golangci-lint run ./...` → 0
 
 ## Core ID Type
 
 | Feature                                            | Status                | Notes                                                                                |
 | -------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------ |
-| `ID[B any, V comparable]` phantom-typed identifier | 🟢 `FULLY_FUNCTIONAL` | `id.go:59`; compile-time brand safety across all operations                          |
-| `NewID[B, V](v)` constructor                       | 🟢 `FULLY_FUNCTIONAL` | `id.go:62`; type inference for strings                                               |
-| `Get() V` value accessor                           | 🟢 `FULLY_FUNCTIONAL` | `id.go:65`; zero-allocation                                                          |
-| `IsZero() bool` / `Reset()` zero-value semantics   | 🟢 `FULLY_FUNCTIONAL` | `id.go:68`, `id.go:75`; zero value means "unset"                                     |
-| `Equal(other ID) bool`                             | 🟢 `FULLY_FUNCTIONAL` | `id.go:83`; same brand+value required                                                |
-| `Compare(other ID) (int, error)`                   | 🟢 `FULLY_FUNCTIONAL` | `id.go:91`; ordered types only (int/uint/string families); `ErrNotOrdered` otherwise |
-| `Or(default ID) ID` fallback                       | 🟢 `FULLY_FUNCTIONAL` | `id.go:132`                                                                          |
+| `ID[B any, V comparable]` phantom-typed identifier | 🟢 `FULLY_FUNCTIONAL` | `id.go:55`; compile-time brand safety across all operations                          |
+| `NewID[B, V](v)` constructor                       | 🟢 `FULLY_FUNCTIONAL` | `id.go:58`; type inference for strings                                               |
+| `Get() V` value accessor                           | 🟢 `FULLY_FUNCTIONAL` | `id.go:61`; zero-allocation                                                          |
+| `IsZero() bool` / `Reset()` zero-value semantics   | 🟢 `FULLY_FUNCTIONAL` | `id.go:64`, `id.go:71`; zero value means "unset"                                     |
+| `Equal(other ID) bool`                             | 🟢 `FULLY_FUNCTIONAL` | `id.go:79`; same brand+value required                                                |
+| `Compare(other ID) (int, error)`                   | 🟢 `FULLY_FUNCTIONAL` | `id.go:87`; ordered types only (int/uint/string families); `ErrNotOrdered` otherwise |
+| `Or(default ID) ID` fallback                       | 🟢 `FULLY_FUNCTIONAL` | `id.go:128`                                                                          |
 
 ## Named Brands & Validation
 
 | Feature                                   | Status                | Notes                                                                         |
 | ----------------------------------------- | --------------------- | ----------------------------------------------------------------------------- |
-| `BrandNamer` interface (`Name() string`)  | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:10`; optional, opt-in                                            |
-| `BrandName[B]() string` introspection     | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:32`; falls back to `fmt.Sprintf("%T", brand)` for unnamed brands |
-| Brand-aware `String()` (`"Brand:value"`)  | 🟢 `FULLY_FUNCTIONAL` | `id.go:185`; unnamed brands return value-only (backward compatible)           |
-| `ValidateID[B, V](id) error`              | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:56`; returns `ErrInvalidID` with brand-aware message             |
-| `ValidateIDWithValue[B, V](id, fn) error` | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:66`; custom value validator hook                                 |
-| `MustValidateID[B, V](id)`                | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:85`; panic variant for init-time checks                          |
+| `BrandNamer` interface (`Name() string`)  | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:9`; optional, opt-in                                            |
+| `BrandName[B]() string` introspection     | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:28`; falls back to `fmt.Sprintf("%T", brand)` for unnamed brands |
+| Brand-aware `String()` (`"Brand:value"`)  | 🟢 `FULLY_FUNCTIONAL` | `id.go:181`; unnamed brands return value-only (backward compatible)           |
+| `ValidateID[B, V](id) error`              | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:52`; returns `ErrInvalidID` with brand-aware message             |
+| `ValidateIDWithValue[B, V](id, fn) error` | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:62`; custom value validator hook                                 |
+| `MustValidateID[B, V](id)`                | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:81`; panic variant for init-time checks                          |
 
 ## Serialization
 
 > Serialization always uses the raw value (never the brand prefix) via internal
-> `valueString()`. Zero values serialize to `null` / `nil`.
+> `valueString()` (`id.go:140`). Zero values serialize to `null` / `nil`.
 
 | Feature                                    | Status                | Notes                                                                                                                                                                |
 | ------------------------------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,11 +63,26 @@ Computed live from the repo (do not hardcode these numbers):
 | Binary (`MarshalBinary`/`UnmarshalBinary`) | 🟢 `FULLY_FUNCTIONAL` | `id_binary.go`; little-endian; `int`/`uint` as 8 bytes; `BinaryMarshaler` fallback                                                                                   |
 | Gob (`GobEncode`/`GobDecode`)              | 🟢 `FULLY_FUNCTIONAL` | `id_gob.go`; delegates to binary                                                                                                                                     |
 
+## Sentinel Errors
+
+> All ID operations return wrapped sentinel errors defined in `errors.go`.
+> Match with `errors.Is()` to branch on error category without parsing strings.
+
+| Feature                          | Status                | Notes                                                                                                                  |
+| -------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `ErrInvalidID`                   | 🟢 `FULLY_FUNCTIONAL` | `errors.go:11`; returned by `ValidateID` when ID is zero                                                               |
+| `ErrNotOrdered`                  | 🟢 `FULLY_FUNCTIONAL` | `errors.go:14`; returned by `Compare` for non-ordered value types. Tested via `errors.Is` at `id_test.go:332`          |
+| `ErrUnsupportedType`             | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:18`; returned when a serialization format doesn't support value type `V`. **No `errors.Is` test coverage.** |
+| `ErrCannotScan`                  | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:22`; returned when a SQL source value can't be scanned. **No `errors.Is` test coverage.**                   |
+| `ErrInsufficientData`            | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:25`; returned when binary data is too short. **No `errors.Is` test coverage.**                              |
+| `ErrInternal`                    | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:29`; returned for unreachable internal errors. **No `errors.Is` test coverage.**                           |
+| `ErrNilReceiver`                 | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:32`; returned when a method is called on nil pointer. **No `errors.Is` test coverage.**                     |
+
 ## Formatting & Pointers
 
 | Feature                                               | Status                | Notes                                                                               |
 | ----------------------------------------------------- | --------------------- | ----------------------------------------------------------------------------------- |
-| `String()` / `GoString()` / `Format(fmt.State, rune)` | 🟢 `FULLY_FUNCTIONAL` | `id.go:185`, `id.go:205`, `id.go:214`; `%s %d %v %#v %q`; alloc-optimized in v0.3.1 |
+| `String()` / `GoString()` / `Format(fmt.State, rune)` | 🟢 `FULLY_FUNCTIONAL` | `id.go:181`, `id.go:202`, `id.go:211`; `%s %d %v %#v %q`; alloc-optimized in v0.3.1 |
 | `Ptr() *ID[B, V]`                                     | 🟢 `FULLY_FUNCTIONAL` | `id_ptr.go:4`; for optional fields                                                  |
 | `FromPtr(*ID[B, V]) ID[B, V]`                         | 🟢 `FULLY_FUNCTIONAL` | `id_ptr.go:7`; nil → zero value                                                     |
 
@@ -82,4 +98,6 @@ Computed live from the repo (do not hardcode these numbers):
   - Source of truth is the CODE, not docs or commit messages. Open the file.
   - One row per user-visible feature, not per function or endpoint.
   - When a feature ships, remove it from TODO_LIST.md to avoid split brains.
+  - Sentinel errors marked PARTIALLY_FUNCTIONAL because they are wired but lack
+    errors.Is test coverage for 5 of 7 sentinels. See TODO_LIST.md.
 -->

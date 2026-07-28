@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - CI workflows (`go.yml`, `release.yml`) now run build + tests in both v1 and v2 modes.
 - Nix flake `checks` now include a `test` check that runs both modes; `apps.test`/`test-race`/`build` also run both modes.
 - Removed `GOEXPERIMENT=jsonv2` from devShells (no longer required for default v1 mode).
+- `ErrNotOrdered` message shortened from `"id: Compare requires an ordered type (int, uint, or string)"` to `"id: Compare requires an ordered type"`. `errors.Is` matching is unaffected; consumers parsing the message string will see a different text.
 
 ### Removed
 
