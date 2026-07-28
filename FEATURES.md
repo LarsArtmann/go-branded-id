@@ -43,7 +43,7 @@ Computed live from the repo (do not hardcode these numbers):
 
 | Feature                                   | Status                | Notes                                                                         |
 | ----------------------------------------- | --------------------- | ----------------------------------------------------------------------------- |
-| `BrandNamer` interface (`Name() string`)  | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:9`; optional, opt-in                                            |
+| `BrandNamer` interface (`Name() string`)  | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:9`; optional, opt-in                                             |
 | `BrandName[B]() string` introspection     | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:28`; falls back to `fmt.Sprintf("%T", brand)` for unnamed brands |
 | Brand-aware `String()` (`"Brand:value"`)  | 🟢 `FULLY_FUNCTIONAL` | `id.go:181`; unnamed brands return value-only (backward compatible)           |
 | `ValidateID[B, V](id) error`              | 🟢 `FULLY_FUNCTIONAL` | `id_brand.go:52`; returns `ErrInvalidID` with brand-aware message             |
@@ -68,15 +68,15 @@ Computed live from the repo (do not hardcode these numbers):
 > All ID operations return wrapped sentinel errors defined in `errors.go`.
 > Match with `errors.Is()` to branch on error category without parsing strings.
 
-| Feature                          | Status                | Notes                                                                                                                  |
-| -------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `ErrInvalidID`                   | 🟢 `FULLY_FUNCTIONAL` | `errors.go:11`; returned by `ValidateID` when ID is zero                                                               |
-| `ErrNotOrdered`                  | 🟢 `FULLY_FUNCTIONAL` | `errors.go:14`; returned by `Compare` for non-ordered value types. Tested via `errors.Is` at `id_test.go:332`          |
-| `ErrUnsupportedType`             | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:18`; returned when a serialization format doesn't support value type `V`. **No `errors.Is` test coverage.** |
-| `ErrCannotScan`                  | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:22`; returned when a SQL source value can't be scanned. **No `errors.Is` test coverage.**                   |
-| `ErrInsufficientData`            | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:25`; returned when binary data is too short. **No `errors.Is` test coverage.**                              |
-| `ErrInternal`                    | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:29`; returned for unreachable internal errors. **No `errors.Is` test coverage.**                           |
-| `ErrNilReceiver`                 | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:32`; returned when a method is called on nil pointer. **No `errors.Is` test coverage.**                     |
+| Feature               | Status                    | Notes                                                                                                                  |
+| --------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `ErrInvalidID`        | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:11`; returned by `ValidateID` when ID is zero                                                               |
+| `ErrNotOrdered`       | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:14`; returned by `Compare` for non-ordered value types. Tested via `errors.Is` at `id_test.go:332`          |
+| `ErrUnsupportedType`  | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:18`; returned when a serialization format doesn't support value type `V`. **No `errors.Is` test coverage.** |
+| `ErrCannotScan`       | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:22`; returned when a SQL source value can't be scanned. **No `errors.Is` test coverage.**                   |
+| `ErrInsufficientData` | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:25`; returned when binary data is too short. **No `errors.Is` test coverage.**                              |
+| `ErrInternal`         | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:29`; returned for unreachable internal errors. **No `errors.Is` test coverage.**                            |
+| `ErrNilReceiver`      | 🟡 `PARTIALLY_FUNCTIONAL` | `errors.go:32`; returned when a method is called on nil pointer. **No `errors.Is` test coverage.**                     |
 
 ## Formatting & Pointers
 

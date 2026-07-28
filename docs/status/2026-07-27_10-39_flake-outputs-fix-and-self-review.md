@@ -231,6 +231,7 @@ The flake fix is **permanent** — `flake.nix:23` retains the `...` pattern.
 BuildFlow passes (37/38, `gitleaks` skipped by config).
 
 **Items from section (f) addressed by later sessions:**
+
 - CONTRIBUTING.md stale references (`just`, `pkg/errors/`) — fixed in v0.3.2
 - goimports corruption hazard — documented in AGENTS.md + contract test added
   (see `2026-07-27_11-35` and `2026-07-27_16-44` reports)
