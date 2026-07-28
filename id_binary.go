@@ -321,7 +321,12 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 		if unmarshaler, ok := any(&zero).(encoding.BinaryUnmarshaler); ok {
 			err := unmarshaler.UnmarshalBinary(data)
 			if err != nil {
-				return fmt.Errorf("%w: cannot unmarshal binary into %T: %w", ErrUnmarshal, zero, err)
+				return fmt.Errorf(
+					"%w: cannot unmarshal binary into %T: %w",
+					ErrUnmarshal,
+					zero,
+					err,
+				)
 			}
 
 			*id = ID[B, V]{value: zero}

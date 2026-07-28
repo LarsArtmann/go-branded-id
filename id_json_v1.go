@@ -3,7 +3,7 @@
 package id
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 )
 
@@ -36,7 +36,13 @@ func (id *ID[B, V]) UnmarshalJSON(data []byte) error {
 
 	err := json.Unmarshal(data, &zero)
 	if err != nil {
-		return fmt.Errorf("%w: cannot unmarshal %s into %T: %w", ErrUnmarshal, string(data), zero, err)
+		return fmt.Errorf(
+			"%w: cannot unmarshal %s into %T: %w",
+			ErrUnmarshal,
+			string(data),
+			zero,
+			err,
+		)
 	}
 
 	*id = ID[B, V]{value: zero}
