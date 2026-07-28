@@ -69,17 +69,17 @@ Computed live from the repo (do not hardcode these numbers):
 > All ID operations return wrapped sentinel errors defined in `errors.go`.
 > Match with `errors.Is()` to branch on error category without parsing strings.
 
-| Feature               | Status                    | Notes                                                                                                                  |
-| --------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `ErrInvalidID`        | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:11`; returned by `ValidateID` when ID is zero                                                               |
-| `ErrNotOrdered`       | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:14`; returned by `Compare` for non-ordered value types. Tested via `errors.Is` at `id_test.go:332`          |
-| `ErrUnsupportedType`  | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:18`; returned when a serialization format doesn't support value type `V`. Tested via `errors.Is` in `id_errors_test.go`. |
-| `ErrCannotScan`       | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:22`; returned when a SQL source value can't be scanned. Tested via `errors.Is` in `id_errors_test.go`.                   |
-| `ErrInsufficientData` | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:25`; returned when binary data is too short. Tested via `errors.Is` in `id_errors_test.go`.                              |
-| `ErrInternal`         | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:29`; returned for unreachable internal errors. Defensive only — verified in `id_errors_test.go`.                        |
-| `ErrNilReceiver`      | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:32`; returned when a method is called on nil pointer. Tested via `errors.Is` in `id_errors_test.go`.                     |
-| `ErrMarshal`          | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:36`; wraps marshaler failures (JSON, binary, SQL text). Tested via `errors.Is` in `id_errors_test.go`.                   |
-| `ErrUnmarshal`        | 🟢 `FULLY_FUNCTIONAL`     | `errors.go:42`; wraps unmarshaler failures (JSON, text). Tested via `errors.Is` in `id_errors_test.go`.                             |
+| Feature               | Status                | Notes                                                                                                                               |
+| --------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `ErrInvalidID`        | 🟢 `FULLY_FUNCTIONAL` | `errors.go:11`; returned by `ValidateID` when ID is zero                                                                            |
+| `ErrNotOrdered`       | 🟢 `FULLY_FUNCTIONAL` | `errors.go:14`; returned by `Compare` for non-ordered value types. Tested via `errors.Is` at `id_test.go:332`                       |
+| `ErrUnsupportedType`  | 🟢 `FULLY_FUNCTIONAL` | `errors.go:18`; returned when a serialization format doesn't support value type `V`. Tested via `errors.Is` in `id_errors_test.go`. |
+| `ErrCannotScan`       | 🟢 `FULLY_FUNCTIONAL` | `errors.go:22`; returned when a SQL source value can't be scanned. Tested via `errors.Is` in `id_errors_test.go`.                   |
+| `ErrInsufficientData` | 🟢 `FULLY_FUNCTIONAL` | `errors.go:25`; returned when binary data is too short. Tested via `errors.Is` in `id_errors_test.go`.                              |
+| `ErrInternal`         | 🟢 `FULLY_FUNCTIONAL` | `errors.go:29`; returned for unreachable internal errors. Defensive only — verified in `id_errors_test.go`.                         |
+| `ErrNilReceiver`      | 🟢 `FULLY_FUNCTIONAL` | `errors.go:32`; returned when a method is called on nil pointer. Tested via `errors.Is` in `id_errors_test.go`.                     |
+| `ErrMarshal`          | 🟢 `FULLY_FUNCTIONAL` | `errors.go:36`; wraps marshaler failures (JSON, binary, SQL text). Tested via `errors.Is` in `id_errors_test.go`.                   |
+| `ErrUnmarshal`        | 🟢 `FULLY_FUNCTIONAL` | `errors.go:42`; wraps unmarshaler failures (JSON, text). Tested via `errors.Is` in `id_errors_test.go`.                             |
 
 ## Formatting & Pointers
 

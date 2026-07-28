@@ -34,17 +34,17 @@ func handle(userID UserID) {
 
 ## Available Sentinels
 
-| Sentinel              | When it fires                                        |
-| --------------------- | ---------------------------------------------------- |
-| `ErrInvalidID`        | `ValidateID` called on a zero ID                     |
-| `ErrNotOrdered`       | `Compare` called on a non-ordered type (e.g. float)  |
-| `ErrUnsupportedType`  | Serialization format doesn't support value type `V`  |
-| `ErrCannotScan`       | SQL `Scan` source type doesn't match target `V`      |
-| `ErrInsufficientData` | Binary data too short to decode                      |
-| `ErrMarshal`          | A marshaler (JSON, binary, SQL text) returned error  |
-| `ErrUnmarshal`        | An unmarshaler (JSON, text, binary) returned error   |
-| `ErrNilReceiver`      | Method called on nil pointer receiver                |
-| `ErrInternal`         | Defensive: unreachable type assertion (never fires)  |
+| Sentinel              | When it fires                                       |
+| --------------------- | --------------------------------------------------- |
+| `ErrInvalidID`        | `ValidateID` called on a zero ID                    |
+| `ErrNotOrdered`       | `Compare` called on a non-ordered type (e.g. float) |
+| `ErrUnsupportedType`  | Serialization format doesn't support value type `V` |
+| `ErrCannotScan`       | SQL `Scan` source type doesn't match target `V`     |
+| `ErrInsufficientData` | Binary data too short to decode                     |
+| `ErrMarshal`          | A marshaler (JSON, binary, SQL text) returned error |
+| `ErrUnmarshal`        | An unmarshaler (JSON, text, binary) returned error  |
+| `ErrNilReceiver`      | Method called on nil pointer receiver               |
+| `ErrInternal`         | Defensive: unreachable type assertion (never fires) |
 
 ## Serialization Errors
 

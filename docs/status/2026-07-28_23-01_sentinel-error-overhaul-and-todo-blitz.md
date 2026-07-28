@@ -185,6 +185,7 @@ The auto-git daemon has already committed the CHANGELOG changes. When these are 
 ### E7. Coverage Should Be Higher
 
 85.6% is good but not excellent for a library this small. The main uncovered paths are:
+
 - `ErrInternal` branches (structurally untestable)
 - Fallback paths in `valueString()` for non-standard types
 - Some `Scan` edge cases for unusual driver types
@@ -281,19 +282,19 @@ The `website/` has its own `flake.nix` and `package.json`. I couldn't run `npm i
 
 ## Session Metrics
 
-| Metric                      | Before | After  | Delta   |
-| --------------------------- | ------ | ------ | ------- |
-| Test subtests               | 370    | 427    | +57     |
-| Statement coverage          | 81.6%  | 85.6%  | +4.0%   |
-| Fuzz functions              | 6      | 10     | +4      |
-| Sentinel errors             | 7      | 9      | +2      |
-| Sentinel errors with tests  | 1/7    | 9/9    | +8      |
-| Unwrapped `fmt.Errorf` paths| 7      | 0      | -7      |
-| TODO items actionable       | 15     | 0      | -15     |
-| TODO items blocked          | 1      | 1      | 0       |
-| GitHub Actions pinned       | 0      | 18     | +18     |
-| Website guides              | 4      | 6      | +2      |
-| Dependabot alerts open      | 2      | 2\*    | 0\*     |
+| Metric                       | Before | After | Delta |
+| ---------------------------- | ------ | ----- | ----- |
+| Test subtests                | 370    | 427   | +57   |
+| Statement coverage           | 81.6%  | 85.6% | +4.0% |
+| Fuzz functions               | 6      | 10    | +4    |
+| Sentinel errors              | 7      | 9     | +2    |
+| Sentinel errors with tests   | 1/7    | 9/9   | +8    |
+| Unwrapped `fmt.Errorf` paths | 7      | 0     | -7    |
+| TODO items actionable        | 15     | 0     | -15   |
+| TODO items blocked           | 1      | 1     | 0     |
+| GitHub Actions pinned        | 0      | 18    | +18   |
+| Website guides               | 4      | 6     | +2    |
+| Dependabot alerts open       | 2      | 2\*   | 0\*   |
 
 \* `package.json` fixed but `package-lock.json` not regenerated — alerts will persist until `npm install` runs.
 

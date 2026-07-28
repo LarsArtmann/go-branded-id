@@ -826,14 +826,22 @@ func TestSuggestName_IntegrationWithPrint(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name      string
-		typeName  string
+		name           string
+		typeName       string
 		wantSuggestion string
 	}{
 		{"Brand suffix", "UserBrand", `func (UserBrand) Name() string { return "User" }`},
 		{"ID suffix", "OrderID", `func (OrderID) Name() string { return "Order" }`},
-		{"Brand and ID suffixes", "EventBrandID", `func (EventBrandID) Name() string { return "Event" }`},
-		{"T prefix and Brand suffix", "TCategoryBrand", `func (TCategoryBrand) Name() string { return "Category" }`},
+		{
+			"Brand and ID suffixes",
+			"EventBrandID",
+			`func (EventBrandID) Name() string { return "Event" }`,
+		},
+		{
+			"T prefix and Brand suffix",
+			"TCategoryBrand",
+			`func (TCategoryBrand) Name() string { return "Category" }`,
+		},
 		{"no suffix or prefix", "Product", `func (Product) Name() string { return "Product" }`},
 		{"fallback for Brand alone", "Brand", `func (Brand) Name() string { return "Brand" }`},
 	}

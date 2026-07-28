@@ -9,8 +9,10 @@ import (
 // Test types for sentinel error tests. Defined at package level so methods can
 // be attached.
 
-type sentinelUnsupportedBrand struct{}
-type sentinelUnsupportedType struct{ X int } // comparable, no serialization interface
+type (
+	sentinelUnsupportedBrand struct{}
+	sentinelUnsupportedType  struct{ X int } // comparable, no serialization interface
+)
 
 type sentinelMarshalBrand struct{}
 
@@ -74,7 +76,9 @@ func TestSentinelErrUnsupportedType(t *testing.T) {
 	t.Run("binary marshal", func(t *testing.T) {
 		t.Parallel()
 
-		id := NewID[sentinelUnsupportedBrand, sentinelUnsupportedType](sentinelUnsupportedType{X: 1})
+		id := NewID[sentinelUnsupportedBrand, sentinelUnsupportedType](
+			sentinelUnsupportedType{X: 1},
+		)
 		_, err := id.MarshalBinary()
 		assertErrorIs(t, err, ErrUnsupportedType)
 	})
@@ -98,7 +102,9 @@ func TestSentinelErrUnsupportedType(t *testing.T) {
 	t.Run("SQL value", func(t *testing.T) {
 		t.Parallel()
 
-		id := NewID[sentinelUnsupportedBrand, sentinelUnsupportedType](sentinelUnsupportedType{X: 1})
+		id := NewID[sentinelUnsupportedBrand, sentinelUnsupportedType](
+			sentinelUnsupportedType{X: 1},
+		)
 		_, err := id.Value()
 		assertErrorIs(t, err, ErrUnsupportedType)
 	})
