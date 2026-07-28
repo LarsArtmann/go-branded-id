@@ -15,35 +15,35 @@
 
 ## High Impact
 
-| Task                                                  | Status    | Impact | Effort | Evidence                                                                                                                                                                           |
-| ----------------------------------------------------- | --------- | ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add `errors.Is` tests for 5 new sentinel errors       | 🔴 `TODO` | High   | 1h     | Only `ErrNotOrdered` has an `errors.Is` test (`id_test.go:332`). `ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver` have zero coverage. |
-| Fix Validate Docs CI failure                          | 🔴 `TODO` | High   | 30min  | `validate-docs.yml` fails: `md-go-validator@latest` module v1.2.0 exists but root package doesn't. Needs install path corrected (likely `cmd/md-go-validator`).                    |
-| Remove tracked `namer` binary and add to `.gitignore` | 🟢 `DONE` | High   | 5min   | Binary removed in `c29a034` and `/namer` is gitignored. Released in v0.5.1 so source archives no longer contain the artifact.                                                      |
-| Investigate Dependabot vulnerabilities                | 🔴 `TODO` | High   | 30min  | GitHub reported 2 vulnerabilities (1 high, 1 moderate) on v0.5.0 push. Not investigated. Run `gh api repos/LarsArtmann/go-branded-id/dependabot/alerts`.                           |
+| Task                                                  | Status    | Impact | Evidence                                                                                                  |
+| ----------------------------------------------------- | --------- | ------ | --------------------------------------------------------------------------------------------------------- |
+| Add `errors.Is` tests for sentinel errors             | 🟢 `DONE` | High   | All 9 sentinels covered in `id_errors_test.go`. `ErrMarshal` and `ErrUnmarshal` also added.               |
+| Fix Validate Docs CI failure                          | 🟢 `DONE` | High   | Install path corrected to `cmd/md-go-validator` in `validate-docs.yml`.                                   |
+| Remove tracked `namer` binary and add to `.gitignore` | 🟢 `DONE` | High   | Binary removed in `c29a034` and `/namer` is gitignored. Released in v0.5.1.                               |
+| Investigate Dependabot vulnerabilities                | 🟢 `DONE` | High   | 2 alerts in website npm deps: astro XSS (→ `^7.1.0`), fast-uri host confusion (→ override `^3.1.4`). Fixed. |
 
 ## Medium Impact
 
-| Task                                                          | Status       | Impact | Effort | Evidence                                                                                                                                                               |
-| ------------------------------------------------------------- | ------------ | ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bump 14 downstream ecosystem repos to v0.5.0                  | 🔵 `BLOCKED` | Med    | Days   | v0.5.0 tagged and pushed. Source fixes applied to all repos. `go.mod` bump not done in any repo. Requires per-repo access. See ecosystem section.                      |
-| Document sentinel errors in README                            | 🔴 `TODO`    | Med    | 30min  | README has no mention of `errors.Is`, sentinel errors, or the error handling pattern. Consumers don't know they can branch on error category.                          |
-| Add `cmd/namer` and sentinel errors to website docs           | 🔴 `TODO`    | Med    | 2h     | Website (`website/src/content/docs/`) documents neither the namer codemod tool nor the sentinel error taxonomy. Both shipped in v0.5.0.                                |
-| Add website `changelog.mdx` entries for v0.4.0 and v0.5.0     | 🔴 `TODO`    | Med    | 30min  | Website changelog only goes up to 0.3.2. Dual-mode support, namer tool, and sentinel errors are invisible on the public site.                                          |
-| Pin GitHub Actions to SHA hashes                              | 🔴 `TODO`    | Med    | 1h     | BuildFlow flags 17 `github-actions-pinned` errors. All actions use `@v4`/`@v5`/`@v7` tags instead of commit SHAs.                                                      |
-| Add `nix flake check` to CI workflows                         | 🔴 `TODO`    | Med    | 30min  | `nix flake check` (sandbox build in both JSON modes) only runs locally. Not in `go.yml` or `release.yml`.                                                              |
-| Restore `ErrNotOrdered` full message                          | 🔴 `TODO`    | Med    | 5min   | Sentinel shortened from `"id: Compare requires an ordered type (int, uint, or string)"` to `"id: Compare requires an ordered type"`. `errors.go:14`.                   |
-| Review remaining `fmt.Errorf` calls without sentinel wrapping | 🔴 `TODO`    | Med    | 1h     | 7 `fmt.Errorf` calls wrap external errors (strconv, TextUnmarshaler, etc.) without a library sentinel. E.g., `id_sql.go:261` wraps `err` but not `ErrUnsupportedType`. |
+| Task                                                          | Status       | Impact | Evidence                                                                                                                       |
+| ------------------------------------------------------------- | ------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Bump 14 downstream ecosystem repos to v0.5.0                  | 🔵 `BLOCKED` | Med    | v0.5.0 tagged and pushed. Source fixes applied to all repos. `go.mod` bump not done. Requires per-repo access. See ecosystem. |
+| Document sentinel errors in README                            | 🟢 `DONE`    | Med    | README "Error Handling" section with sentinel table and `errors.Is` examples added.                                            |
+| Add `cmd/namer` and sentinel errors to website docs           | 🟢 `DONE`    | Med    | `guides/namer-tool.mdx`, `guides/error-handling.mdx`, and API reference sentinel table added.                                  |
+| Add website `changelog.mdx` entries for v0.4.0 and v0.5.0     | 🟢 `DONE`    | Med    | Website changelog now includes v0.5.1, v0.5.0, and v0.4.0 entries.                                                             |
+| Pin GitHub Actions to SHA hashes                              | 🟢 `DONE`    | Med    | All actions in `go.yml`, `release.yml`, `validate-docs.yml` pinned to commit SHAs with `# vX` comments.                        |
+| Add `nix flake check` to CI workflows                         | 🟢 `DONE`    | Med    | `flake-check` job added to `go.yml` using `DeterminateSystems/nix-installer-action`.                                           |
+| Restore `ErrNotOrdered` full message                          | 🟢 `DONE`    | Med    | Sentinel restored to `"id: Compare requires an ordered type (int, uint, or string)"` in `errors.go:14`.                        |
+| Review remaining `fmt.Errorf` calls without sentinel wrapping | 🟢 `DONE`    | Med    | All marshal/unmarshal paths now wrap `ErrMarshal`/`ErrUnmarshal`/`ErrCannotScan`. Zero unwrapped error paths remain.           |
 
 ## Low Impact
 
-| Task                                                    | Status    | Impact | Effort | Evidence                                                                                                                                    |
-| ------------------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Restore `TestSuggestName_IntegrationWithPrint`          | 🔴 `TODO` | Low    | 30min  | Deleted in commit `0e73d12` (regression). Guards against future expectation-weakening. Not in `cmd/namer/main_test.go`.                     |
-| Add `printResults` test asserting suggested name string | 🔴 `TODO` | Low    | 30min  | Existing `TestPrintResults_*` only check counts/headers, never the suggested `Name()` string value.                                         |
-| Add fuzz tests for SQL `Scan` and Text `UnmarshalText`  | 🔴 `TODO` | Low    | 1h     | Only JSON (`FuzzMarshalJSON`) and Binary (`FuzzMarshalBinary`) have fuzz tests. SQL and Text round-trips are untested with arbitrary input. |
-| Add `outputs` pattern gotcha to AGENTS.md               | 🔴 `TODO` | Low    | 10min  | Flake `outputs` must include `...` if not all inputs are named. Not documented in AGENTS.md "Critical Gotchas".                             |
-| Add pre-commit hook for dual-mode `go test`             | 🔴 `TODO` | Low    | 30min  | Developers running plain `go test` only test v1 mode. A pre-commit hook running both modes prevents single-mode blind spots.                |
+| Task                                                    | Status    | Impact | Evidence                                                                                                        |
+| ------------------------------------------------------- | --------- | ------ | --------------------------------------------------------------------------------------------------------------- |
+| Restore `TestSuggestName_IntegrationWithPrint`          | 🟢 `DONE` | Low    | Comprehensive multi-case test in `cmd/namer/main_test.go` covering all suffix patterns.                         |
+| Add `printResults` test asserting suggested name string | 🟢 `DONE` | Low    | Covered by `TestSuggestName_IntegrationWithPrint` (6 cases) and `TestPrintResults_SuggestNameIntegration`.      |
+| Add fuzz tests for SQL `Scan` and Text `UnmarshalText`  | 🟢 `DONE` | Low    | `FuzzSQLScanRoundTripString/Int64`, `FuzzTextRoundTripString/Int64` in `id_bench_test.go`.                      |
+| Add `outputs` pattern gotcha to AGENTS.md               | 🟢 `DONE` | Low    | "Flake `outputs` Must Include `...`" section added to AGENTS.md Critical Gotchas.                               |
+| Add pre-commit hook for dual-mode `go test`             | 🟢 `DONE` | Low    | `scripts/pre-push-dual-test.sh` installed as `.git/hooks/pre-push`. Documented in AGENTS.md.                    |
 
 ---
 

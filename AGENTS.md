@@ -149,6 +149,10 @@ The `outputs` function in `flake.nix` destructures `inputs@{ self, flake-parts, 
 
 The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspace.
 
+### Dual-Mode Pre-Push Hook
+
+A pre-push git hook (`scripts/pre-push-dual-test.sh`) runs `go test` in both v1 and v2 JSON modes. It's installed at `.git/hooks/pre-push`. Plain `go test` only exercises v1; the hook catches code that passes v1 but breaks v2 (build tag issues, import corruption).
+
 ### Lint Action Version Mismatch (Fixed)
 
 The release workflow (`release.yml`) used `golangci-lint-action@v6` while `go.yml` used `@v7`. Fixed in this session — both now use `@v7`.

@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **`ErrMarshal` and `ErrUnmarshal` sentinel errors**: All marshal/unmarshal failures (JSON, binary, SQL text, text) now wrap a library sentinel. Consumers can use `errors.Is(err, id.ErrMarshal)` or `errors.Is(err, id.ErrUnmarshal)` to branch on serialization failures.
+- **Sentinel error test coverage**: All 9 exported sentinels (`ErrInvalidID`, `ErrNotOrdered`, `ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver`, `ErrMarshal`, `ErrUnmarshal`) now have `errors.Is` test coverage in `id_errors_test.go`.
+- **Fuzz tests for SQL Scan and Text round-trips**: `FuzzSQLScanRoundTripString`, `FuzzSQLScanRoundTripInt64`, `FuzzTextRoundTripString`, `FuzzTextRoundTripInt64` — fills the gap where only JSON and Binary had fuzz coverage.
+- **`TestSuggestName_IntegrationWithPrint` restored**: Comprehensive multi-case test verifying `suggestName` + `printResults` integration across all suffix patterns (Brand, ID, T prefix, fallback).
+- **Website: Error Handling guide** (`guides/error-handling.mdx`) and **Namer Tool guide** (`guides/namer-tool.mdx`).
+- **Pre-push dual-mode test hook** (`scripts/pre-push-dual-test.sh`): Runs `go test` in both v1 and v2 JSON modes to catch single-mode blind spots.
+- **`nix flake check` job in CI** (`go.yml`): Nix sandbox build and test checks now run on every push/PR.
+
+### Changed
+
+- **`ErrNotOrdered` message restored** to `"id: Compare requires an ordered type (int, uint, or string)"` (was shortened in v0.5.0). `errors.Is` matching is unaffected.
+- All `fmt.Errorf` calls that previously used `"id: ..."` prefix without a sentinel now wrap the appropriate sentinel (`ErrMarshal`, `ErrUnmarshal`, `ErrCannotScan`). Every error path from ID operations is now matchable via `errors.Is`.
+- GitHub Actions pinned to commit SHA hashes (BuildFlow `github-actions-pinned` compliance).
+- `validate-docs.yml` install path fixed: `github.com/larsartmann/md-go-validator/cmd/md-go-validator` (was root package).
+- Website `package.json`: bumped `astro` to `^7.1.0` (XSS fix), added `fast-uri` override `^3.1.4` (host confusion fix).
+- Website changelog updated with v0.4.0 and v0.5.0 entries.
+- FEATURES.md sentinel errors upgraded from `PARTIALLY_FUNCTIONAL` to `FULLY_FUNCTIONAL`.
+
+### Documentation
+
+- README: added "Error Handling" section with sentinel error table and `errors.Is` examples.
+- AGENTS.md: added "Flake outputs must include `...`" and "Dual-Mode Pre-Push Hook" gotchas.
+- Website API reference: added sentinel error table and link to Error Handling guide.
+
 ## [0.5.1] - 2026-07-28
 
 ### Fixed
