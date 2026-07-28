@@ -43,14 +43,10 @@ package id
 import (
 	"cmp"
 	"encoding"
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
 )
-
-// ErrNotOrdered is returned when Compare is called on an ID with a non-ordered value type.
-var ErrNotOrdered = errors.New("id: Compare requires an ordered type (int, uint, or string)")
 
 // ID is a branded, strongly-typed identifier that prevents mixing different entity IDs.
 // B is the brand (phantom type for distinctness), V is the value type.

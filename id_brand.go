@@ -1,7 +1,6 @@
 package id
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -10,9 +9,6 @@ import (
 type BrandNamer interface {
 	Name() string
 }
-
-// ErrInvalidID is returned when ID validation fails.
-var ErrInvalidID = errors.New("id: invalid")
 
 // brandName returns the brand name if it implements BrandNamer.
 // Returns (name, true) for named brands, ("", false) for unnamed brands.
