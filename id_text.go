@@ -67,25 +67,33 @@ func (id *ID[B, V]) UnmarshalText(data []byte) error {
 			return unsignedInt(n), err
 		}, "uint64")
 	default:
-		var zero V
-		if unmarshaler, ok := any(&zero).(encoding.TextUnmarshaler); ok {
-			err := unmarshaler.UnmarshalText(data)
-			if err != nil {
-				return fmt.Errorf("id: cannot unmarshal text into %T: %w", zero, err)
-			}
+		return unmarshalTextDefault[B, V](id, data)
+	}
+}
 
-			*id = ID[B, V]{value: zero}
+// unmarshalTextDefault handles the fallback path for types that do not match the
+// built-in string/int/int64/uint64 cases: it tries encoding.TextUnmarshaler,
+// then returns ErrUnsupportedType.
+func unmarshalTextDefault[B any, V comparable](id *ID[B, V], data []byte) error {
+	var zero V
 
-			return nil
+	if unmarshaler, ok := any(&zero).(encoding.TextUnmarshaler); ok {
+		err := unmarshaler.UnmarshalText(data)
+		if err != nil {
+			return fmt.Errorf("id: cannot unmarshal text into %T: %w", zero, err)
 		}
 
-		return fmt.Errorf(
-			"%w: cannot unmarshal text into %T (only string and numeric IDs supported, got data=%q)",
-			ErrUnsupportedType,
-			zero,
-			string(data),
-		)
+		*id = ID[B, V]{value: zero}
+
+		return nil
 	}
+
+	return fmt.Errorf(
+		"%w: cannot unmarshal text into %T (only string and numeric IDs supported, got data=%q)",
+		ErrUnsupportedType,
+		zero,
+		string(data),
+	)
 }
 
 type (

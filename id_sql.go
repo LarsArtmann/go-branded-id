@@ -194,8 +194,9 @@ func (id *ID[B, V]) Scan(src any) error {
 			case []byte:
 				text = v
 			default:
-				return fmt.Errorf( //nolint:err113 // diagnostic embeds type
-					"id: cannot scan %T into text-unmarshalable ID (targetType=%T)",
+				return fmt.Errorf(
+					"%w: %T into text-unmarshalable ID (targetType=%T)",
+					ErrCannotScan,
 					src,
 					zero,
 				)
