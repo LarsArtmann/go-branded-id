@@ -212,7 +212,12 @@ func (id *ID[B, V]) Scan(src any) error {
 			return nil
 		}
 
-		return fmt.Errorf("%w: target type %T for SQL scanning (src=%T)", ErrUnsupportedType, *new(V), src)
+		return fmt.Errorf(
+			"%w: target type %T for SQL scanning (src=%T)",
+			ErrUnsupportedType,
+			*new(V),
+			src,
+		)
 	}
 }
 

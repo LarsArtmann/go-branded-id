@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **`cmd/namer` codemod tool**: Standalone CLI that scans Go source for brand types (empty structs used as `id.ID[Brand, Value]` type arguments) that are missing the `Name() string` method, and optionally generates stubs. Built to assist migrating the downstream ecosystem to named brands. Dry-run by default.
 - **Test suite for `cmd/namer`**: 0% → 93% coverage. Found and fixed a nil-pointer bug in `isNameMethod` when encountering methods with no return values.
 - **Dual JSON v1/v2 support**: The library now supports both `encoding/json` (v1, default) and `encoding/json/v2` via Go build tags. Consumers without `GOEXPERIMENT=jsonv2` get v1; consumers with it get v2 automatically. CI tests both modes on every push.
+- **Sentinel errors**: All ID operations now return wrapped sentinel errors (`ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver`) defined in `errors.go`. Consumers can use `errors.Is()` to branch on error category. Previously these were inline `errors.New`/`fmt.Errorf` calls suppressed with `//nolint:err113`.
 
 ### Changed
 
