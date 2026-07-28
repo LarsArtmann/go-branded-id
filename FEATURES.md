@@ -21,9 +21,10 @@
 
 Computed live from the repo (do not hardcode these numbers):
 
-- Test subtests: `go test ./... -count=1 -v \| grep -cE '^\s*=== RUN'` → 262
+- Test subtests: `go test ./... -count=1 -v \| grep -cE '^\s*=== RUN'` → 370
 - Statement coverage (library package): `go test ./... -cover` → 81.8%
-- Benchmark functions: `grep -c '^func Benchmark' id_bench_test.go` → 25
+- Statement coverage (`cmd/namer`): `go test -cover ./cmd/namer/` → 93.2%
+- Benchmark functions: `grep -c '^func Benchmark' id_bench_test.go` → 29
 
 ## Core ID Type
 
@@ -73,7 +74,7 @@ Computed live from the repo (do not hardcode these numbers):
 
 | Feature                                      | Status                    | Notes                                                                                             |
 | -------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------- |
-| `cmd/namer` codemod (brand `Name()` scanner) | 🟡 `PARTIALLY_FUNCTIONAL` | `cmd/namer/main.go`; AST scanner + optional stub writer; **0% test coverage**; dry-run by default |
+| `cmd/namer` codemod (brand `Name()` scanner) | 🟢 `FULLY_FUNCTIONAL` | `cmd/namer/main.go`; AST scanner + optional stub writer; 93% test coverage; dry-run by default |
 
 ---
 

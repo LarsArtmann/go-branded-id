@@ -6,10 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-28
+
 ### Added
 
+- **`cmd/namer` codemod tool**: Standalone CLI that scans Go source for brand types (empty structs used as `id.ID[Brand, Value]` type arguments) that are missing the `Name() string` method, and optionally generates stubs. Built to assist migrating the downstream ecosystem to named brands. Dry-run by default.
+- **Test suite for `cmd/namer`**: 0% → 93% coverage. Found and fixed a nil-pointer bug in `isNameMethod` when encountering methods with no return values.
 - **Dual JSON v1/v2 support**: The library now supports both `encoding/json` (v1, default) and `encoding/json/v2` via Go build tags. Consumers without `GOEXPERIMENT=jsonv2` get v1; consumers with it get v2 automatically. CI tests both modes on every push.
-- **Comprehensive test suite for `cmd/namer`**: 0% → 80% coverage. Found and fixed a nil-pointer bug in `isNameMethod` when encountering methods with no return values.
 
 ### Changed
 
@@ -21,7 +24,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
-- `GOEXPERIMENT=jsonv2` is no longer a hard requirement. The library compiles and passes all tests with plain `go build`/`go test`.
+- `GOEXPERIMENT=jsonv2` is no longer a hard requirement. The library compiles and passes all tests with plain `go build`/`go test`. This eliminates the class of failure that broke the v0.3.1 release.
+
+## [0.4.0] - 2026-07-27
+
+### Changed
+
+- Re-tagged release point aligning dependency updates with the tag-based GitHub release workflow (`release.yml`). Shares its release commit with `v0.3.3`.
+
+## [0.3.3] - 2026-07-27
+
+### Changed
+
+- Dependency updates.
 
 ## [0.3.2] - 2026-07-13
 
@@ -125,6 +140,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+[0.5.0]: https://github.com/larsartmann/go-branded-id/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/larsartmann/go-branded-id/compare/v0.3.3...v0.4.0
+[0.3.3]: https://github.com/larsartmann/go-branded-id/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/larsartmann/go-branded-id/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/larsartmann/go-branded-id/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/larsartmann/go-branded-id/compare/v0.1.0...v0.3.0
