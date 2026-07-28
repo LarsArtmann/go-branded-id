@@ -1,0 +1,71 @@
+---
+title: Namer Tool
+description: Codemod CLI that finds brand types missing the Name() method.
+---
+
+The `cmd/namer` tool scans Go source files for brand types (empty structs used
+as `id.ID[Brand, Value]` type arguments) that are missing the `Name() string`
+method, and generates suggested stubs.
+
+## Why
+
+When migrating to named brands, every brand type needs a `Name()` method to get
+debug-visible IDs (`"User:abc123"` instead of `"abc123"`). Finding and writing
+these by hand across a large codebase is tedious and error-prone.
+
+## Usage
+
+```bash
+# Dry-run (default): scan and print suggestions
+go run ./cmd/namer ./myproject/
+
+# Write mode: print suggestions with write-mode note
+go run ./cmd/namer -write ./myproject/
+
+# Verbose
+go run ./cmd/namer -v ./myproject/
+```
+
+## Output Format
+
+```
+Found 3 brand types, 2 missing Name() method:
+
+  main.go:12 — UserBrand
+    → func (UserBrand) Name() string { return "User" }
+  main.go:20 — OrderBrand
+    → func (OrderBrand) Name() string { return "Order" }
+
+(dry-run — no files written)
+```
+
+## How It Works
+
+1. Walks `.go` files and parses the AST.
+2. Finds `id.ID[Brand, Value]` and `ID[Brand, Value]` usages (both qualified and same-package).
+3. Checks if the brand type (must be an empty struct) has a `Name() string` method.
+4. Derives a suggested name by stripping `Brand`/`ID` suffixes and leading `T` prefix.
+
+### Name Derivation Rules
+
+| Input           | Suggested Name |
+| --------------- | -------------- |
+| `UserBrand`     | `User`         |
+| `OrderID`       | `Order`        |
+| `TProduct`      | `Product`      |
+| `EventBrandID`  | `Event`        |
+| `Brand`         | `Brand` (fallback to original when result is empty) |
+
+## Limitations
+
+- AST-based file insertion is not implemented — the tool prints suggestions but does not write method stubs to files automatically.
+- Only empty-struct types used with `id.ID[...]` are flagged. Plain structs or types not used with `ID` are ignored.
+
+## Running on This Library
+
+```bash
+go run ./cmd/namer .
+```
+
+Brand types that intentionally skip `Name()` (e.g. CQRS marker types) will be
+flagged — this is expected. See the project AGENTS.md for guidance.

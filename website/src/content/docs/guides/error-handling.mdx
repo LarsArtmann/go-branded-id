@@ -1,0 +1,79 @@
+---
+title: Error Handling
+description: Branch on error categories with sentinel errors and errors.Is.
+---
+
+Every ID operation that can fail returns a **sentinel error** wrapped with runtime
+context. Match with `errors.Is` to branch on the error category instead of
+parsing strings.
+
+## Quick Example
+
+```go
+import (
+    "errors"
+    "log"
+
+    "github.com/larsartmann/go-branded-id"
+)
+
+type UserBrand struct{}
+
+func (UserBrand) Name() string { return "User" }
+
+type UserID = id.ID[UserBrand, string]
+
+func handle(userID UserID) {
+    if err := id.ValidateID(userID); err != nil {
+        if errors.Is(err, id.ErrInvalidID) {
+            log.Println("ID is zero:", err)
+        }
+    }
+}
+```
+
+## Available Sentinels
+
+| Sentinel              | When it fires                                        |
+| --------------------- | ---------------------------------------------------- |
+| `ErrInvalidID`        | `ValidateID` called on a zero ID                     |
+| `ErrNotOrdered`       | `Compare` called on a non-ordered type (e.g. float)  |
+| `ErrUnsupportedType`  | Serialization format doesn't support value type `V`  |
+| `ErrCannotScan`       | SQL `Scan` source type doesn't match target `V`      |
+| `ErrInsufficientData` | Binary data too short to decode                      |
+| `ErrMarshal`          | A marshaler (JSON, binary, SQL text) returned error  |
+| `ErrUnmarshal`        | An unmarshaler (JSON, text, binary) returned error   |
+| `ErrNilReceiver`      | Method called on nil pointer receiver                |
+| `ErrInternal`         | Defensive: unreachable type assertion (never fires)  |
+
+## Serialization Errors
+
+Serialization errors fall into two categories:
+
+- **`ErrUnsupportedType`** — the value type `V` is not supported by the format (e.g. a struct passed to binary marshaling that doesn't implement `BinaryMarshaler`).
+- **`ErrMarshal` / `ErrUnmarshal`** — the value type's own marshaler/unmarshaler returned an error, or the input could not be parsed.
+
+```go
+var id ID[MyBrand, int64]
+err := id.UnmarshalText([]byte("not-a-number"))
+if errors.Is(err, id.ErrUnmarshal) {
+    log.Println("failed to parse:", err)
+}
+```
+
+## SQL Scan Errors
+
+```go
+var id ID[UserBrand, string]
+err := id.Scan(123)
+if errors.Is(err, id.ErrCannotScan) {
+    log.Println("driver returned int, expected string:", err)
+}
+```
+
+## Design Principle
+
+Call sites wrap sentinels with `fmt.Errorf("%w: ...", sentinel, ...)` to attach
+runtime context (type names, byte counts, etc.) without losing sentinel
+identity. This means `errors.Is` always works, even when the error message
+contains extra detail.

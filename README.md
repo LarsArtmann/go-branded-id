@@ -117,6 +117,43 @@ fmt.Println(id.BrandName[UserBrand]()) // User
 
 IDs without `Name()` work exactly as before — `String()` returns just the value.
 
+## Error Handling
+
+All ID operations return [sentinel errors](https://pkg.go.dev/github.com/larsartmann/go-branded-id#pkg-variables) that you can match with `errors.Is`:
+
+```go
+// skip-validate: illustrative snippet mixing decls and statements
+if err := id.ValidateID(userID); err != nil {
+    if errors.Is(err, id.ErrInvalidID) {
+        log.Println("ID is zero:", err)
+    }
+}
+
+_, err := floatID.Compare(otherFloatID)
+if errors.Is(err, id.ErrNotOrdered) {
+    log.Println("type doesn't support ordering")
+}
+
+err = sqlID.Scan(driverValue)
+if errors.Is(err, id.ErrCannotScan) {
+    log.Println("incompatible SQL source type:", err)
+}
+```
+
+Available sentinels:
+
+| Sentinel              | When it fires                                        |
+| --------------------- | ---------------------------------------------------- |
+| `ErrInvalidID`        | `ValidateID` called on a zero ID                     |
+| `ErrNotOrdered`       | `Compare` called on a non-ordered type (e.g. float)  |
+| `ErrUnsupportedType`  | Serialization format doesn't support value type `V`  |
+| `ErrCannotScan`       | SQL `Scan` source type doesn't match target `V`      |
+| `ErrInsufficientData` | Binary data too short to decode                      |
+| `ErrMarshal`          | A marshaler (JSON, binary, SQL text) returned error  |
+| `ErrUnmarshal`        | An unmarshaler (JSON, text, binary) returned error   |
+| `ErrNilReceiver`      | Method called on nil pointer receiver                |
+| `ErrInternal`         | Defensive: unreachable type assertion (never fires)  |
+
 ## Supported Value Types
 
 The generic type is `ID[Brand, V comparable]` — any comparable type works as `V`.

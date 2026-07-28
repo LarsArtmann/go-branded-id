@@ -16,7 +16,7 @@ jobs:
           go-version: "1.26"
 
       - name: Install md-go-validator
-        run: go install github.com/larsartmann/md-go-validator@latest
+        run: go install github.com/larsartmann/md-go-validator/cmd/md-go-validator@latest
 
       - name: Validate code blocks
         run: md-go-validator -f json -o results.json .

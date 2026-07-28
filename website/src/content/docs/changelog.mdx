@@ -3,6 +3,32 @@ title: Changelog
 description: All notable changes to go-branded-id.
 ---
 
+## [0.5.1] — 2026-07-28
+
+### Fixed
+
+- Removed accidentally tracked `namer` binary from the repository. Source archives now contain only source code.
+
+## [0.5.0] — 2026-07-28
+
+### Added
+
+- **`cmd/namer` codemod tool**: CLI that scans Go source for brand types missing the `Name()` method and generates suggested stubs. See the [Namer Tool guide](/guides/namer-tool/).
+- **Dual JSON v1/v2 support**: The library now works with both `encoding/json` (default) and `encoding/json/v2` (via build tags). No `GOEXPERIMENT` required.
+- **Sentinel errors**: All ID operations return wrapped sentinel errors (`ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrMarshal`, `ErrUnmarshal`, `ErrInternal`, `ErrNilReceiver`). Use `errors.Is()` to branch on error category. See the [Error Handling guide](/guides/error-handling/).
+
+### Changed
+
+- JSON serialization split into build-tagged pairs for dual-mode support.
+- CI workflows now run build + tests in both v1 and v2 modes.
+- `GOEXPERIMENT=jsonv2` is no longer a hard requirement — the library compiles with plain `go build`.
+
+## [0.4.0] — 2026-07-27
+
+### Changed
+
+- Re-tagged release point aligning dependency updates with the tag-based GitHub release workflow.
+
 ## [0.3.2] — 2026-07-13
 
 ### Fixed
