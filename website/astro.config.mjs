@@ -60,8 +60,10 @@ export default defineConfig({
 					items: [
 						{ label: "Named Brands", slug: "guides/named-brands" },
 						{ label: "Serialization", slug: "guides/serialization" },
+						{ label: "Error Handling", slug: "guides/error-handling" },
 						{ label: "Value Types", slug: "guides/value-types" },
 						{ label: "Performance", slug: "guides/performance" },
+						{ label: "Namer Tool", slug: "guides/namer-tool" },
 					],
 				},
 				{

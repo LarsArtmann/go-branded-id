@@ -141,6 +141,10 @@ Binary marshaling uses **little-endian** for all numeric types. `int` is seriali
 
 `nix flake check` builds the `checks.build` derivation in a sandbox where `HOME=/homeless-shelter` (read-only). Go's build cache cannot initialize at `$HOME/.cache/go-build`. The flake's `checks.build` sets `GOCACHE=$TMPDIR/go-cache` to work around this. Any Go-based Nix check derivation needs this.
 
+### Flake `outputs` Must Include `...` for Unnamed Inputs
+
+The `outputs` function in `flake.nix` destructures `inputs@{ self, flake-parts, treefmt-nix, systems, ... }`. The `...` is **required** because not all inputs are named in the pattern. Without it, Nix fails with an error about extra arguments. Always include `...` when adding new flake inputs to this project.
+
 ### No go.work / GOWORK=off
 
 The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspace.

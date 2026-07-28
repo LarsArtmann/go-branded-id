@@ -818,6 +818,47 @@ func TestPrintResults_SuggestNameIntegration(t *testing.T) {
 	}
 }
 
+// TestSuggestName_IntegrationWithPrint verifies that suggestName and printResults
+// produce correct Name() stubs for all suffix patterns when combined. This guards
+// against future expectation-weakening where the output format or name derivation
+// could silently change. Restored after being deleted in 0e73d12.
+func TestSuggestName_IntegrationWithPrint(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		typeName  string
+		wantSuggestion string
+	}{
+		{"Brand suffix", "UserBrand", `func (UserBrand) Name() string { return "User" }`},
+		{"ID suffix", "OrderID", `func (OrderID) Name() string { return "Order" }`},
+		{"Brand and ID suffixes", "EventBrandID", `func (EventBrandID) Name() string { return "Event" }`},
+		{"T prefix and Brand suffix", "TCategoryBrand", `func (TCategoryBrand) Name() string { return "Category" }`},
+		{"no suffix or prefix", "Product", `func (Product) Name() string { return "Product" }`},
+		{"fallback for Brand alone", "Brand", `func (Brand) Name() string { return "Brand" }`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			brands := []BrandInfo{
+				{TypeName: tt.typeName, HasName: false, File: "test.go", Line: 1},
+			}
+
+			output := capturePrint(t, brands, true)
+
+			if !strings.Contains(output, tt.wantSuggestion) {
+				t.Errorf(
+					"expected suggestion %q in output:\n%s",
+					tt.wantSuggestion,
+					output,
+				)
+			}
+		})
+	}
+}
+
 // findFuncDecl finds the first FuncDecl with the given name in f.
 func findFuncDecl(t *testing.T, f *ast.File, name string) *ast.FuncDecl {
 	t.Helper()

@@ -158,6 +158,107 @@ func FuzzIDBinaryUint64(f *testing.F) {
 	})
 }
 
+// Fuzz tests for SQL Scan and Text UnmarshalText — fills the gap where only
+// JSON and Binary had fuzz coverage.
+
+func FuzzSQLScanRoundTripString(f *testing.F) {
+	testcases := []string{"test", "hello-world", "123", "", "unicode-日本語"}
+	for _, tc := range testcases {
+		f.Add(tc)
+	}
+
+	f.Fuzz(func(t *testing.T, orig string) {
+		id := NewID[StringBrand](orig)
+
+		val, err := id.Value()
+		if err != nil {
+			t.Fatalf("Value failed: %v", err)
+		}
+
+		if val == nil && orig != "" {
+			t.Fatalf("Value returned nil for non-empty string: %q", orig)
+		}
+
+		var restored ID[StringBrand, string]
+
+		err = restored.Scan(val)
+		if err != nil {
+			t.Fatalf("Scan failed: %v", err)
+		}
+
+		assertCmpEqual(t, restored.Get(), orig)
+	})
+}
+
+func FuzzSQLScanRoundTripInt64(f *testing.F) {
+	addInt64FuzzCases(f)
+
+	f.Fuzz(func(t *testing.T, orig int64) {
+		id := NewID[Int64Brand, int64](orig)
+
+		val, err := id.Value()
+		if err != nil {
+			t.Fatalf("Value failed: %v", err)
+		}
+
+		var restored ID[Int64Brand, int64]
+
+		err = restored.Scan(val)
+		if err != nil {
+			t.Fatalf("Scan failed: %v", err)
+		}
+
+		assertCmpEqual(t, restored.Get(), orig)
+	})
+}
+
+func FuzzTextRoundTripString(f *testing.F) {
+	testcases := []string{"test", "hello-world", "123", "unicode-日本語"}
+	for _, tc := range testcases {
+		f.Add(tc)
+	}
+
+	f.Fuzz(func(t *testing.T, orig string) {
+		id := NewID[StringBrand](orig)
+
+		data, err := id.MarshalText()
+		if err != nil {
+			t.Fatalf("MarshalText failed: %v", err)
+		}
+
+		var restored ID[StringBrand, string]
+
+		err = restored.UnmarshalText(data)
+		if err != nil {
+			t.Fatalf("UnmarshalText failed: %v", err)
+		}
+
+		assertCmpEqual(t, restored.Get(), orig)
+	})
+}
+
+func FuzzTextRoundTripInt64(f *testing.F) {
+	addInt64FuzzCases(f)
+
+	f.Fuzz(func(t *testing.T, orig int64) {
+		id := NewID[Int64Brand, int64](orig)
+
+		data, err := id.MarshalText()
+		if err != nil {
+			t.Fatalf("MarshalText failed: %v", err)
+		}
+
+		var restored ID[Int64Brand, int64]
+
+		err = restored.UnmarshalText(data)
+		if err != nil {
+			t.Fatalf("UnmarshalText failed: %v", err)
+		}
+
+		assertCmpEqual(t, restored.Get(), orig)
+	})
+}
+
 // Benchmarks
 
 func BenchmarkNewID(b *testing.B) {
