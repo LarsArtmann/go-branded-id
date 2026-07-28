@@ -11,7 +11,7 @@ var (
 	ErrInvalidID = errors.New("id: invalid")
 
 	// ErrNotOrdered is returned when Compare is called on an ID with a non-ordered value type.
-	ErrNotOrdered = errors.New("id: Compare requires an ordered type")
+	ErrNotOrdered = errors.New("id: Compare requires an ordered type (int, uint, or string)")
 
 	// ErrUnsupportedType is returned when a serialization format does not support
 	// the ID's value type V (e.g., a struct passed to binary marshaling).
@@ -30,4 +30,14 @@ var (
 
 	// ErrNilReceiver is returned when a method is called on a nil pointer receiver.
 	ErrNilReceiver = errors.New("id: nil receiver")
+
+	// ErrMarshal is returned when marshaling an ID's value to a serialization format
+	// fails because the value type's own marshaler (encoding.TextMarshaler,
+	// encoding.BinaryMarshaler, json.Marshaler) returned an error.
+	ErrMarshal = errors.New("id: marshal failed")
+
+	// ErrUnmarshal is returned when unmarshaling data into an ID fails because the
+	// value type's own unmarshaler returned an error, or because the text/JSON input
+	// could not be parsed as the target value type.
+	ErrUnmarshal = errors.New("id: unmarshal failed")
 )

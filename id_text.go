@@ -43,7 +43,7 @@ func (id *ID[B, V]) UnmarshalText(data []byte) error {
 	case int:
 		n, err := strconv.Atoi(string(data))
 		if err != nil {
-			return fmt.Errorf("id: cannot parse %q as int: %w", data, err)
+			return fmt.Errorf("%w: cannot parse %q as int: %w", ErrUnmarshal, data, err)
 		}
 
 		v, ok := any(n).(V)
@@ -80,7 +80,7 @@ func unmarshalTextDefault[B any, V comparable](id *ID[B, V], data []byte) error 
 	if unmarshaler, ok := any(&zero).(encoding.TextUnmarshaler); ok {
 		err := unmarshaler.UnmarshalText(data)
 		if err != nil {
-			return fmt.Errorf("id: cannot unmarshal text into %T: %w", zero, err)
+			return fmt.Errorf("%w: cannot unmarshal text into %T: %w", ErrUnmarshal, zero, err)
 		}
 
 		*id = ID[B, V]{value: zero}
@@ -109,7 +109,7 @@ func parseIntegerID[B any, V comparable, I signedInt | unsignedInt](
 ) error {
 	n, err := parse(string(data), parseBaseDecimal, parseBitSize64)
 	if err != nil {
-		return fmt.Errorf("id: cannot parse %q as %s: %w", data, typeName, err)
+		return fmt.Errorf("%w: cannot parse %q as %s: %w", ErrUnmarshal, data, typeName, err)
 	}
 
 	var v V

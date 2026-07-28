@@ -204,7 +204,7 @@ func (id *ID[B, V]) Scan(src any) error {
 
 			err := unmarshaler.UnmarshalText(text)
 			if err != nil {
-				return fmt.Errorf("id: cannot scan text into %T: %w", zero, err)
+				return fmt.Errorf("%w: cannot scan text into %T: %w", ErrCannotScan, zero, err)
 			}
 
 			*id = ID[B, V]{value: zero}
@@ -259,7 +259,8 @@ func (id ID[B, V]) Value() (driver.Value, error) {
 			text, err := marshaler.MarshalText()
 			if err != nil {
 				return nil, fmt.Errorf(
-					"id: cannot marshal %T to text for SQL value: %w",
+					"%w: cannot marshal %T to text for SQL value: %w",
+					ErrMarshal,
 					id.value,
 					err,
 				)

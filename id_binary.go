@@ -119,7 +119,7 @@ func (id ID[B, V]) MarshalBinary() ([]byte, error) {
 		if marshaler, ok := any(id.value).(encoding.BinaryMarshaler); ok {
 			data, err := marshaler.MarshalBinary()
 			if err != nil {
-				return nil, fmt.Errorf("id: binary marshal %T: %w", id.value, err)
+				return nil, fmt.Errorf("%w: binary marshal %T: %w", ErrMarshal, id.value, err)
 			}
 
 			return data, nil
@@ -321,7 +321,7 @@ func (id *ID[B, V]) UnmarshalBinary(data []byte) error {
 		if unmarshaler, ok := any(&zero).(encoding.BinaryUnmarshaler); ok {
 			err := unmarshaler.UnmarshalBinary(data)
 			if err != nil {
-				return fmt.Errorf("id: cannot unmarshal binary into %T: %w", zero, err)
+				return fmt.Errorf("%w: cannot unmarshal binary into %T: %w", ErrUnmarshal, zero, err)
 			}
 
 			*id = ID[B, V]{value: zero}
