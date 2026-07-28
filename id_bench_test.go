@@ -162,7 +162,7 @@ func FuzzIDBinaryUint64(f *testing.F) {
 // JSON and Binary had fuzz coverage.
 
 func FuzzSQLScanRoundTripString(f *testing.F) {
-	testcases := []string{"test", "hello-world", "123", "", "unicode-日本語"}
+	testcases := []string{"test", "hello-world", "123", "", "unicode-日本語"} //nolint:gosmopolitan // intentional unicode fuzz seed
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
@@ -213,7 +213,7 @@ func FuzzSQLScanRoundTripInt64(f *testing.F) {
 }
 
 func FuzzTextRoundTripString(f *testing.F) {
-	testcases := []string{"test", "hello-world", "123", "unicode-日本語"}
+	testcases := []string{"test", "hello-world", "123", "unicode-日本語"} //nolint:gosmopolitan // intentional unicode fuzz seed
 	for _, tc := range testcases {
 		f.Add(tc)
 	}

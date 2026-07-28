@@ -87,6 +87,7 @@ func TestSentinelErrUnsupportedType(t *testing.T) {
 		t.Parallel()
 
 		var id ID[sentinelUnsupportedBrand, sentinelUnsupportedType]
+
 		err := id.UnmarshalBinary([]byte{1, 2, 3})
 		assertErrorIs(t, err, ErrUnsupportedType)
 	})
@@ -95,6 +96,7 @@ func TestSentinelErrUnsupportedType(t *testing.T) {
 		t.Parallel()
 
 		var id ID[sentinelUnsupportedBrand, sentinelUnsupportedType]
+
 		err := id.UnmarshalText([]byte("data"))
 		assertErrorIs(t, err, ErrUnsupportedType)
 	})
@@ -117,6 +119,7 @@ func TestSentinelErrCannotScan(t *testing.T) {
 		t.Parallel()
 
 		var id ID[StringBrand, string]
+
 		err := id.Scan(42)
 		assertErrorIs(t, err, ErrCannotScan)
 	})
@@ -125,6 +128,7 @@ func TestSentinelErrCannotScan(t *testing.T) {
 		t.Parallel()
 
 		var id ID[Int64Brand, int64]
+
 		err := id.Scan("not-a-number")
 		assertErrorIs(t, err, ErrCannotScan)
 	})
@@ -137,6 +141,7 @@ func TestSentinelErrInsufficientData(t *testing.T) {
 		t.Parallel()
 
 		var id ID[Int64Brand, int64]
+
 		err := id.UnmarshalBinary([]byte{1, 2, 3})
 		assertErrorIs(t, err, ErrInsufficientData)
 	})
@@ -145,6 +150,7 @@ func TestSentinelErrInsufficientData(t *testing.T) {
 		t.Parallel()
 
 		var id ID[Int32Brand, int32]
+
 		err := id.UnmarshalBinary([]byte{1})
 		assertErrorIs(t, err, ErrInsufficientData)
 	})
@@ -157,6 +163,7 @@ func TestSentinelErrNilReceiver(t *testing.T) {
 		t.Parallel()
 
 		var id *ID[StringBrand, string]
+
 		err := id.Scan("test")
 		assertErrorIs(t, err, ErrNilReceiver)
 	})
@@ -181,6 +188,7 @@ func TestSentinelErrUnmarshal(t *testing.T) {
 		t.Parallel()
 
 		var id ID[Int64Brand, int64]
+
 		err := id.UnmarshalText([]byte("not-a-number"))
 		assertErrorIs(t, err, ErrUnmarshal)
 	})
@@ -189,6 +197,7 @@ func TestSentinelErrUnmarshal(t *testing.T) {
 		t.Parallel()
 
 		var id ID[Uint64Brand, uint64]
+
 		err := id.UnmarshalText([]byte("not-a-number"))
 		assertErrorIs(t, err, ErrUnmarshal)
 	})
@@ -197,6 +206,7 @@ func TestSentinelErrUnmarshal(t *testing.T) {
 		t.Parallel()
 
 		var id ID[Int64Brand, int64]
+
 		err := id.UnmarshalJSON([]byte("not-json"))
 		assertErrorIs(t, err, ErrUnmarshal)
 	})
