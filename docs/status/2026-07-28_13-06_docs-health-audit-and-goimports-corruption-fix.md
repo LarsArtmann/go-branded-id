@@ -391,12 +391,12 @@ living docs?
 The 4 "fix-on-sight violations" flagged in section (d).2 are **all DONE**, closed
 by the subsequent `2026-07-28_23-01` session:
 
-| Item flagged here                          | Resolution                                                                                       |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| Tracked `namer` binary                     | Removed in `c29a034`, `/namer` gitignored, shipped in **v0.5.1** (source archive dropped ~10x).  |
-| Restore `ErrNotOrdered` full message       | Restored at `errors.go:14`; message is `"id: Compare requires an ordered type (int, uint, or string)"`. |
-| `outputs` pattern gotcha in AGENTS.md      | Added ("Flake `outputs` Must Include `...`" in Critical Gotchas).                                |
-| `validate-docs.yml` install path           | Fixed to `github.com/larsartmann/md-go-validator/cmd/md-go-validator@latest`.                    |
+| Item flagged here                     | Resolution                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Tracked `namer` binary                | Removed in `c29a034`, `/namer` gitignored, shipped in **v0.5.1** (source archive dropped ~10x).         |
+| Restore `ErrNotOrdered` full message  | Restored at `errors.go:14`; message is `"id: Compare requires an ordered type (int, uint, or string)"`. |
+| `outputs` pattern gotcha in AGENTS.md | Added ("Flake `outputs` Must Include `...`" in Critical Gotchas).                                       |
+| `validate-docs.yml` install path      | Fixed to `github.com/larsartmann/md-go-validator/cmd/md-go-validator@latest`.                           |
 
 Section (f) high-impact items also resolved by later work: 9/9 sentinel errors
 now have `errors.Is` tests (`id_errors_test.go`); GitHub Actions pinned to SHA
