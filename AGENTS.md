@@ -105,7 +105,11 @@ The `goexperiment.jsonv2` build tag is set automatically by the Go toolchain whe
 
 **Historical note:** Previously the library hard-required `GOEXPERIMENT=jsonv2`, which caused the v0.3.1 release to fail (CI didn't set it). The dual-mode approach eliminates this class of problem entirely.
 
-**CRITICAL: goimports corrupts v1 files.** Running `nix fmt` or any `goimports`-based formatter will silently rewrite `"encoding/json"` to `"encoding/json/v2"` in `id_json_v1.go` and `json_helpers_v1_test.go` (because goimports sees `json.Marshal` calls and picks the v2 package). This breaks the v1 build entirely — `go build ./...` without `GOEXPERIMENT` fails with `build constraints exclude all Go files in encoding/json/v2`. **Always run `go build ./...` (no GOEXPERIMENT) after any formatting pass** and manually fix the imports back if corrupted. This has happened multiple times.
+**CRITICAL: the `go-auto-upgrade` buildflow step corrupts v1 files.** BuildFlow's `go-auto-upgrade` step ("Code modernization: encoding/json v1→v2") silently rewrites `"encoding/json"` to `"encoding/json/v2"` in `id_json_v1.go` and `json_helpers_v1_test.go`. This breaks the v1 build entirely — `go build ./...` without `GOEXPERIMENT` fails with `build constraints exclude all Go files in encoding/json/v2`.
+
+**Permanent fix (in place):** `.buildflow.yml` has `skip_steps: [go-auto-upgrade]`. This project deliberately supports BOTH v1 and v2 via build tags, so the v1→v2 modernizer must never run here. Plain `goimports` does NOT corrupt these files (verified) — only the auto-upgrade step does.
+
+**If the v1 build ever breaks again** with that error, the imports in `id_json_v1.go` / `json_helpers_v1_test.go` have been rewritten back to `"encoding/json/v2"` — change them back to `"encoding/json"` and confirm `go build ./...` (no GOEXPERIMENT) passes.
 
 ### String() vs Get() — Know the Difference
 
