@@ -23,7 +23,7 @@ structurally incapable of catching this bug in v1 mode.
 - **What:** `id_json_v1.go:6` and `json_helpers_v1_test.go:6` both had
   `"encoding/json/v2"` instead of `"encoding/json"`. The v1 build was
   completely broken — `go build ./...` failed with `build constraints exclude
-  all Go files in encoding/json/v2`.
+all Go files in encoding/json/v2`.
 - **Fix:** Manually corrected both import paths back to `"encoding/json"`.
 - **Verification:** Both v1 (`go test ./...`) and v2
   (`GOEXPERIMENT=jsonv2 go test ./...`) pass with `-race`.
@@ -52,10 +52,10 @@ structurally incapable of catching this bug in v1 mode.
   modernization) is actively harmful here. Skipping it globally is correct.
 - **Verification:**
   - `buildflow --profile full --dry-run` → `go-auto-upgrade: skipped via
-    skip_steps config` ✓
+skip_steps config` ✓
   - `buildflow format --dry-run` → skipped ✓
   - Pre-commit hook run → `go-auto-upgrade: skipped by build mode
-    'pre-commit'` ✓ (it was already skipped in pre-commit mode, but now also
+'pre-commit'` ✓ (it was already skipped in pre-commit mode, but now also
     in full mode where the corruption actually happened)
 - **Also committed:** Updated AGENTS.md "Critical Gotchas" section with
   corrected root cause and the permanent fix documentation.
@@ -167,12 +167,12 @@ first-line check in the pre-push hook that greps the import before running
 
 ### 2. Update misleading "goimports" references throughout codebase
 
-| Location                                | Current text                  | Should say             |
-| --------------------------------------- | ----------------------------- | ---------------------- |
-| `id_json_contract_test.go:13-14`        | "goimports v1 corruption hazard" | "go-auto-upgrade corruption hazard" |
-| `id_json_contract_test.go:32`           | "goimports corruption hazard"    | "go-auto-upgrade corruption hazard" |
-| `id_json_contract_test.go:63`           | "goimports corruption hazard"    | "go-auto-upgrade corruption hazard" |
-| 4+ previous status reports              | "goimports corruption"           | Needs resolution annotation         |
+| Location                         | Current text                     | Should say                          |
+| -------------------------------- | -------------------------------- | ----------------------------------- |
+| `id_json_contract_test.go:13-14` | "goimports v1 corruption hazard" | "go-auto-upgrade corruption hazard" |
+| `id_json_contract_test.go:32`    | "goimports corruption hazard"    | "go-auto-upgrade corruption hazard" |
+| `id_json_contract_test.go:63`    | "goimports corruption hazard"    | "go-auto-upgrade corruption hazard" |
+| 4+ previous status reports       | "goimports corruption"           | Needs resolution annotation         |
 
 ### 3. The `.buildflow.yml` should be checked into the repo and reviewed
 
@@ -297,12 +297,12 @@ intentional?
 
 ## Session metrics
 
-| Metric                     | Value                              |
-| -------------------------- | ---------------------------------- |
-| Commits pushed             | 2 (`cab7b03`, `5efdc95`)          |
-| Files changed              | 4 (2 imports, 1 new config, 1 doc) |
-| Tests run                  | 4 (v1+v2 build, v1+v2 race test)  |
-| Root cause accuracy        | Wrong for 10 min, then corrected   |
-| Permanent fix              | Yes — `.buildflow.yml skip_steps`  |
-| Time to push               | ~15 minutes                        |
-| Recurrence likelihood      | Near-zero (go-auto-upgrade globally skipped) |
+| Metric                | Value                                        |
+| --------------------- | -------------------------------------------- |
+| Commits pushed        | 2 (`cab7b03`, `5efdc95`)                     |
+| Files changed         | 4 (2 imports, 1 new config, 1 doc)           |
+| Tests run             | 4 (v1+v2 build, v1+v2 race test)             |
+| Root cause accuracy   | Wrong for 10 min, then corrected             |
+| Permanent fix         | Yes — `.buildflow.yml skip_steps`            |
+| Time to push          | ~15 minutes                                  |
+| Recurrence likelihood | Near-zero (go-auto-upgrade globally skipped) |
