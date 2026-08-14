@@ -71,7 +71,7 @@
 
 - **`astro` XSS (GHSA, medium)**: Bumped `astro` from `^7.0.3` to `^7.1.0` in `website/package.json`.
 - **`fast-uri` host confusion (GHSA, high)**: Added `"fast-uri": "^3.1.4"` to `overrides` in `website/package.json`.
-- **`website/package-lock.json` was NOT regenerated** — `npm` is not available in this environment. The lockfile still contains the vulnerable versions. See section D.
+- **`website/package-lock.json` was NOT regenerated** — `pnpm` is not available in this environment. The lockfile still contains the vulnerable versions. See section D.
 
 ### 7. Documentation Overhaul
 
@@ -102,7 +102,7 @@
 
 ### Dependabot Remediation
 
-The `package.json` overrides are correct, but the `package-lock.json` was not regenerated because `npm` is not in the PATH in this environment. The GitHub Dependabot alerts will NOT auto-resolve until someone runs `npm install` in `website/`. This is a **real gap** — the fix is declared but not materialized.
+The `package.json` overrides are correct, but the `package-lock.json` was not regenerated because `pnpm` is not in the PATH in this environment. The GitHub Dependabot alerts will NOT auto-resolve until someone runs `pnpm install` in `website/`. This is a **real gap** — the fix is declared but not materialized.
 
 ### Ecosystem go.mod Bumps (BLOCKED)
 
@@ -130,13 +130,13 @@ The project uses `nix fmt` (gofumpt + goimports + golines + nixfmt). My new file
 
 I added a `flake-check` CI job but never ran `nix flake check` locally to verify the flake is still valid. The `DeterminateSystems/nix-installer-action` SHA I used (`21a544727d0c`) was verified against the GitHub API, but I have no confirmation that `nix flake check --all-systems` actually passes in CI.
 
-### D4. Website lockfile not regenerated (npm unavailable)
+### D4. Website lockfile not regenerated (pnpm unavailable)
 
-`npm` was not available in this environment. I edited `package.json` directly (correct overrides) but couldn't run `npm install` to regenerate `package-lock.json`. The Dependabot alerts will persist until this is done. I noted this in the final summary but should have been more emphatic — **the vulnerability fix is incomplete**.
+`pnpm` was not available in this environment. I edited `package.json` directly (correct overrides) but couldn't run `pnpm install` to regenerate `package-lock.json`. The Dependabot alerts will persist until this is done. I noted this in the final summary but should have been more emphatic — **the vulnerability fix is incomplete**.
 
 ### D5. Never built the website
 
-I created new `.mdx` files and updated `astro.config.mjs`, but never ran `npm run build` or `astro check` to verify the website compiles. A broken frontmatter field, invalid import, or sidebar mismatch would only surface at deploy time.
+I created new `.mdx` files and updated `astro.config.mjs`, but never ran `pnpm run build` or `astro check` to verify the website compiles. A broken frontmatter field, invalid import, or sidebar mismatch would only surface at deploy time.
 
 ### D6. The `TestSentinelErrInternal_Defensive` test is weak
 
@@ -196,11 +196,11 @@ The auto-git daemon has already committed the CHANGELOG changes. When these are 
 
 ### Immediate (must do before release)
 
-1. **Run `npm install` in `website/`** to regenerate `package-lock.json` and actually resolve the Dependabot alerts.
+1. **Run `pnpm install` in `website/`** to regenerate `package-lock.json` and actually resolve the Dependabot alerts.
 2. **Run `golangci-lint run ./...`** in both v1 and v2 modes and fix all findings.
 3. **Run `nix fmt`** to format all new files through gofumpt/goimports/golines.
 4. **Run `nix flake check`** locally to verify the flake is valid.
-5. **Build the website** (`npm run build` in `website/`) to verify new `.mdx` files compile.
+5. **Build the website** (`pnpm run build` in `website/`) to verify new `.mdx` files compile.
 6. **Verify Dependabot alerts auto-dismiss** after lockfile regeneration (check GitHub UI).
 
 ### Short-term (next session)
@@ -245,7 +245,7 @@ The auto-git daemon has already committed the CHANGELOG changes. When these are 
 
 36. **Add `golangci-lint` to the `flake-check` job** (currently only `nix flake check` runs, not lint).
 37. **Add a website build/deploy job** to CI (the website has no CI coverage).
-38. **Add a Dependabot config** (`dependabot.yml`) for GitHub Actions and npm.
+38. **Add a Dependabot config** (`dependabot.yml`) for GitHub Actions and pnpm.
 39. **Add `codecov` or similar** coverage tracking to CI.
 40. **Add a `release-please` or `semantic-release` bot** for automated changelog generation.
 41. **Add SARIF output to `golangci-lint`** for GitHub Security tab integration.
@@ -274,9 +274,9 @@ The current design uses two generic sentinels (`ErrMarshal`, `ErrUnmarshal`) for
 
 The `ErrNotOrdered` message restoration is technically a breaking change for consumers parsing the message string (though `errors.Is` matching is unaffected). The new `ErrMarshal`/`ErrUnmarshal` sentinels are additive. Should we tag a minor release (v0.5.2) for just the additive changes, or a minor (v0.6.0) that includes the message restoration? The semver implications depend on how strictly we treat error message text changes.
 
-### Q3: Is `npm install` in `website/` something I should do, or do you handle website deps separately?
+### Q3: Is `pnpm install` in `website/` something I should do, or do you handle website deps separately?
 
-The `website/` has its own `flake.nix` and `package.json`. I couldn't run `npm install` to regenerate the lockfile. Should I add a `nix run .#update-deps` app to the website flake, or do you manage npm deps outside of Nix?
+The `website/` has its own `flake.nix` and `package.json`. I couldn't run `pnpm install` to regenerate the lockfile. Should I add a `nix run .#update-deps` app to the website flake, or do you manage pnpm deps outside of Nix?
 
 ---
 
@@ -296,7 +296,7 @@ The `website/` has its own `flake.nix` and `package.json`. I couldn't run `npm i
 | Website guides               | 4      | 6     | +2    |
 | Dependabot alerts open       | 2      | 2\*   | 0\*   |
 
-\* `package.json` fixed but `package-lock.json` not regenerated — alerts will persist until `npm install` runs.
+\* `package.json` fixed but `package-lock.json` not regenerated — alerts will persist until `pnpm install` runs.
 
 ## Files Changed (25 files)
 
@@ -323,7 +323,7 @@ v0.6.0 — open question Q2) is a design call still pending.
 
 **Section (D) items still open** (now in `TODO_LIST.md`):
 
-- D4 / D5: website `package-lock.json` not regenerated and site not built (npm
+- D4 / D5: website `package-lock.json` not regenerated and site not built (pnpm
   was unavailable). The `package.json` overrides are correct; the lockfile still
   holds the vulnerable `astro`/`fast-uri` versions.
 - E5: `ErrMarshal` SQL `Value()` TextMarshaler path has no failing-marshaler test

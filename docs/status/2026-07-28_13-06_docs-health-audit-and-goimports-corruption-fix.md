@@ -408,7 +408,7 @@ status instead of removed) was rebuilt in a later docs-health pass: completed
 items now live only in `CHANGELOG.md`, and `TODO_LIST.md` holds open work only.
 
 **Still open** (now in `TODO_LIST.md`): website `package-lock.json` regeneration
-(`npm install` in `website/` — npm was unavailable in both sessions); website
+(`pnpm install` in `website/` — pnpm was unavailable in both sessions); website
 build verification; `ErrMarshal`/`ErrUnmarshal` delegate-path test coverage
 (only `MarshalBinary` proven for `ErrMarshal`).
 

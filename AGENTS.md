@@ -199,7 +199,7 @@ The `website/` directory contains an Astro + Starlight documentation site deploy
 - **Hosting target**: `brandedid`
 - **Color theme**: Violet (#a855f7)
 - **DNS**: CNAME `branded-id.lars.software` → `brandedid.web.app` (in `domains/lars.software.tf`, needs `terraform apply`)
-- **Build**: `nix run .#build` (from `website/`) or `npm run build`
-- **Dev**: `nix run .#dev` (from `website/`) or `npm run dev`
+- **Build**: `nix run .#build` (from `website/`) or `pnpm run build`
+- **Dev**: `nix run .#dev` (from `website/`) or `pnpm run dev`
 - **Deploy**: `nix run .#deploy` (from `website/`) — builds and runs `firebase deploy --only hosting`
 - The website has its own `flake.nix`, `package.json`, and `firebase.json` — independent from the Go library's flake

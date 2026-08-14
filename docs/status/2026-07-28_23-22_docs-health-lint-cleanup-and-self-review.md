@@ -139,7 +139,7 @@ that reflect a tool I did not run are left with their original values.
 4. **The `[Unreleased]` section has no version/date.** The 23-01 report left
    v0.5.2-vs-v0.6.0 as an open question (Q2). I carried it forward; no decision
    was made or proposed forcefully.
-5. **Website never built.** Files exist; `npm run build` not run (npm unavailable
+5. **Website never built.** Files exist; `pnpm run build` not run (pnpm unavailable
    in environment). Carried as a TODO.
 
 ---
@@ -235,10 +235,10 @@ a focused separate step first, or (b) left it for a dedicated cleanup commit.
 
 ### High impact — real open work
 
-4. **Regenerate `website/package-lock.json`** (`npm install` in `website/`) — the
+4. **Regenerate `website/package-lock.json`** (`pnpm install` in `website/`) — the
    `astro`/`fast-uri` overrides are set but the lockfile still holds vulnerable
    versions; Dependabot alerts will not dismiss until this runs.
-5. **Build & verify the website** (`npm run build`) — `error-handling.mdx` and
+5. **Build & verify the website** (`pnpm run build`) — `error-handling.mdx` and
    `namer-tool.mdx` were added but never compiled; sidebar/frontmatter unverified.
 6. **Add a CI/release guard rejecting a tracked compiled binary at repo root** —
    prevents recurrence of the v0.5.0 `namer`-binary incident (currently
@@ -285,7 +285,7 @@ a focused separate step first, or (b) left it for a dedicated cleanup commit.
 
 31. Add `golangci-lint` to the `flake-check` CI job (currently only `nix flake check`).
 32. Add a website build/deploy job to CI.
-33. Add a `dependabot.yml` for GitHub Actions and npm.
+33. Add a `dependabot.yml` for GitHub Actions and pnpm.
 34. Add SARIF output to `golangci-lint` for the GitHub Security tab.
 35. Mirror the pre-push dual-mode hook as an explicit CI check.
 36. Add automated `nix flake update` PRs.
