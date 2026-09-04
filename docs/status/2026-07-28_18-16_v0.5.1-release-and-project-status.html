@@ -33,14 +33,14 @@
         --radius: 0px;
         --radius-sm: 0px;
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -221,15 +221,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       .issue {
@@ -241,15 +253,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -566,8 +590,8 @@
           <h1>v0.5.1 Release &amp; Project Health</h1>
           <p class="hero-subtitle">
             Snapshot after shipping v0.5.1 to remove the accidentally tracked
-            <code>namer</code> binary. Covers what was accomplished, what remains broken, and what
-            should happen next.
+            <code>namer</code> binary. Covers what was accomplished, what
+            remains broken, and what should happen next.
           </p>
         </div>
 
@@ -618,11 +642,12 @@
         <div class="card card-solution">
           <h4>Bottom Line</h4>
           <p>
-            v0.5.1 is out and the source archives are clean. The immediate crisis (a tracked binary
-            inflating release tarballs ~10x) is resolved. However, the project still carries
-            significant hygiene debt: uninvestigated security alerts, failing docs validation CI,
-            unpinned actions, and incomplete test coverage for new sentinel errors. Nothing is on
-            fire, but several items are smoldering.
+            v0.5.1 is out and the source archives are clean. The immediate
+            crisis (a tracked binary inflating release tarballs ~10x) is
+            resolved. However, the project still carries significant hygiene
+            debt: uninvestigated security alerts, failing docs validation CI,
+            unpinned actions, and incomplete test coverage for new sentinel
+            errors. Nothing is on fire, but several items are smoldering.
           </p>
         </div>
 
@@ -633,9 +658,11 @@
             <div class="text">
               <strong>Fixed goimports corruption in v1 JSON files</strong>
               <span
-                ><code>id_json_v1.go</code> and <code>json_helpers_v1_test.go</code> were importing
-                <code>encoding/json/v2</code>; restored to <code>encoding/json</code>. Default build
-                mode now compiles and tests pass.</span
+                ><code>id_json_v1.go</code> and
+                <code>json_helpers_v1_test.go</code> were importing
+                <code>encoding/json/v2</code>; restored to
+                <code>encoding/json</code>. Default build mode now compiles and
+                tests pass.</span
               >
             </div>
           </div>
@@ -644,9 +671,11 @@
             <div class="text">
               <strong>Verified dual JSON mode health</strong>
               <span
-                >Ran plain <code>go test</code>, <code>GOEXPERIMENT=jsonv2 go test</code>,
+                >Ran plain <code>go test</code>,
+                <code>GOEXPERIMENT=jsonv2 go test</code>,
                 <code>nix run .#test-race</code>, <code>nix run .#lint</code>,
-                <code>nix run .#build</code>, and <code>nix flake check</code> — all green.</span
+                <code>nix run .#build</code>, and <code>nix flake check</code> —
+                all green.</span
               >
             </div>
           </div>
@@ -655,9 +684,9 @@
             <div class="text">
               <strong>Removed tracked <code>namer</code> binary</strong>
               <span
-                >Binary was untracked in commit <code>c29a034</code>, <code>/namer</code> was
-                already in <code>.gitignore</code>, and release source archives no longer contain
-                it.</span
+                >Binary was untracked in commit <code>c29a034</code>,
+                <code>/namer</code> was already in <code>.gitignore</code>, and
+                release source archives no longer contain it.</span
               >
             </div>
           </div>
@@ -666,9 +695,10 @@
             <div class="text">
               <strong>Released v0.5.1</strong>
               <span
-                >Created signed annotated tag <code>v0.5.1</code>, pushed to origin, and verified
-                the GitHub Release was auto-created with no extra assets. Source tarball dropped
-                from ~2.09 MB to ~212 KB.</span
+                >Created signed annotated tag <code>v0.5.1</code>, pushed to
+                origin, and verified the GitHub Release was auto-created with no
+                extra assets. Source tarball dropped from ~2.09 MB to ~212
+                KB.</span
               >
             </div>
           </div>
@@ -677,8 +707,9 @@
             <div class="text">
               <strong>Updated project docs</strong>
               <span
-                >Added v0.5.1 entry to <code>CHANGELOG.md</code> and marked the binary-removal task
-                <code>DONE</code> in <code>TODO_LIST.md</code>.</span
+                >Added v0.5.1 entry to <code>CHANGELOG.md</code> and marked the
+                binary-removal task <code>DONE</code> in
+                <code>TODO_LIST.md</code>.</span
               >
             </div>
           </div>
@@ -701,14 +732,15 @@
           <h3>Binary leak prevention</h3>
           <div class="where"><code>.gitignore</code> only</div>
           <p>
-            We rely on <code>/namer</code> in <code>.gitignore</code> and human discipline. There is
-            no CI or pre-commit guard that fails if a binary becomes tracked again. A future
-            developer can still <code>git add -f namer</code> or add a differently-named binary and
+            We rely on <code>/namer</code> in <code>.gitignore</code> and human
+            discipline. There is no CI or pre-commit guard that fails if a
+            binary becomes tracked again. A future developer can still
+            <code>git add -f namer</code> or add a differently-named binary and
             ship it.
           </p>
           <div class="callout callout-solution">
-            <strong>Fix:</strong> Add a BuildFlow / CI step that fails if any executable non-source
-            file is tracked at repo root.
+            <strong>Fix:</strong> Add a BuildFlow / CI step that fails if any
+            executable non-source file is tracked at repo root.
           </div>
         </div>
 
@@ -720,9 +752,10 @@
             <code>website/src/content/docs/changelog.mdx</code> stale
           </div>
           <p>
-            The repo changelog now covers v0.5.1, but the public website changelog still stops at
-            v0.3.2. Dual-mode JSON support, sentinel errors, the namer tool, and v0.5.1 are
-            invisible on <code>branded-id.lars.software</code>.
+            The repo changelog now covers v0.5.1, but the public website
+            changelog still stops at v0.3.2. Dual-mode JSON support, sentinel
+            errors, the namer tool, and v0.5.1 are invisible on
+            <code>branded-id.lars.software</code>.
           </p>
         </div>
 
@@ -734,8 +767,8 @@
           </div>
           <p>
             Five new sentinel errors shipped in v0.5.0, but only one has an
-            <code>errors.Is</code> test. The public API contract around error taxonomy is
-            effectively unverified.
+            <code>errors.Is</code> test. The public API contract around error
+            taxonomy is effectively unverified.
           </p>
         </div>
 
@@ -744,37 +777,60 @@
           <h3>Downstream ecosystem adoption</h3>
           <div class="where">14 repos</div>
           <p>
-            Source fixes from the v0.3.x cycle were applied and pushed to all 14 downstream repos,
-            but no <code>go.mod</code> bump to v0.5.0 (or v0.5.1) has been done in any of them.
+            Source fixes from the v0.3.x cycle were applied and pushed to all 14
+            downstream repos, but no <code>go.mod</code> bump to v0.5.0 (or
+            v0.5.1) has been done in any of them.
           </p>
         </div>
 
         <h2 id="not-started"><span class="num">03</span>Not Started</h2>
         <p>
-          Items from <code>TODO_LIST.md</code> that remain in <code>TODO</code> or
-          <code>BLOCKED</code> state:
+          Items from <code>TODO_LIST.md</code> that remain in
+          <code>TODO</code> or <code>BLOCKED</code> state:
         </p>
         <ul>
           <li>Add <code>errors.Is</code> tests for 5 new sentinel errors.</li>
           <li>
-            Fix <code>validate-docs.yml</code> CI failure (<code>md-go-validator</code> install
-            path).
+            Fix <code>validate-docs.yml</code> CI failure (<code
+              >md-go-validator</code
+            >
+            install path).
           </li>
-          <li>Investigate 2 Dependabot vulnerabilities reported on v0.5.0 push.</li>
+          <li>
+            Investigate 2 Dependabot vulnerabilities reported on v0.5.0 push.
+          </li>
           <li>Bump 14 downstream ecosystem repos to v0.5.1.</li>
           <li>Document sentinel errors in <code>README.md</code>.</li>
-          <li>Add <code>cmd/namer</code> and sentinel errors to website docs.</li>
-          <li>Add website <code>changelog.mdx</code> entries for v0.4.0, v0.5.0, and v0.5.1.</li>
+          <li>
+            Add <code>cmd/namer</code> and sentinel errors to website docs.
+          </li>
+          <li>
+            Add website <code>changelog.mdx</code> entries for v0.4.0, v0.5.0,
+            and v0.5.1.
+          </li>
           <li>Pin GitHub Actions to commit SHA hashes.</li>
           <li>Add <code>nix flake check</code> to CI workflows.</li>
           <li>Restore full <code>ErrNotOrdered</code> message text.</li>
-          <li>Review remaining <code>fmt.Errorf</code> calls that lack sentinel wrapping.</li>
-          <li>Restore <code>TestSuggestName_IntegrationWithPrint</code> regression test.</li>
           <li>
-            Add <code>printResults</code> test asserting the suggested <code>Name()</code> string.
+            Review remaining <code>fmt.Errorf</code> calls that lack sentinel
+            wrapping.
           </li>
-          <li>Add fuzz tests for SQL <code>Scan</code> and Text <code>UnmarshalText</code>.</li>
-          <li>Add flake <code>outputs</code> pattern gotcha to <code>AGENTS.md</code>.</li>
+          <li>
+            Restore <code>TestSuggestName_IntegrationWithPrint</code> regression
+            test.
+          </li>
+          <li>
+            Add <code>printResults</code> test asserting the suggested
+            <code>Name()</code> string.
+          </li>
+          <li>
+            Add fuzz tests for SQL <code>Scan</code> and Text
+            <code>UnmarshalText</code>.
+          </li>
+          <li>
+            Add flake <code>outputs</code> pattern gotcha to
+            <code>AGENTS.md</code>.
+          </li>
           <li>Add pre-commit hook that runs dual-mode <code>go test</code>.</li>
         </ul>
 
@@ -782,40 +838,51 @@
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">Shipped Defect</span>
-          <h3>v0.5.0 source archives shipped a tracked <code>namer</code> binary</h3>
+          <h3>
+            v0.5.0 source archives shipped a tracked <code>namer</code> binary
+          </h3>
           <div class="where">
-            <code>git ls-tree -r v0.5.0</code> → <code>100755 blob ... namer</code>
+            <code>git ls-tree -r v0.5.0</code> →
+            <code>100755 blob ... namer</code>
           </div>
           <p>
-            The v0.5.0 release tarball was ~2.09 MB because it included a build artifact. v0.5.1 is
-            the fix, but this should never have been committed. The root cause was missing automated
-            enforcement: <code>.gitignore</code> existed but the binary was force-added or added
-            before the ignore rule.
+            The v0.5.0 release tarball was ~2.09 MB because it included a build
+            artifact. v0.5.1 is the fix, but this should never have been
+            committed. The root cause was missing automated enforcement:
+            <code>.gitignore</code> existed but the binary was force-added or
+            added before the ignore rule.
           </p>
           <div class="callout callout-solution">
-            <strong>Mitigated in v0.5.1.</strong> Long-term fix is a CI guard against tracked
-            binaries plus a release dry-run that inspects source archives before the tag is pushed.
+            <strong>Mitigated in v0.5.1.</strong> Long-term fix is a CI guard
+            against tracked binaries plus a release dry-run that inspects source
+            archives before the tag is pushed.
           </div>
         </div>
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">Security</span>
           <h3>Two Dependabot vulnerabilities are uninvestigated</h3>
-          <div class="where">GitHub reported 1 high + 1 moderate on the v0.5.0 push</div>
+          <div class="where">
+            GitHub reported 1 high + 1 moderate on the v0.5.0 push
+          </div>
           <p>
-            We do not know if these affect runtime users, the website, or dev-only dependencies.
-            They have been sitting in the TODO list since v0.5.0.
+            We do not know if these affect runtime users, the website, or
+            dev-only dependencies. They have been sitting in the TODO list since
+            v0.5.0.
           </p>
         </div>
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">CI</span>
           <h3>Docs validation CI is failing</h3>
-          <div class="where"><code>.github/workflows/validate-docs.yml</code></div>
+          <div class="where">
+            <code>.github/workflows/validate-docs.yml</code>
+          </div>
           <p>
-            <code>md-go-validator@latest</code> module v1.2.0 exists but the root package does not.
-            The install path likely needs to point to <code>cmd/md-go-validator</code>. This means
-            every push currently fails docs validation unless it is skipped.
+            <code>md-go-validator@latest</code> module v1.2.0 exists but the
+            root package does not. The install path likely needs to point to
+            <code>cmd/md-go-validator</code>. This means every push currently
+            fails docs validation unless it is skipped.
           </p>
         </div>
 
@@ -827,20 +894,24 @@
             <code>validate-docs.yml</code>
           </div>
           <p>
-            Tags can be moved to malicious code. BuildFlow flags this as high-severity. For a
-            library consumed by 14 downstream repos, this is a supply-chain risk.
+            Tags can be moved to malicious code. BuildFlow flags this as
+            high-severity. For a library consumed by 14 downstream repos, this
+            is a supply-chain risk.
           </p>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Quality</span>
           <h3>26 structural linter findings from BuildFlow</h3>
-          <div class="where"><code>go-structure-linter</code> output during pre-commit</div>
+          <div class="where">
+            <code>go-structure-linter</code> output during pre-commit
+          </div>
           <p>
-            Includes the root-package-files rule flagging <code>errors.go</code>,
-            <code>id_*.go</code> as "should be in /internal/ or /pkg/". Some may be false positives
-            for an intentional flat single-package library, but they are currently un-suppressed and
-            create noise on every commit.
+            Includes the root-package-files rule flagging
+            <code>errors.go</code>, <code>id_*.go</code> as "should be in
+            /internal/ or /pkg/". Some may be false positives for an intentional
+            flat single-package library, but they are currently un-suppressed
+            and create noise on every commit.
           </p>
         </div>
 
@@ -849,54 +920,63 @@
         <div class="card card-warning">
           <h4>1. Make binary leaks impossible, not unlikely</h4>
           <p>
-            Add a CI check (and ideally a pre-commit hook) that fails if any tracked file matches
-            executable/binary heuristics at the repo root or in build output directories. The
-            existing <code>file-size-check</code> in BuildFlow might catch large files, but a
-            targeted <code>git ls-files | xargs file</code> check would be explicit.
+            Add a CI check (and ideally a pre-commit hook) that fails if any
+            tracked file matches executable/binary heuristics at the repo root
+            or in build output directories. The existing
+            <code>file-size-check</code> in BuildFlow might catch large files,
+            but a targeted <code>git ls-files | xargs file</code> check would be
+            explicit.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>2. Investigate Dependabot alerts before the next release</h4>
           <p>
-            Run <code>gh api repos/LarsArtmann/go-branded-id/dependabot/alerts</code>, determine
-            affected dependency paths, and either patch or document why they are dev-only /
-            non-exploitable. Do not ship v0.5.2 with these still open.
+            Run
+            <code>gh api repos/LarsArtmann/go-branded-id/dependabot/alerts</code
+            >, determine affected dependency paths, and either patch or document
+            why they are dev-only / non-exploitable. Do not ship v0.5.2 with
+            these still open.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>3. Pin actions and add <code>nix flake check</code> to CI</h4>
           <p>
-            Converting all <code>@vN</code> references to full commit SHAs removes the supply-chain
-            warning. Adding <code>nix flake check</code> to <code>go.yml</code> and
-            <code>release.yml</code> closes the gap between local Nix validation and CI.
+            Converting all <code>@vN</code> references to full commit SHAs
+            removes the supply-chain warning. Adding
+            <code>nix flake check</code> to <code>go.yml</code> and
+            <code>release.yml</code> closes the gap between local Nix validation
+            and CI.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>4. Close the sentinel-error testing gap</h4>
           <p>
-            Add table-driven <code>errors.Is</code> tests for <code>ErrUnsupportedType</code>,
-            <code>ErrCannotScan</code>, <code>ErrInsufficientData</code>, <code>ErrInternal</code>,
-            and <code>ErrNilReceiver</code>. This is a 1-hour task with high public-API value.
+            Add table-driven <code>errors.Is</code> tests for
+            <code>ErrUnsupportedType</code>, <code>ErrCannotScan</code>,
+            <code>ErrInsufficientData</code>, <code>ErrInternal</code>, and
+            <code>ErrNilReceiver</code>. This is a 1-hour task with high
+            public-API value.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>5. Sync public website with releases</h4>
           <p>
-            The website is the public face of the library. Changelog and feature docs for
-            v0.4.0–v0.5.1 should be updated before DNS for <code>branded-id.lars.software</code> is
-            considered complete.
+            The website is the public face of the library. Changelog and feature
+            docs for v0.4.0–v0.5.1 should be updated before DNS for
+            <code>branded-id.lars.software</code> is considered complete.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>6. Decide on root-package-files linter policy</h4>
           <p>
-            Either accept the flat-package design and suppress the rule, or redesign the module
-            layout. Leaving 24 warnings unaddressed trains everyone to ignore BuildFlow output.
+            Either accept the flat-package design and suppress the rule, or
+            redesign the module layout. Leaving 24 warnings unaddressed trains
+            everyone to ignore BuildFlow output.
           </p>
         </div>
 
@@ -968,7 +1048,9 @@
               </tr>
               <tr>
                 <td>8</td>
-                <td>Review <code>fmt.Errorf</code> calls without sentinel wrapping</td>
+                <td>
+                  Review <code>fmt.Errorf</code> calls without sentinel wrapping
+                </td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>1 h</td>
                 <td><span class="badge badge-low">Open</span></td>
@@ -982,7 +1064,9 @@
               </tr>
               <tr>
                 <td>10</td>
-                <td>Add <code>cmd/namer</code> + sentinel errors to website docs</td>
+                <td>
+                  Add <code>cmd/namer</code> + sentinel errors to website docs
+                </td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>2 h</td>
                 <td><span class="badge badge-low">Open</span></td>
@@ -996,14 +1080,19 @@
               </tr>
               <tr>
                 <td>12</td>
-                <td>Restore <code>TestSuggestName_IntegrationWithPrint</code></td>
+                <td>
+                  Restore <code>TestSuggestName_IntegrationWithPrint</code>
+                </td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>30 min</td>
                 <td><span class="badge badge-low">Open</span></td>
               </tr>
               <tr>
                 <td>13</td>
-                <td>Add <code>printResults</code> test asserting suggested name string</td>
+                <td>
+                  Add <code>printResults</code> test asserting suggested name
+                  string
+                </td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>30 min</td>
                 <td><span class="badge badge-low">Open</span></td>
@@ -1011,7 +1100,8 @@
               <tr>
                 <td>14</td>
                 <td>
-                  Add fuzz tests for SQL <code>Scan</code> and Text <code>UnmarshalText</code>
+                  Add fuzz tests for SQL <code>Scan</code> and Text
+                  <code>UnmarshalText</code>
                 </td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>1 h</td>
@@ -1019,7 +1109,10 @@
               </tr>
               <tr>
                 <td>15</td>
-                <td>Add flake <code>outputs</code> pattern gotcha to <code>AGENTS.md</code></td>
+                <td>
+                  Add flake <code>outputs</code> pattern gotcha to
+                  <code>AGENTS.md</code>
+                </td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>10 min</td>
                 <td><span class="badge badge-low">Open</span></td>
@@ -1054,7 +1147,9 @@
               </tr>
               <tr>
                 <td>20</td>
-                <td>Refresh <code>AGENTS.md</code> with v0.5.1 release notes link</td>
+                <td>
+                  Refresh <code>AGENTS.md</code> with v0.5.1 release notes link
+                </td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>10 min</td>
                 <td><span class="badge badge-low">Open</span></td>
@@ -1068,7 +1163,9 @@
               </tr>
               <tr>
                 <td>22</td>
-                <td>Apply Terraform DNS for <code>branded-id.lars.software</code></td>
+                <td>
+                  Apply Terraform DNS for <code>branded-id.lars.software</code>
+                </td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>30 min</td>
                 <td><span class="badge badge-low">Open</span></td>
@@ -1077,16 +1174,20 @@
           </table>
         </div>
 
-        <h2 id="questions"><span class="num">07</span>Open Questions I Cannot Answer</h2>
+        <h2 id="questions">
+          <span class="num">07</span>Open Questions I Cannot Answer
+        </h2>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Question 1</span>
           <h3>How should we handle the 2 Dependabot vulnerabilities?</h3>
           <p>
-            I can run <code>gh api repos/LarsArtmann/go-branded-id/dependabot/alerts</code>, but I
-            cannot decide remediation priority or whether a vulnerable dependency is dev-only vs.
-            runtime-relevant without your input. Should I investigate them now, or do you already
-            know if they are false positives?
+            I can run
+            <code>gh api repos/LarsArtmann/go-branded-id/dependabot/alerts</code
+            >, but I cannot decide remediation priority or whether a vulnerable
+            dependency is dev-only vs. runtime-relevant without your input.
+            Should I investigate them now, or do you already know if they are
+            false positives?
           </p>
         </div>
 
@@ -1094,46 +1195,56 @@
           <span class="severity severity-important">Question 2</span>
           <h3>Is the flat single-package layout intentional and permanent?</h3>
           <p>
-            BuildFlow's <code>go-structure-linter</code> flags every <code>id_*.go</code> and
-            <code>errors.go</code> as "should be in /internal/ or /pkg/".
-            <code>AGENTS.md</code> says the repo is "intentionally a flat, single-package library."
-            Should I suppress this linter rule project-wide, or do you want to reconsider the
+            BuildFlow's <code>go-structure-linter</code> flags every
+            <code>id_*.go</code> and <code>errors.go</code> as "should be in
+            /internal/ or /pkg/". <code>AGENTS.md</code> says the repo is
+            "intentionally a flat, single-package library." Should I suppress
+            this linter rule project-wide, or do you want to reconsider the
             package structure?
           </p>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Question 3</span>
-          <h3>Should the next priority be security/CI hardening or feature/docs work?</h3>
+          <h3>
+            Should the next priority be security/CI hardening or feature/docs
+            work?
+          </h3>
           <p>
-            We have competing high-value streams: (A) Dependabot + action pinning +
-            <code>nix flake check</code> CI, or (B) sentinel-error tests + website docs + downstream
-            bumps. Which stream do you want tackled first?
+            We have competing high-value streams: (A) Dependabot + action
+            pinning +
+            <code>nix flake check</code> CI, or (B) sentinel-error tests +
+            website docs + downstream bumps. Which stream do you want tackled
+            first?
           </p>
         </div>
 
         <div class="card card-solution" id="resolution">
           <h4>Resolution (2026-07-28)</h4>
           <p>
-            Several "smoldering" items flagged in this snapshot were extinguished by the subsequent
-            <code>2026-07-28_23-01</code> session. The summary cards above have been corrected
-            inline; the details:
+            Several "smoldering" items flagged in this snapshot were
+            extinguished by the subsequent
+            <code>2026-07-28_23-01</code> session. The summary cards above have
+            been corrected inline; the details:
           </p>
           <ul>
             <li>
-              <strong>Sentinel error tests (was 5 open):</strong> all 9 sentinels now have
-              <code>errors.Is</code> coverage in <code>id_errors_test.go</code> (25 subtests).
-              <code>ErrMarshal</code> and <code>ErrUnmarshal</code> were also added.
-            </li>
-            <li>
-              <strong>Unpinned GitHub Actions (was 17):</strong> all actions across
-              <code>go.yml</code>, <code>release.yml</code>, <code>validate-docs.yml</code> pinned
-              to commit SHAs.
-            </li>
-            <li>
-              <strong>Website changelog:</strong> <code>changelog.mdx</code> gained v0.4.0, v0.5.0,
-              v0.5.1 entries (previously stopped at v0.3.2). Error Handling and Namer Tool guides
+              <strong>Sentinel error tests (was 5 open):</strong> all 9
+              sentinels now have <code>errors.Is</code> coverage in
+              <code>id_errors_test.go</code> (25 subtests).
+              <code>ErrMarshal</code> and <code>ErrUnmarshal</code> were also
               added.
+            </li>
+            <li>
+              <strong>Unpinned GitHub Actions (was 17):</strong> all actions
+              across <code>go.yml</code>, <code>release.yml</code>,
+              <code>validate-docs.yml</code> pinned to commit SHAs.
+            </li>
+            <li>
+              <strong>Website changelog:</strong>
+              <code>changelog.mdx</code> gained v0.4.0, v0.5.0, v0.5.1 entries
+              (previously stopped at v0.3.2). Error Handling and Namer Tool
+              guides added.
             </li>
             <li>
               <strong>Validate Docs CI:</strong> install path fixed to
@@ -1142,16 +1253,18 @@
           </ul>
           <p>
             <strong>Still open:</strong> the 2 Dependabot vulnerabilities have
-            <code>package.json</code> overrides set but the <code>package-lock.json</code> was never
-            regenerated (pnpm unavailable), so the alerts persist; the website was never built to
+            <code>package.json</code> overrides set but the
+            <code>package-lock.json</code> was never regenerated (pnpm
+            unavailable), so the alerts persist; the website was never built to
             verify the new <code>.mdx</code> guides compile. Both are now in
             <code>TODO_LIST.md</code>.
           </p>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-28 18:16 CEST &middot; Based on current session work and project state
-          at commit <code>20603a7</code> &middot; Tagged <code>v0.5.1</code>.
+          Generated 2026-07-28 18:16 CEST &middot; Based on current session work
+          and project state at commit <code>20603a7</code> &middot; Tagged
+          <code>v0.5.1</code>.
         </footer>
       </main>
     </div>

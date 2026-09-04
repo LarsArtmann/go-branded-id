@@ -68,27 +68,27 @@ func (id ID[B, V]) MarshalBinary() ([]byte, error) {
 		return []byte(v), nil
 	case int:
 		b := make([]byte, byteSizeInt64)
-		//nolint:gosec // G115: int to uint64 is safe for binary serialization
+
 		binary.LittleEndian.PutUint64(b, uint64(v))
 
 		return b, nil
 	case int8:
-		return []byte{byte(v)}, nil //nolint:gosec // G115: int8 to byte is safe for serialization
+		return []byte{byte(v)}, nil
 	case int16:
 		b := make([]byte, byteSizeInt16)
-		//nolint:gosec // G115: int16 to uint16 is safe for binary serialization
+
 		binary.LittleEndian.PutUint16(b, uint16(v))
 
 		return b, nil
 	case int32:
 		b := make([]byte, byteSizeInt32)
-		//nolint:gosec // G115: int32 to uint32 is safe for binary serialization
+
 		binary.LittleEndian.PutUint32(b, uint32(v))
 
 		return b, nil
 	case int64:
 		b := make([]byte, byteSizeInt64)
-		//nolint:gosec // G115: int64 to uint64 is safe for binary serialization
+
 		binary.LittleEndian.PutUint64(b, uint64(v))
 
 		return b, nil

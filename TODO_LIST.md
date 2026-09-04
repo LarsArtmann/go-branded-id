@@ -17,8 +17,8 @@
 
 | Task                                                                       | Status | Impact | Evidence                                                                                                                                                  |
 | -------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Regenerate website `package-lock.json` (`pnpm install` in `website/`)       | 🔴     | High   | `package.json` overrides are set (`astro` → `^7.1.0` XSS fix, `fast-uri` → `^3.1.4` host-confusion fix) but the lockfile still holds vulnerable versions. |
-| Build & verify the website (`pnpm run build` in `website/`)                 | 🔴     | High   | `guides/error-handling.mdx` and `guides/namer-tool.mdx` were added but never compiled; sidebar links (`astro.config.mjs`) and frontmatter are unverified. |
+| Regenerate website `package-lock.json` (`pnpm install` in `website/`)      | 🔴     | High   | `package.json` overrides are set (`astro` → `^7.1.0` XSS fix, `fast-uri` → `^3.1.4` host-confusion fix) but the lockfile still holds vulnerable versions. |
+| Build & verify the website (`pnpm run build` in `website/`)                | 🔴     | High   | `guides/error-handling.mdx` and `guides/namer-tool.mdx` were added but never compiled; sidebar links (`astro.config.mjs`) and frontmatter are unverified. |
 | Add a CI/release guard that rejects a tracked compiled binary at repo root | 🔴     | High   | Prevents recurrence of the v0.5.0 incident where a tracked `namer` binary inflated release source archives ~10x. Currently relies on `.gitignore` only.   |
 
 ## Medium Impact

@@ -45,6 +45,7 @@ func (id *ID[B, V]) UnmarshalJSON(data []byte) error {
 		)
 	}
 
+	// art-dupl:accept jsonv1/jsonv2 are build-tag alternatives (only one compiles per build); sharing is impossible across tags
 	*id = ID[B, V]{value: zero}
 
 	return nil

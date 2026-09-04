@@ -6,57 +6,57 @@
 
 ## A) FULLY DONE
 
-| #   | Item                                       | Evidence                                                                                                                                            |
-| --- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **README.md rewritten**                    | 7 badges (Go, CI, pkg.go.dev, Go Report Card, stars, MIT, docs), feature table, condensed perf table, docs links. `README.md` committed to staging. |
-| 2   | **Website scaffold — all 49 source files** | Astro v7 + Starlight + Tailwind v4. Matches go-atomic-write/gogenfilter architecture exactly.                                                       |
-| 3   | **Landing page**                           | Hero (live GitHub stars), FeatureGrid (6 cards), HowItWorks (4 steps), Comparison (7-row matrix), UseCases (3 cards), CTA.                          |
-| 4   | **Documentation — 11 Starlight pages**     | Installation, Quick Start, Named Brands, Serialization, Value Types, Performance, API Reference, Changelog, Contributing, Related Tools.            |
-| 5   | **Website builds clean**                   | `astro build` → 0 errors, 0 warnings, 12 pages, sitemap, pagefind search index.                                                                     |
-| 6   | **Typecheck passes**                       | `astro check` → 0 errors, 0 warnings.                                                                                                               |
-| 7   | **Firebase Hosting site created**          | Site `brandedid` in project `lars-software`. Default URL `brandedid.web.app` live and verified via HTTP fetch.                                      |
-| 8   | **Website deployed**                       | 63 files uploaded. `https://brandedid.web.app` returns full rendered HTML (verified).                                                               |
-| 9   | **Firebase custom domain added**           | `branded-id.lars.software` registered via Hosting API. Status: `DOMAIN_ACTIVE`, cert `CERT_PENDING` (waiting on DNS).                               |
-| 10  | **DNS Terraform changes written**          | CNAME + ACME TXT added to `domains/lars.software.tf`.                                                                                               |
-| 11  | **GitHub description updated**             | Concise, keyword-rich.                                                                                                                              |
-| 12  | **GitHub topics expanded**                 | 16 topics: added `zero-allocation`, `type-safe`, `go-library`, `jsonv2`.                                                                            |
-| 13  | **GitHub homepage URL set**                | `https://branded-id.lars.software`.                                                                                                                 |
-| 14  | **AGENTS.md updated**                      | Added website section with build/deploy commands and DNS notes.                                                                                     |
-| 15  | **Nix flake for website**                  | `dev`, `build`, `preview`, `deploy` apps. Matches reference projects.                                                                               |
+| #  | Item                                       | Evidence                                                                                                                                            |
+| -- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | **README.md rewritten**                    | 7 badges (Go, CI, pkg.go.dev, Go Report Card, stars, MIT, docs), feature table, condensed perf table, docs links. `README.md` committed to staging. |
+| 2  | **Website scaffold — all 49 source files** | Astro v7 + Starlight + Tailwind v4. Matches go-atomic-write/gogenfilter architecture exactly.                                                       |
+| 3  | **Landing page**                           | Hero (live GitHub stars), FeatureGrid (6 cards), HowItWorks (4 steps), Comparison (7-row matrix), UseCases (3 cards), CTA.                          |
+| 4  | **Documentation — 11 Starlight pages**     | Installation, Quick Start, Named Brands, Serialization, Value Types, Performance, API Reference, Changelog, Contributing, Related Tools.            |
+| 5  | **Website builds clean**                   | `astro build` → 0 errors, 0 warnings, 12 pages, sitemap, pagefind search index.                                                                     |
+| 6  | **Typecheck passes**                       | `astro check` → 0 errors, 0 warnings.                                                                                                               |
+| 7  | **Firebase Hosting site created**          | Site `brandedid` in project `lars-software`. Default URL `brandedid.web.app` live and verified via HTTP fetch.                                      |
+| 8  | **Website deployed**                       | 63 files uploaded. `https://brandedid.web.app` returns full rendered HTML (verified).                                                               |
+| 9  | **Firebase custom domain added**           | `branded-id.lars.software` registered via Hosting API. Status: `DOMAIN_ACTIVE`, cert `CERT_PENDING` (waiting on DNS).                               |
+| 10 | **DNS Terraform changes written**          | CNAME + ACME TXT added to `domains/lars.software.tf`.                                                                                               |
+| 11 | **GitHub description updated**             | Concise, keyword-rich.                                                                                                                              |
+| 12 | **GitHub topics expanded**                 | 16 topics: added `zero-allocation`, `type-safe`, `go-library`, `jsonv2`.                                                                            |
+| 13 | **GitHub homepage URL set**                | `https://branded-id.lars.software`.                                                                                                                 |
+| 14 | **AGENTS.md updated**                      | Added website section with build/deploy commands and DNS notes.                                                                                     |
+| 15 | **Nix flake for website**                  | `dev`, `build`, `preview`, `deploy` apps. Matches reference projects.                                                                               |
 
 ---
 
 ## B) PARTIALLY DONE
 
-| #   | Item                            | What's done                                                | What's missing                                                                                                                                                                                   |
-| --- | ------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **DNS records**                 | Terraform config written in `domains/lars.software.tf`     | NOT applied — requires Namecheap API key + IP whitelisting. `terraform plan` fails with auto-IP detection error.                                                                                 |
-| 2   | **Custom domain SSL**           | Domain registered in Firebase, ACME TXT added to Terraform | Cert is `CERT_PENDING` / `DNS_MISSING`. Won't activate until DNS propagates after `terraform apply`.                                                                                             |
-| 3   | **Website deployment**          | Deployed to `brandedid.web.app`                            | Custom domain `branded-id.lars.software` not yet serving (DNS pending). The `nix run .#deploy` command has NOT been verified end-to-end (I ran `firebase deploy` directly inside nix-shell).     |
-| 4   | **CHANGELOG.md (website docs)** | Written with 5 versions                                    | **Dates are approximated** — I invented v0.1.0-v0.3.0 dates (2026-04-20, 2026-05-15, 2026-06-10) without verifying against git tags. Only v0.3.1 and v0.3.2 dates are from the actual CHANGELOG. |
+| # | Item                            | What's done                                                | What's missing                                                                                                                                                                                   |
+| - | ------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | **DNS records**                 | Terraform config written in `domains/lars.software.tf`     | NOT applied — requires Namecheap API key + IP whitelisting. `terraform plan` fails with auto-IP detection error.                                                                                 |
+| 2 | **Custom domain SSL**           | Domain registered in Firebase, ACME TXT added to Terraform | Cert is `CERT_PENDING` / `DNS_MISSING`. Won't activate until DNS propagates after `terraform apply`.                                                                                             |
+| 3 | **Website deployment**          | Deployed to `brandedid.web.app`                            | Custom domain `branded-id.lars.software` not yet serving (DNS pending). The `nix run .#deploy` command has NOT been verified end-to-end (I ran `firebase deploy` directly inside nix-shell).     |
+| 4 | **CHANGELOG.md (website docs)** | Written with 5 versions                                    | **Dates are approximated** — I invented v0.1.0-v0.3.0 dates (2026-04-20, 2026-05-15, 2026-06-10) without verifying against git tags. Only v0.3.1 and v0.3.2 dates are from the actual CHANGELOG. |
 
 ---
 
 ## C) NOT STARTED
 
-| #   | Item                                                                                                                                                   |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **Git commit** — Nothing committed. All changes are staged/unstaged in working tree.                                                                   |
-| 2   | **`package-lock.json` not staged** — Generated by `pnpm install` but not `git add`-ed.                                                                  |
-| 3   | **Visual verification** — Never opened the site in a browser. Only fetched HTML as text.                                                               |
-| 4   | **Mobile responsive check** — Not tested.                                                                                                              |
-| 5   | **Dark/light toggle verification** — Not tested interactively.                                                                                         |
-| 6   | **Starlight docs visual check** — Not verified that docs render correctly with the violet theme override.                                              |
-| 7   | **Lighthouse / performance audit** — Not run.                                                                                                          |
-| 8   | **HTML validation** — `html-validate` is in devDeps but never run against `dist/`.                                                                     |
-| 9   | **CSP headers** — No `fix-csp.mjs` post-build script (gogenfilter has one). Firebase headers don't include a Content-Security-Policy at all.           |
-| 10  | **OG image generation** — No `astro-og-canvas`, no `og/[...slug].ts` route, no OG images per page.                                                     |
-| 11  | **Dependents page** — gogenfilter has a `dependents.astro` that queries GitHub Code Search at build time. Not replicated.                              |
-| 12  | **GitHub Actions CI for website** — No workflow to auto-deploy on push to main.                                                                        |
-| 13  | **PWA installability check** — manifest.json exists but not verified.                                                                                  |
-| 14  | **`sitemap-index.xml` verification** — Generated but not checked for correct URLs (will contain `branded-id.lars.software` which doesn't resolve yet). |
-| 15  | **GitHub Social Preview image** — Not created. The repo has no social preview OG image.                                                                |
-| 16  | **pkg.go.dev link verification** — Not checked if pkg.go.dev has indexed this module.                                                                  |
+| #  | Item                                                                                                                                                   |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1  | **Git commit** — Nothing committed. All changes are staged/unstaged in working tree.                                                                   |
+| 2  | **`package-lock.json` not staged** — Generated by `pnpm install` but not `git add`-ed.                                                                 |
+| 3  | **Visual verification** — Never opened the site in a browser. Only fetched HTML as text.                                                               |
+| 4  | **Mobile responsive check** — Not tested.                                                                                                              |
+| 5  | **Dark/light toggle verification** — Not tested interactively.                                                                                         |
+| 6  | **Starlight docs visual check** — Not verified that docs render correctly with the violet theme override.                                              |
+| 7  | **Lighthouse / performance audit** — Not run.                                                                                                          |
+| 8  | **HTML validation** — `html-validate` is in devDeps but never run against `dist/`.                                                                     |
+| 9  | **CSP headers** — No `fix-csp.mjs` post-build script (gogenfilter has one). Firebase headers don't include a Content-Security-Policy at all.           |
+| 10 | **OG image generation** — No `astro-og-canvas`, no `og/[...slug].ts` route, no OG images per page.                                                     |
+| 11 | **Dependents page** — gogenfilter has a `dependents.astro` that queries GitHub Code Search at build time. Not replicated.                              |
+| 12 | **GitHub Actions CI for website** — No workflow to auto-deploy on push to main.                                                                        |
+| 13 | **PWA installability check** — manifest.json exists but not verified.                                                                                  |
+| 14 | **`sitemap-index.xml` verification** — Generated but not checked for correct URLs (will contain `branded-id.lars.software` which doesn't resolve yet). |
+| 15 | **GitHub Social Preview image** — Not created. The repo has no social preview OG image.                                                                |
+| 16 | **pkg.go.dev link verification** — Not checked if pkg.go.dev has indexed this module.                                                                  |
 
 ---
 

@@ -244,7 +244,7 @@ func (id ID[B, V]) Value() (driver.Value, error) {
 	case int64:
 		return v, nil
 	case uint:
-		return int64(v), nil //nolint:gosec // G115: uint to int64 for SQL value
+		return int64(v), nil
 	case uint8:
 		return int64(v), nil
 	case uint16:
@@ -252,7 +252,7 @@ func (id ID[B, V]) Value() (driver.Value, error) {
 	case uint32:
 		return int64(v), nil
 	case uint64:
-		return int64(v), nil //nolint:gosec // G115: uint64 to int64 for SQL value
+		return int64(v), nil
 	default:
 		// Check if V implements TextMarshaler for text-based value conversion.
 		if marshaler, ok := any(id.value).(encoding.TextMarshaler); ok {

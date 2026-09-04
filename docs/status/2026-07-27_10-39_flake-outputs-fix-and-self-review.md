@@ -32,14 +32,14 @@ The pattern had **no ellipsis (`...`)**, making it strict. Nix always calls `out
 Added `...` to the pattern (`flake.nix:23`):
 
 ```nix
-  outputs =
-    inputs@{
-      self,
-      flake-parts,
-      treefmt-nix,
-      systems,
-      ...
-    }:
+outputs =
+  inputs@{
+    self,
+    flake-parts,
+    treefmt-nix,
+    systems,
+    ...
+  }:
 ```
 
 **Why `...` and not re-adding `nixpkgs`:** `nixpkgs` is never referenced directly in the `outputs` body. It flows through `inputs` → `mkFlake { inherit inputs; }` → arrives as `pkgs` in `perSystem`. Naming it explicitly in the destructure would imply it's used there, which is a lie. The ellipsis is the honest, idiomatic flake-parts pattern. (Confirmed: `website/flake.nix:21` uses exactly this pattern — `inputs@{ self, flake-parts, ... }`.)

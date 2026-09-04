@@ -1,7 +1,7 @@
 # Status Report: go-branded-id
 
-**Date:** 2026-05-20 12:27  
-**Trigger:** Critical review — library documented a best practice it didn't support, phantom types invisible at runtime  
+**Date:** 2026-05-20 12:27\
+**Trigger:** Critical review — library documented a best practice it didn't support, phantom types invisible at runtime\
 **Status:** Changes implemented, tested, linted — NOT YET VERSIONED OR PUSHED
 
 ---
@@ -160,33 +160,33 @@ The following repos could benefit from adding `Name()` to their brand types. Non
 
 ## F) TOP 25 THINGS TO DO NEXT
 
-| #   | Priority | Task                                                                   |
-| --- | -------- | ---------------------------------------------------------------------- |
-| 1   | P0       | Tag release: `v0.2.0` or `v1.0.0`                                      |
-| 2   | P0       | Update CHANGELOG.md                                                    |
-| 3   | P0       | Push to remote                                                         |
-| 4   | P1       | Add `Name()` to all brand types in go-cqrs-lite                        |
-| 5   | P1       | Add `Name()` to all brand types in ActaFlow                            |
-| 6   | P1       | Add `Name()` to all brand types in CreditReformBilanzampel             |
-| 7   | P1       | Add `Name()` to all brand types in InboxClean                          |
-| 8   | P1       | Run go-cqrs-lite test suite against updated library                    |
-| 9   | P1       | Fix `GoString()` ugly double-package prefix for unnamed brands         |
-| 10  | P2       | Add benchmarks for `BrandName[B]()` and brand-aware `String()`         |
-| 11  | P2       | Add fuzz tests for `ValidateID`                                        |
-| 12  | P2       | Update MIGRATION.md with `String()` behavior change                    |
-| 13  | P2       | Add `Name()` to brand types in BuildFlow                               |
-| 14  | P2       | Add `Name()` to brand types in GmbH                                    |
-| 15  | P2       | Add `Name()` to brand types in SEC                                     |
-| 16  | P2       | Add `Name()` to brand types in Cyberdom                                |
-| 17  | P3       | Consider `MustValidateID` convenience function                         |
-| 18  | P3       | Update package doc comment to mention BrandNamer                       |
-| 19  | P3       | Add `Name()` to remaining 30+ repos                                    |
-| 20  | P3       | Create a codemod/tool to add `Name()` to all brand types automatically |
-| 21  | P3       | Add Example tests for `ValidateIDWithValue`                            |
-| 22  | P3       | Consider adding `String()` format to domain language doc               |
-| 23  | P4       | Verify CI pipeline covers new files                                    |
-| 24  | P4       | Update go-cqrs-lite to use `ValidateID` instead of custom validation   |
-| 25  | P4       | Write blog post / announcement about the change                        |
+| #  | Priority | Task                                                                   |
+| -- | -------- | ---------------------------------------------------------------------- |
+| 1  | P0       | Tag release: `v0.2.0` or `v1.0.0`                                      |
+| 2  | P0       | Update CHANGELOG.md                                                    |
+| 3  | P0       | Push to remote                                                         |
+| 4  | P1       | Add `Name()` to all brand types in go-cqrs-lite                        |
+| 5  | P1       | Add `Name()` to all brand types in ActaFlow                            |
+| 6  | P1       | Add `Name()` to all brand types in CreditReformBilanzampel             |
+| 7  | P1       | Add `Name()` to all brand types in InboxClean                          |
+| 8  | P1       | Run go-cqrs-lite test suite against updated library                    |
+| 9  | P1       | Fix `GoString()` ugly double-package prefix for unnamed brands         |
+| 10 | P2       | Add benchmarks for `BrandName[B]()` and brand-aware `String()`         |
+| 11 | P2       | Add fuzz tests for `ValidateID`                                        |
+| 12 | P2       | Update MIGRATION.md with `String()` behavior change                    |
+| 13 | P2       | Add `Name()` to brand types in BuildFlow                               |
+| 14 | P2       | Add `Name()` to brand types in GmbH                                    |
+| 15 | P2       | Add `Name()` to brand types in SEC                                     |
+| 16 | P2       | Add `Name()` to brand types in Cyberdom                                |
+| 17 | P3       | Consider `MustValidateID` convenience function                         |
+| 18 | P3       | Update package doc comment to mention BrandNamer                       |
+| 19 | P3       | Add `Name()` to remaining 30+ repos                                    |
+| 20 | P3       | Create a codemod/tool to add `Name()` to all brand types automatically |
+| 21 | P3       | Add Example tests for `ValidateIDWithValue`                            |
+| 22 | P3       | Consider adding `String()` format to domain language doc               |
+| 23 | P4       | Verify CI pipeline covers new files                                    |
+| 24 | P4       | Update go-cqrs-lite to use `ValidateID` instead of custom validation   |
+| 25 | P4       | Write blog post / announcement about the change                        |
 
 ---
 

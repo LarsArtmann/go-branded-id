@@ -278,7 +278,6 @@ func assertBytes(t *testing.T, got, want []byte) {
 // readSource loads a source file as a string for content assertions. Tests run
 // from the package directory, so relative paths resolve correctly.
 func readSource(filename string) (string, error) {
-	//nolint:gosec // G304: filename is a hard-coded test fixture path, not user input
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return "", fmt.Errorf("read source %s: %w", filename, err)

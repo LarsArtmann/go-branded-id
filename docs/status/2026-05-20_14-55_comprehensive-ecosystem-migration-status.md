@@ -1,7 +1,7 @@
 # go-branded-id v0.3.0 — Comprehensive Ecosystem Migration Status
 
-**Date:** 2026-05-20 14:55  
-**Author:** Crush (assisted) + Lars  
+**Date:** 2026-05-20 14:55\
+**Author:** Crush (assisted) + Lars\
 **Scope:** Library hardening + 14 ecosystem repos
 
 ---

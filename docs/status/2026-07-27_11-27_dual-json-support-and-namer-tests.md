@@ -103,7 +103,7 @@ The core feature requested mid-session ("Let's support both!"):
 
 ### 2. Rushed sed-Based Documentation Updates
 
-**What happened:** Used `sed` to mass-remove `GOEXPERIMENT=jsonv2 ` prefixes from website files. This left broken empty backticks (` `) in multiple places (e.g., "requires ``" instead of "requires `GOEXPERIMENT=jsonv2`").
+**What happened:** Used `sed` to mass-remove `GOEXPERIMENT=jsonv2` prefixes from website files. This left broken empty backticks (`) in multiple places (e.g., "requires`" instead of "requires `GOEXPERIMENT=jsonv2`").
 
 **How I caught it:** Ran `rg -n "GOEXPERIMENT|json/v2" website/src/` after the sed and saw the broken output. Had to write a second round of targeted fixes.
 
