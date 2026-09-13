@@ -34,47 +34,47 @@ func assertIDValueMatches(t *testing.T, v, expected any) {
 
 	switch val := v.(type) {
 	case ID[IntBrand, int]:
-		if val.Get() != expected.(int) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(int) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Int8Brand, int8]:
-		if val.Get() != expected.(int8) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(int8) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Int16Brand, int16]:
-		if val.Get() != expected.(int16) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(int16) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Int32Brand, int32]:
-		if val.Get() != expected.(int32) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(int32) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Int64Brand, int64]:
-		if val.Get() != expected.(int64) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(int64) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[UintBrand, uint]:
-		if val.Get() != expected.(uint) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(uint) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Uint8Brand, uint8]:
-		if val.Get() != expected.(uint8) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(uint8) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Uint16Brand, uint16]:
-		if val.Get() != expected.(uint16) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(uint16) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Uint32Brand, uint32]:
-		if val.Get() != expected.(uint32) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(uint32) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[Uint64Brand, uint64]:
-		if val.Get() != expected.(uint64) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(uint64) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 	case ID[StringBrand, string]:
-		if val.Get() != expected.(string) { //nolint:forcetypeassert // guaranteed by test construction
+		if val.Get() != expected.(string) {
 			t.Errorf("expected %v, got %v", expected, val.Get())
 		}
 
@@ -126,19 +126,19 @@ func TestNewIDNumeric(t *testing.T) {
 				assertIDValue[Int64Brand](
 					t,
 					v,
-					tt.expected.(int64), //nolint:forcetypeassert // guaranteed by type switch
+					tt.expected.(int64),
 				)
 			case int32:
 				assertIDValue[Int32Brand](
 					t,
 					v,
-					tt.expected.(int32), //nolint:forcetypeassert // guaranteed by type switch
+					tt.expected.(int32),
 				)
 			case uint64:
 				assertIDValue[Uint64Brand](
 					t,
 					v,
-					tt.expected.(uint64), //nolint:forcetypeassert // guaranteed by type switch
+					tt.expected.(uint64),
 				)
 			}
 		})
@@ -482,19 +482,19 @@ func edgeCase(name string, brandFunc func(v any) any, value any) edgeCaseTest {
 func TestIDEdgeCases(t *testing.T) {
 	t.Parallel()
 
-	int64Brand := func(v any) any { return NewID[Int64Brand](v.(int64)) } //nolint:forcetypeassert // test construction
+	int64Brand := func(v any) any { return NewID[Int64Brand](v.(int64)) }
 
 	tests := []edgeCaseTest{
 		edgeCase("max int64", int64Brand, int64(math.MaxInt64)),
 		edgeCase("min int64", int64Brand, int64(math.MinInt64)),
 		edgeCase(
 			"max uint64",
-			func(v any) any { return NewID[Uint64Brand](v.(uint64)) }, //nolint:forcetypeassert // test construction
+			func(v any) any { return NewID[Uint64Brand](v.(uint64)) },
 			uint64(math.MaxUint64),
 		),
 		{
 			"empty string",
-			func(v any) any { return NewID[StringBrand](v.(string)) }, //nolint:forcetypeassert // test construction
+			func(v any) any { return NewID[StringBrand](v.(string)) },
 			"",
 			"",
 		},
