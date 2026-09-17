@@ -6,13 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`go.mod` toolchain regression repaired**: an auto-upgrader bumped the `go` directive to `1.27.1` while the Nix flake (`go_1_26`) and CI (`go-version: "1.26"`) still pin Go 1.26 — breaking `nix flake check`, local builds with `GOTOOLCHAIN=local`, and language-server tooling. Restored to `go 1.26`; the three pins now agree.
+
 ### Added
 
 - **`ErrMarshal` and `ErrUnmarshal` sentinel errors**: All marshal/unmarshal failures (JSON, binary, SQL text, text) now wrap a library sentinel. Consumers can use `errors.Is(err, id.ErrMarshal)` or `errors.Is(err, id.ErrUnmarshal)` to branch on serialization failures.
+- **`.buildflow.yml` guard**: `go-auto-upgrade` is permanently skipped for this repo — it rewrites `encoding/json` to `encoding/json/v2` in the build-tagged v1 files, which corrupted the default (v1) build five times. Root cause corrected in `id_json_contract_test.go` comments (goimports was originally blamed, wrongly).
+- **Website: Error Handling guide** (`guides/error-handling.mdx`) and **Namer Tool guide** (`guides/namer-tool.mdx`).
 - **Sentinel error test coverage**: All 9 exported sentinels (`ErrInvalidID`, `ErrNotOrdered`, `ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver`, `ErrMarshal`, `ErrUnmarshal`) now have `errors.Is` test coverage in `id_errors_test.go`.
 - **Fuzz tests for SQL Scan and Text round-trips**: `FuzzSQLScanRoundTripString`, `FuzzSQLScanRoundTripInt64`, `FuzzTextRoundTripString`, `FuzzTextRoundTripInt64` — fills the gap where only JSON and Binary had fuzz coverage.
 - **`TestSuggestName_IntegrationWithPrint` restored**: Comprehensive multi-case test verifying `suggestName` + `printResults` integration across all suffix patterns (Brand, ID, T prefix, fallback).
-- **Website: Error Handling guide** (`guides/error-handling.mdx`) and **Namer Tool guide** (`guides/namer-tool.mdx`).
 - **Pre-push dual-mode test hook** (`scripts/pre-push-dual-test.sh`): Runs `go test` in both v1 and v2 JSON modes to catch single-mode blind spots.
 - **`nix flake check` job in CI** (`go.yml`): Nix sandbox build and test checks now run on every push/PR.
 
@@ -22,7 +27,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - All `fmt.Errorf` calls that previously used `"id: ..."` prefix without a sentinel now wrap the appropriate sentinel (`ErrMarshal`, `ErrUnmarshal`, `ErrCannotScan`). Every error path from ID operations is now matchable via `errors.Is`.
 - GitHub Actions pinned to commit SHA hashes (BuildFlow `github-actions-pinned` compliance).
 - `validate-docs.yml` install path fixed: `github.com/larsartmann/md-go-validator/cmd/md-go-validator` (was root package).
-- Website `package.json`: bumped `astro` to `^7.1.0` (XSS fix), added `fast-uri` override `^3.1.4` (host confusion fix).
+- Website package manager migrated from npm to pnpm (`pnpm-lock.yaml`; `packageManager: pnpm@11` in `website/package.json`).
+- Website `package.json`: bumped `astro` to `^7.3.3` (XSS + AVIF RCE fixes), added overrides for `fast-uri` `^3.1.4` (SSRF/host-confusion fixes) and `brace-expansion` `5.0.6` (ReDoS fix); `pnpm-lock.yaml` regeneration still pending (see TODO_LIST).
 - Website changelog updated with v0.4.0 and v0.5.0 entries.
 - FEATURES.md sentinel errors upgraded from `PARTIALLY_FUNCTIONAL` to `FULLY_FUNCTIONAL`.
 

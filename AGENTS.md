@@ -141,6 +141,18 @@ For unnamed brands (no `Name()` method), `BrandName[B]()` returns `fmt.Sprintf("
 
 Binary marshaling uses **little-endian** for all numeric types. `int` is serialized as 8 bytes (uint64). This is an implementation detail but matters for cross-language compatibility.
 
+### Go Version Pins Must Move Together (go.mod / flake.nix / CI)
+
+The Go toolchain version is pinned in **three places that must agree**: `go.mod`
+(the `go` directive), `flake.nix` (`goPkg = pkgs.go_1_26`), and
+`.github/workflows/go.yml` (`go-version`). Auto-upgraders sometimes bump only
+`go.mod`, which breaks the Nix sandbox build (`could not create module cache:
+mkdir /homeless-shelter`), local shells with `GOTOOLCHAIN=local`, and
+gopls/golangci-lint (`go.mod requires go >= ...`). If `go build ./...` fails
+with a version error while no source changed, compare `go.mod` against
+`flake.nix`. Bump all three in one deliberate commit — the `go` directive is a
+consumer-facing minimum for a library, not something to auto-bump.
+
 ### Nix Sandbox Build Cache (GOCACHE)
 
 `nix flake check` builds the `checks.build` derivation in a sandbox where `HOME=/homeless-shelter` (read-only). Go's build cache cannot initialize at `$HOME/.cache/go-build`. The flake's `checks.build` sets `GOCACHE=$TMPDIR/go-cache` to work around this. Any Go-based Nix check derivation needs this.
@@ -156,10 +168,6 @@ The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspa
 ### Dual-Mode Pre-Push Hook
 
 A pre-push git hook (`scripts/pre-push-dual-test.sh`) runs `go test` in both v1 and v2 JSON modes. It's installed at `.git/hooks/pre-push`. Plain `go test` only exercises v1; the hook catches code that passes v1 but breaks v2 (build tag issues, import corruption).
-
-### Lint Action Version Mismatch (Fixed)
-
-The release workflow (`release.yml`) used `golangci-lint-action@v6` while `go.yml` used `@v7`. Fixed in this session — both now use `@v7`.
 
 ## Ecosystem Context
 
@@ -184,7 +192,7 @@ Not all brand types should implement `Name()`. The `cmd/namer` tool may flag the
 - CI creates a GitHub Release automatically on semver tags (`v*.*.*`) — pattern: `v[0-9]+.[0-9]+.[0-9]+*`.
 - Release workflow (`.github/workflows/release.yml`) runs tests with race detector + golangci-lint before creating the release.
 - Tags must be signed (SSH) and annotated (`git tag -a`).
-- **To release**: update CHANGELOG, commit, tag, push tag: `git push origin v0.3.1`.
+- **To release**: update CHANGELOG, commit, tag, push the tag: `git push origin vX.Y.Z`.
 - `git-town.toml` configures `master` as the main branch.
 - BuildFlow pre-commit hook runs 34 checks (Go mode) including golangci-lint, gofumpt, goimports, statix, gitleaks, doc-files-age-check (max 3w freshness), and nix-flake-check.
 - `doc-files-age-check` requires README.md and TODO_LIST.md to be updated within 3 weeks of code changes — SARIF format reveals the specific stale file (`buildflow --step doc-files-age-check --format sarif`).
@@ -193,13 +201,10 @@ Not all brand types should implement `Name()`. The `cmd/namer` tool may flag the
 
 The `website/` directory contains an Astro + Starlight documentation site deployed to Firebase Hosting.
 
-- **Live URL**: `https://branded-id.lars.software` (custom domain, DNS pending `terraform apply` in `domains/` repo)
-- **Temporary URL**: `https://brandedid.web.app` (Firebase default, works now)
-- **Firebase project**: `lars-software`
-- **Hosting target**: `brandedid`
+- **URL**: `https://branded-id.lars.software` (custom domain via CNAME → `brandedid.web.app`, configured in `domains/lars.software.tf`; the Firebase default `https://brandedid.web.app` serves the same site)
+- **Firebase**: project `lars-software`, hosting target `brandedid`
 - **Color theme**: Violet (#a855f7)
-- **DNS**: CNAME `branded-id.lars.software` → `brandedid.web.app` (in `domains/lars.software.tf`, needs `terraform apply`)
 - **Build**: `nix run .#build` (from `website/`) or `pnpm run build`
 - **Dev**: `nix run .#dev` (from `website/`) or `pnpm run dev`
 - **Deploy**: `nix run .#deploy` (from `website/`) — builds and runs `firebase deploy --only hosting`
-- The website has its own `flake.nix`, `package.json`, and `firebase.json` — independent from the Go library's flake
+- The website uses **pnpm** (`pnpm-lock.yaml`, `packageManager` in `package.json`) and has its own `flake.nix` and `firebase.json` — independent from the Go library's flake
