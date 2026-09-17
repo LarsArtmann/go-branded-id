@@ -9,7 +9,7 @@
 
 **Branded, strongly-typed identifiers for Go.** Phantom types prevent mixing different entity IDs at compile time. Zero-allocation. Stdlib-only. Full serialization.
 
-[Documentation](https://branded-id.lars.so) &middot; [Quick Start](https://branded-id.lars.so/getting-started/quick-start/) &middot; [API Reference](https://pkg.go.dev/github.com/larsartmann/go-branded-id)
+[Documentation](https://branded-id.lars.software) &middot; [Quick Start](https://branded-id.lars.software/getting-started/quick-start/) &middot; [API Reference](https://pkg.go.dev/github.com/larsartmann/go-branded-id)
 
 ## Why?
 

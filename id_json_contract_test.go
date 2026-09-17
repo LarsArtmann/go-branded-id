@@ -10,10 +10,11 @@ import (
 
 // The dual-JSON architecture relies on two build-tagged file pairs that are
 // structurally identical except for the build constraint and the json import
-// path. A recurring hazard (documented in commit history as the "goimports v1
-// corruption hazard") is that goimports, when re-adding the json import from
-// scratch, picks encoding/json/v2 for the v1 file — silently breaking the
-// default build mode. These tests lock down the contract so any drift fails
+// path. A recurring hazard (root cause: the BuildFlow `go-auto-upgrade` step,
+// permanently disabled via `.buildflow.yml` skip_steps) is that auto-upgraders
+// rewrite the v1 file's import to encoding/json/v2 — silently breaking the
+// default build mode. goimports was originally blamed but exonerated (it
+// respects build tags). These tests lock down the contract so any drift fails
 // loudly in both CI modes.
 
 const (
@@ -29,7 +30,8 @@ const (
 
 // TestDualJSONContract_Imports locks the import split: the v1 files MUST import
 // encoding/json (never v2) and the v2 files MUST import encoding/json/v2.
-// This is the direct guard against the goimports corruption hazard.
+// This is the direct guard against the v1-import corruption hazard
+// (go-auto-upgrade rewrites; see .buildflow.yml skip_steps).
 func TestDualJSONContract_Imports(t *testing.T) {
 	t.Parallel()
 
@@ -60,7 +62,7 @@ func TestDualJSONContract_Imports(t *testing.T) {
 
 			if strings.Contains(content, tc.mustOmit) {
 				t.Errorf(
-					"%s must NOT contain %s (goimports corruption hazard)",
+					"%s must NOT contain %s (v1-import corruption hazard)",
 					tc.filename,
 					tc.mustOmit,
 				)

@@ -22,8 +22,8 @@
 Computed live from the repo (do not hardcode these numbers):
 
 - Test subtests: `go test ./... -count=1 -v \| grep -cE '^\s*=== RUN'` → 427
-- Statement coverage (library package): `go test ./... -cover` → 85.6%
-- Statement coverage (`cmd/namer`): `go test -cover ./cmd/namer/` → 93.2%
+- Statement coverage (library package): `go test ./... -cover` → 87.6%
+- Statement coverage (`cmd/namer`): `go test -cover ./cmd/namer/` → 95.1%
 - Benchmark functions: `grep -c '^func Benchmark' id_bench_test.go` → 29
 - Fuzz functions: `grep -c '^func Fuzz' id_bench_test.go` → 10
 - Lint issues (both modes): `golangci-lint run ./...` → 0

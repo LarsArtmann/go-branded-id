@@ -22,6 +22,8 @@ Every term below should mean the **same thing** to everyone who reads it.
 | Validation    | Checking an ID is not zero, optionally with custom rules                      | `ValidateID`, `ValidateIDWithValue` |
 | Phantom Type  | A type parameter used only at compile time (carries no runtime data)          | `B` in `ID[B, V]`                   |
 | Zero Value    | The unset state of an ID; serializes to `null`/`nil` across all formats       | `var empty UserID`                  |
+| Sentinel Error | A package-level error (`errors.go`) that ID operations wrap; match with `errors.Is` | `ErrInvalidID`, `ErrMarshal`   |
+| Serialization | Converting an ID to/from a storage format; always uses the raw value, never the brand prefix | `MarshalJSON`, `Scan`/`Value` |
 
 ---
 
