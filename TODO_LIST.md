@@ -18,7 +18,6 @@
 | Task                                                                       | Status | Impact | Evidence                                                                                                                                                                                                                                                                                       |
 | -------------------------------------------------------------------------- | ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Add a CI/release guard that rejects a tracked compiled binary at repo root | 🔴     | High   | Prevents recurrence of the v0.5.0 incident where a tracked `namer` binary inflated release source archives ~10x. Currently relies on `.gitignore` only — no workflow checks for build artifacts.                                                                                               |
-| Bump `js-yaml` to ≥4.3.2 in `website/` (`pnpm update js-yaml`)             | 🔴     | Low    | Lockfile resolves 4.3.1; open Dependabot alert (high, CPU-use DoS in merge keys). The other 6 open alerts (fast-uri ×4, svgo ×2) reference the pre-regeneration lockfile and auto-close on the next Dependabot scan — verified 2026-09-17: count already dropped 10→7 after the lockfile push. |
 
 ## Medium Impact
 
