@@ -30,7 +30,7 @@
 
 | Task                                         | Status       | Impact | Evidence                                                                                                                                                                                                                   |
 | -------------------------------------------- | ------------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bump 14 downstream ecosystem repos to v0.6.0 | 🔵 `BLOCKED` | Med    | Source fixes from the v0.3.x cycle (added `Name()` methods, `.String()` → `.Get()`) are applied and pushed to all repos. The `go.mod` dependency bump is not yet done — requires per-repo access to clone, bump, test, PR. Version decided 2026-09-17: v0.6.0 (MINOR — new `ErrMarshal`/`ErrUnmarshal` sentinels are additive, but the `ErrNotOrdered` message restoration is behavioral for message-parsing consumers). Blocked only until the v0.6.0 tag is pushed. |
+| Bump 14 downstream ecosystem repos to v0.6.0 | 🔴     | Med    | v0.6.0 released 2026-09-17 (tag pushed, proxy indexed, `go get` verified in a clean module). Source fixes from the v0.3.x cycle (added `Name()` methods, `.String()` → `.Get()`) are applied and pushed to all repos; the `go.mod` dependency bump per repo remains — use the go-ecosystem-upgrade skill. |
 
 ---
 

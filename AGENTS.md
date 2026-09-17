@@ -159,7 +159,11 @@ consumer-facing minimum for a library, not something to auto-bump.
 
 ### Flake `outputs` Must Include `...` for Unnamed Inputs
 
-The `outputs` function in `flake.nix` destructures `inputs@{ self, flake-parts, treefmt-nix, systems, ... }`. The `...` is **required** because not all inputs are named in the pattern. Without it, Nix fails with an error about extra arguments. Always include `...` when adding new flake inputs to this project.
+The `outputs` function in `flake.nix` destructures `inputs@{ self, flake-parts, treefmt-nix, ... }`. The `...` is **required** because not all inputs are named in the pattern. Without it, Nix fails with an error about extra arguments. Always include `...` when adding new flake inputs to this project.
+
+### Flake Systems Are Inlined (No `nix-systems` Input)
+
+The supported systems are declared inline in `flake.nix` (`x86_64-linux`, `aarch64-linux`, `aarch64-darwin`) — the `nix-systems/default` input was removed in v0.6.0 prep because nixpkgs unstable 26.11 dropped `x86_64-darwin` and that input's default list still contained it, breaking `nix flake check`. Related: CI's `flake-check` job runs two passes — `nix flake check --all-systems --no-build` (eval-only across all systems) plus `nix flake check` (builds current-system checks). Newer Nix builds checks for ALL systems under `--all-systems`, which fails with a platform mismatch for foreign systems on a single-arch runner.
 
 ### No go.work / GOWORK=off
 
