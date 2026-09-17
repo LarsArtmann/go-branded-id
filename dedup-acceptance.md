@@ -13,7 +13,7 @@ provide `MarshalJSON`/`UnmarshalJSON` with the same semantics through their
 respective json package. Merging them into one file would defeat the build-tag
 architecture.
 
-### id_binary.go:135-141 ↔ id_text.go:29-35 (empty-data early return)
+### id_binary.go:136-140 ↔ id_text.go:26-30 (empty-data early return)
 
 **Reason:** 4-line idiomatic guard: `if len(data) == 0 { id.Reset(); return nil }`.
 Extracting a helper like `resetIfEmpty(id, data) bool` would add 5+ lines and

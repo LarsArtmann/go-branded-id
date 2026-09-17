@@ -204,10 +204,14 @@ unset GOEXPERIMENT
 go build ./...
 ```
 
-#### goimports corrupted the import
+#### A v1-tagged file imports `encoding/json/v2` (auto-upgrader corruption)
 
-If `goimports` rewrote `"encoding/json"` to `"encoding/json/v2"` in a v1-tagged
-file, the contract test will catch it. Run:
+The BuildFlow `go-auto-upgrade` step used to rewrite `"encoding/json"` to
+`"encoding/json/v2"` in v1-tagged files (`id_json_v1.go`,
+`json_helpers_v1_test.go`), breaking the default build with `build constraints
+exclude all Go files in encoding/json/v2`. It is now permanently skipped via
+`.buildflow.yml` (`skip_steps`). If it ever recurs, restore the imports and
+verify the split:
 
 ```bash
 go test -run TestDualJSONContract ./...
