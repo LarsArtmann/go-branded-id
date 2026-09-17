@@ -17,10 +17,7 @@
 
 | Task                                                                              | Status | Impact | Evidence                                                                                                                                                                                                                   |
 | --------------------------------------------------------------------------------- | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Refresh `website/pnpm-lock.yaml` (`pnpm install` in `website/`)                   | 🔴     | High   | The website migrated from npm to pnpm (`pnpm-lock.yaml`, commit `f1f2f42`). `package.json` holds the overrides (`astro` `^7.3.3`, `fast-uri` `^3.1.4`, `brace-expansion` `5.0.6`) but the lockfile still resolves vulnerable versions — 10 open Dependabot alerts on the default branch (astro AVIF RCE + auth bypass, 4× fast-uri SSRF/host-confusion, sharp, 2× svgo, js-yaml), verified 2026-09-17 via the GitHub Dependabot API. |
-| Build & verify the website (`pnpm run build` in `website/`)                       | 🔴     | High   | `guides/error-handling.mdx` and `guides/namer-tool.mdx` were added but never compiled; sidebar links (`astro.config.mjs`) and frontmatter are unverified.                                                                 |
 | Add a CI/release guard that rejects a tracked compiled binary at repo root        | 🔴     | High   | Prevents recurrence of the v0.5.0 incident where a tracked `namer` binary inflated release source archives ~10x. Currently relies on `.gitignore` only — no workflow checks for build artifacts.                           |
-| Decide the next release version (v0.5.2 additive vs v0.6.0) and date `[Unreleased]` | 🔴   | High   | `CHANGELOG.md` `[Unreleased]` has no version header. The `ErrNotOrdered` message restoration is a behavioral change for message-parsing consumers, so the semver call gates the release and all 14 downstream `go.mod` bumps. Harvested from `docs/status/2026-07-28_23-22` (Q2, f.3). |
 
 ## Medium Impact
 
@@ -34,7 +31,7 @@
 
 | Task                                         | Status       | Impact | Evidence                                                                                                                                                                                                                   |
 | -------------------------------------------- | ------------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bump 14 downstream ecosystem repos to the next release | 🔵 `BLOCKED` | Med    | Source fixes from the v0.3.x cycle (added `Name()` methods, `.String()` → `.Get()`) are applied and pushed to all repos. The `go.mod` dependency bump is not yet done — requires per-repo access to clone, bump, test, PR. Blocked on the version decision above. |
+| Bump 14 downstream ecosystem repos to v0.6.0 | 🔵 `BLOCKED` | Med    | Source fixes from the v0.3.x cycle (added `Name()` methods, `.String()` → `.Get()`) are applied and pushed to all repos. The `go.mod` dependency bump is not yet done — requires per-repo access to clone, bump, test, PR. Version decided 2026-09-17: v0.6.0 (MINOR — new `ErrMarshal`/`ErrUnmarshal` sentinels are additive, but the `ErrNotOrdered` message restoration is behavioral for message-parsing consumers). Blocked only until the v0.6.0 tag is pushed. |
 
 ---
 

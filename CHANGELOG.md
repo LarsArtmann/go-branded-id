@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.6.0] - 2026-09-17
+
 ### Fixed
 
 - **`go.mod` toolchain regression repaired**: an auto-upgrader bumped the `go` directive to `1.27.1` while the Nix flake (`go_1_26`) and CI (`go-version: "1.26"`) still pin Go 1.26 — breaking `nix flake check`, local builds with `GOTOOLCHAIN=local`, and language-server tooling. Restored to `go 1.26`; the three pins now agree.
@@ -28,7 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - GitHub Actions pinned to commit SHA hashes (BuildFlow `github-actions-pinned` compliance).
 - `validate-docs.yml` install path fixed: `github.com/larsartmann/md-go-validator/cmd/md-go-validator` (was root package).
 - Website package manager migrated from npm to pnpm (`pnpm-lock.yaml`; `packageManager: pnpm@11` in `website/package.json`).
-- Website `package.json`: bumped `astro` to `^7.3.3` (XSS + AVIF RCE fixes), added overrides for `fast-uri` `^3.1.4` (SSRF/host-confusion fixes) and `brace-expansion` `5.0.6` (ReDoS fix); `pnpm-lock.yaml` regeneration still pending (see TODO_LIST).
+- Website security refresh: bumped `astro` to `7.3.3` (XSS + AVIF RCE fixes), added overrides for `fast-uri` `^3.1.4` (SSRF/host-confusion fixes) and `brace-expansion` `5.0.6` (ReDoS fix), and regenerated `pnpm-lock.yaml` so all overrides are resolved in the lockfile (closes 10 open Dependabot alerts).
 - Website changelog updated with v0.4.0 and v0.5.0 entries.
 - FEATURES.md sentinel errors upgraded from `PARTIALLY_FUNCTIONAL` to `FULLY_FUNCTIONAL`.
 
@@ -180,6 +190,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+[Unreleased]: https://github.com/larsartmann/go-branded-id/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/larsartmann/go-branded-id/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/larsartmann/go-branded-id/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/larsartmann/go-branded-id/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/larsartmann/go-branded-id/compare/v0.3.3...v0.4.0
