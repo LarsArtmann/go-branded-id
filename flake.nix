@@ -18,11 +18,15 @@
       self,
       flake-parts,
       treefmt-nix,
-      systems,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import systems;
+      # nixpkgs unstable (26.11) dropped x86_64-darwin; aarch64-darwin remains supported.
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
 
       imports = [
         treefmt-nix.flakeModule
