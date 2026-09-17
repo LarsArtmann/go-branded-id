@@ -29,6 +29,7 @@ func assertIDValue[B any, V comparable](t *testing.T, v, expected V) {
 	assertCmpEqual(t, NewID[B](v).Get(), expected)
 }
 
+//nolint:gocyclo // exhaustive type switch over all supported ID types
 func assertIDValueMatches(t *testing.T, v, expected any) {
 	t.Helper()
 
