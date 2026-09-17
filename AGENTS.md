@@ -195,6 +195,7 @@ Not all brand types should implement `Name()`. The `cmd/namer` tool may flag the
 
 - CI creates a GitHub Release automatically on semver tags (`v*.*.*`) — pattern: `v[0-9]+.[0-9]+.[0-9]+*`.
 - Release workflow (`.github/workflows/release.yml`) runs tests with race detector + golangci-lint before creating the release.
+- **Release notes come from the CHANGELOG**: the workflow extracts the `## [X.Y.Z]` section of `CHANGELOG.md` into the release body (`body_path`), with GitHub's `generate_release_notes` appending the compare link. GitHub's generated notes alone are PR-based and nearly empty in this direct-push repo — that's why the CHANGELOG section must be cut **before** tagging. A release with no notes means the tag was pushed without a dated CHANGELOG section.
 - Tags must be signed (SSH) and annotated (`git tag -a`).
 - **To release**: update CHANGELOG, commit, tag, push the tag: `git push origin vX.Y.Z`.
 - `git-town.toml` configures `master` as the main branch.
