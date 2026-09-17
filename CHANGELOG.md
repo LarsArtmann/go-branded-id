@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **`flake-check` CI job unblocked**: nixpkgs unstable (26.11) dropped `x86_64-darwin`, which the `nix-systems/default` systems list still includes — `nix flake check --all-systems` failed on every push. The supported systems are now declared inline in `flake.nix` (`x86_64-linux`, `aarch64-linux`, `aarch64-darwin`) and the `nix-systems/default` input was removed.
 - **`go.mod` toolchain regression repaired**: an auto-upgrader bumped the `go` directive to `1.27.1` while the Nix flake (`go_1_26`) and CI (`go-version: "1.26"`) still pin Go 1.26 — breaking `nix flake check`, local builds with `GOTOOLCHAIN=local`, and language-server tooling. Restored to `go 1.26`; the three pins now agree.
 
 ### Added
