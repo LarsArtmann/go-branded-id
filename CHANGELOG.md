@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- Nothing yet.
+- **`go.mod` toolchain bump recurrence stopped at the root**: BuildFlow's `go-mod-update` step bumped `go 1.26` → `1.27.1` again after v0.6.0 (the pre-release repair blamed the wrong step). `go-mod-update` is now in `.buildflow.yml` `skip_steps` alongside `go-auto-upgrade`; CI caught the regression within minutes via `GOTOOLCHAIN=local`.
+- **Website security overrides actually apply now**: the `overrides` block sat in `package.json` (npm syntax, silently ignored by pnpm 11). Moved to `pnpm-workspace.yaml` — `js-yaml` resolves to patched 4.3.2, `fast-uri` to 3.1.5.
 
 ## [0.6.0] - 2026-09-17
 
