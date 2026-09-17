@@ -38,7 +38,7 @@
   directive is a consumer-facing minimum (14 downstream repos); every
   human-authored artifact (commit `f1bc5fb`, flake, CI, all docs) says 1.26;
   repo precedent for daemon-modernizer damage is repair + prevention. Aligning
-  *up* would have forced a month-old Go onto all consumers and still left the
+  _up_ would have forced a month-old Go onto all consumers and still left the
   local `GOTOOLCHAIN=local` shell broken.
 - **Verified:** `go build` v1+v2 ✅, `go test` v1+v2 (427 subtests each) ✅,
   `go test -race` ✅, `go vet` ✅, `nix flake check` → **all checks passed** ✅.
@@ -76,18 +76,18 @@ which reports findings the previous version didn't — so FEATURES.md's
 
 ### 4. Docs-health AUDIT across all living docs — 13 findings, all fixed
 
-| Finding (as-found) | Fix |
-| --- | --- |
-| README.md:12 linked **`branded-id.lars.so`** (wrong domain; badge, AGENTS, astro.config all say `.lars.software`) | Fixed both links on line 12 |
-| FEATURES coverage 85.6% / namer 93.2% | Re-derived live: **87.6% / 95.1%** (`go test -cover`) |
-| ROADMAP "currently 85.6%" + 3 struck-through done items lingering | Updated to 87.6%; done items deleted (they live in CHANGELOG) |
-| TODO_LIST #1 was npm-era (`package-lock.json` no longer exists — pnpm migration `f1f2f42`; astro evidence `^7.1.0` vs actual `^7.3.3`) | Rewritten: refresh `pnpm-lock.yaml`; evidence now cites **10 open Dependabot alerts verified live via GitHub API** (astro AVIF RCE + auth bypass, 4× fast-uri SSRF/host-confusion, sharp, 2× svgo, js-yaml) |
-| Harvest debt: version decision, v1-import guard, hook ordering, flake `--all-systems` never landed in TODO_LIST | Harvested from `2026-08-02_16-11` + `2026-07-28_23-22`, verified against code, routed (see TODO_LIST) |
-| AGENTS.md carried resolved incident "Lint Action Version Mismatch (Fixed)" as a gotcha; temporal website/DNS wording ("pending terraform apply", "works now"); hardcoded `v0.3.1` release example | Gotcha removed (CHANGELOG 0.3.2 owns it); Website section made durable; example is now `vX.Y.Z` |
-| CHANGELOG `[Unreleased]`: missing pnpm migration, buildflow skip guard, go.mod fix; astro line stale (`^7.1.0` vs `^7.3.3` + brace-expansion override) | All appended/updated in `[Unreleased]` (current-cycle, not yet released) |
-| `docs/DOMAIN_LANGUAGE.md` missing sentinel/marshal terms (flagged by two prior reports, never done) | Added **Sentinel Error** + **Serialization** rows |
-| `dedup-acceptance.md` stale line ranges (post-edit drift) | `id_binary.go:136-140 ↔ id_text.go:26-30` |
-| AGENTS.md "provides Go 1.26", MIGRATION/CONTRIBUTING "Go 1.26+" | Re-verified true after the go.mod repair (no edit needed) |
+| Finding (as-found)                                                                                                                                                                                | Fix                                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| README.md:12 linked **`branded-id.lars.so`** (wrong domain; badge, AGENTS, astro.config all say `.lars.software`)                                                                                 | Fixed both links on line 12                                                                                                                                                                                 |
+| FEATURES coverage 85.6% / namer 93.2%                                                                                                                                                             | Re-derived live: **87.6% / 95.1%** (`go test -cover`)                                                                                                                                                       |
+| ROADMAP "currently 85.6%" + 3 struck-through done items lingering                                                                                                                                 | Updated to 87.6%; done items deleted (they live in CHANGELOG)                                                                                                                                               |
+| TODO_LIST #1 was npm-era (`package-lock.json` no longer exists — pnpm migration `f1f2f42`; astro evidence `^7.1.0` vs actual `^7.3.3`)                                                            | Rewritten: refresh `pnpm-lock.yaml`; evidence now cites **10 open Dependabot alerts verified live via GitHub API** (astro AVIF RCE + auth bypass, 4× fast-uri SSRF/host-confusion, sharp, 2× svgo, js-yaml) |
+| Harvest debt: version decision, v1-import guard, hook ordering, flake `--all-systems` never landed in TODO_LIST                                                                                   | Harvested from `2026-08-02_16-11` + `2026-07-28_23-22`, verified against code, routed (see TODO_LIST)                                                                                                       |
+| AGENTS.md carried resolved incident "Lint Action Version Mismatch (Fixed)" as a gotcha; temporal website/DNS wording ("pending terraform apply", "works now"); hardcoded `v0.3.1` release example | Gotcha removed (CHANGELOG 0.3.2 owns it); Website section made durable; example is now `vX.Y.Z`                                                                                                             |
+| CHANGELOG `[Unreleased]`: missing pnpm migration, buildflow skip guard, go.mod fix; astro line stale (`^7.1.0` vs `^7.3.3` + brace-expansion override)                                            | All appended/updated in `[Unreleased]` (current-cycle, not yet released)                                                                                                                                    |
+| `docs/DOMAIN_LANGUAGE.md` missing sentinel/marshal terms (flagged by two prior reports, never done)                                                                                               | Added **Sentinel Error** + **Serialization** rows                                                                                                                                                           |
+| `dedup-acceptance.md` stale line ranges (post-edit drift)                                                                                                                                         | `id_binary.go:136-140 ↔ id_text.go:26-30`                                                                                                                                                                   |
+| AGENTS.md "provides Go 1.26", MIGRATION/CONTRIBUTING "Go 1.26+"                                                                                                                                   | Re-verified true after the go.mod repair (no edit needed)                                                                                                                                                   |
 
 **FEATURES.md citation sweep:** all `file:line` citations re-verified against
 source this session (`id.go:55,58,61,64,71,79,87,128,140,181,202,211`;
@@ -109,15 +109,15 @@ trimmed of AGENTS.md duplication and stale v0.3.x narrative.
 
 ### 6. Quality gate — green (run after every change)
 
-| Check | v1 (default) | v2 (`GOEXPERIMENT=jsonv2`) |
-| --- | --- | --- |
-| `go build ./...` | ✅ | ✅ |
-| `go test ./... -count=1` | ✅ 427 subtests | ✅ 427 subtests |
-| `go test ./... -race -count=1` | ✅ | ✅ |
-| `go vet ./...` | ✅ | — |
-| `golangci-lint run ./...` | ✅ **0 issues** | ✅ **0 issues** |
-| `nix flake check` | ✅ **all checks passed** | (both modes inside checks) |
-| Suite also verified under **Go 1.27.1** (`nix shell nixpkgs#go_1_27`) | ✅ | ✅ |
+| Check                                                                 | v1 (default)             | v2 (`GOEXPERIMENT=jsonv2`) |
+| --------------------------------------------------------------------- | ------------------------ | -------------------------- |
+| `go build ./...`                                                      | ✅                       | ✅                         |
+| `go test ./... -count=1`                                              | ✅ 427 subtests          | ✅ 427 subtests            |
+| `go test ./... -race -count=1`                                        | ✅                       | ✅                         |
+| `go vet ./...`                                                        | ✅                       | —                          |
+| `golangci-lint run ./...`                                             | ✅ **0 issues**          | ✅ **0 issues**            |
+| `nix flake check`                                                     | ✅ **all checks passed** | (both modes inside checks) |
+| Suite also verified under **Go 1.27.1** (`nix shell nixpkgs#go_1_27`) | ✅                       | ✅                         |
 
 Coverage (Go 1.26.7): library **87.6%**, `cmd/namer` **95.1%**. Benchmarks 29,
 fuzz funcs 10 (both match FEATURES).
@@ -126,7 +126,7 @@ fuzz funcs 10 (both match FEATURES).
 
 ## b) PARTIALLY DONE
 
-### 1. Dependabot alert *triage* (not the alerts themselves)
+### 1. Dependabot alert _triage_ (not the alerts themselves)
 
 I verified the 10 open alerts and their packages/severities via `gh api`, and
 wired the exact list into TODO_LIST evidence. I did **not** fix any of them —
@@ -136,9 +136,9 @@ alerts are website-side (npm/pnpm).
 
 ### 2. The go.mod bumper is inferred, not identified
 
-I proved *what* happened (heuristic daemon commit `ee7778d` bundling
+I proved _what_ happened (heuristic daemon commit `ee7778d` bundling
 flake.lock + go.mod + website files — fingerprint of the global auto-update
-daemon, not Dependabot, which only opens PRs) but did **not** identify *which*
+daemon, not Dependabot, which only opens PRs) but did **not** identify _which_
 tool produced the go.mod bump. The AGENTS.md gotcha deliberately says
 "auto-upgraders" (plural, hedged). Identifying the exact step would enable a
 `skip_steps`-style prevention like the JSON-corruption fix. See (f) item 4.
@@ -146,7 +146,7 @@ tool produced the go.mod bump. The AGENTS.md gotcha deliberately says
 ### 3. Docs-health AUDIT output vs. follow-through
 
 The audit's inline health report scored the **as-found** state (Accuracy 6.0,
-Fitness 7.0) and every finding was fixed in-session — but the *scored* state
+Fitness 7.0) and every finding was fixed in-session — but the _scored_ state
 was never re-baselined into a stored artifact, and ANNOTATE mode was not run:
 the 4+ older status reports that still blame "goimports" carry no resolution
 annotations (the 2026-08-02 report's own f.6 item remains open).
@@ -179,7 +179,7 @@ annotations (the 2026-08-02 report's own f.6 item remains open).
 
 ### 1. My CHANGELOG multiedit silently deleted a bullet and created a duplicate
 
-My first `[Unreleased]` edit used an `old_string` that *included* the
+My first `[Unreleased]` edit used an `old_string` that _included_ the
 ErrMarshal/ErrUnmarshal bullet but my replacement dropped it, and my inserted
 website-guide bullet duplicated the existing one two lines below. I caught it
 only because I re-viewed the file afterward to check the result — the exact
@@ -226,7 +226,7 @@ scrolling repeated bogus diagnostics instead of issuing `lsp_restart` early.
 2. **Pin or tolerate linter version drift — pick a policy.** Today's
    nixpkgs bump changed golangci-lint under us and flipped "0 issues" to "18
    issues" between sessions. Either pin the golangci-lint derivation in
-   `flake.nix` or accept that lint-clean is only true *as of a version* —
+   `flake.nix` or accept that lint-clean is only true _as of a version_ —
    FEATURES.md's snapshot claim should then cite the version.
 3. **Verify tool availability before promising checks.** I listed dprint
    formatting as part of the project's quality story in past docs, but it
@@ -319,7 +319,7 @@ scrolling repeated bogus diagnostics instead of issuing `lsp_restart` early.
 ### 1. Do you accept the Go 1.26 alignment, or do you want the ecosystem moved to 1.27?
 
 I reverted the daemon's `go.mod` → `1.27.1` back to `1.26` (matching flake,
-CI, and all docs) and proved the suite passes under *both* toolchains. If you
+CI, and all docs) and proved the suite passes under _both_ toolchains. If you
 deliberately want consumers on Go 1.27+, the change set is: `go.mod` 1.27.1,
 `flake.nix` → `pkgs.go_1_27`, `go.yml` → `go-version: "1.27"`, docs "Go
 1.27+" — one commit, all pins together. Your call defines the next release's
@@ -336,7 +336,7 @@ policy.
 ### 3. Do you know which tool actually bumps `go.mod` — and do you want it disabled for this repo?
 
 I can prove the bump came from a heuristic local auto-commit (`ee7777d`
-bundled flake.lock + go.mod + website files), not Dependabot — but not *which*
+bundled flake.lock + go.mod + website files), not Dependabot — but not _which_
 daemon step produced it (BuildFlow `nix-flake-update` profile? a global
 go-modernizer?). You own the global daemon config: if you can name the step,
 I can add the same kind of `skip_steps`/guard that permanently fixed the JSON
@@ -346,15 +346,15 @@ import corruption.
 
 ## Session metrics
 
-| Metric | Value |
-| --- | --- |
-| Status files read (harvest) | 2 full + 1 skim (`2026-08-02_16-11`, `2026-07-28_23-22`, `23-01` via references) |
-| Living docs touched | 8 (README, AGENTS, FEATURES, TODO_LIST, ROADMAP, CHANGELOG, DOMAIN_LANGUAGE, MIGRATION) + dedup-acceptance.md |
-| Code files touched | 5 (`go.mod`, `id_sql.go`, `id_binary.go`, `id_test.go`, `id_json_contract_test.go`) |
-| Critical doc findings fixed | 1 (toolchain-pin breakage) |
-| Lint findings fixed | 18 (16 unused suppressions + 2 complexity suppressions) |
-| Harvested into TODO_LIST | 4 items (version decision, import guard, hook ordering, `--all-systems`) + 1 rewritten (pnpm lockfile) |
-| Dependabot alerts verified (live API) | 10 open, all website-side |
-| Quality gate | GREEN — build/test/race/vet/lint(0/0)/`nix flake check`, both JSON modes |
-| Corners cut | 2 (dprint formatting not run — not on PATH; website build not attempted) |
-| Auto-daemon commits of my work | 3 (`489164e`, `cc23e7f`, `4f5a478`) — expected behavior |
+| Metric                                | Value                                                                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Status files read (harvest)           | 2 full + 1 skim (`2026-08-02_16-11`, `2026-07-28_23-22`, `23-01` via references)                              |
+| Living docs touched                   | 8 (README, AGENTS, FEATURES, TODO_LIST, ROADMAP, CHANGELOG, DOMAIN_LANGUAGE, MIGRATION) + dedup-acceptance.md |
+| Code files touched                    | 5 (`go.mod`, `id_sql.go`, `id_binary.go`, `id_test.go`, `id_json_contract_test.go`)                           |
+| Critical doc findings fixed           | 1 (toolchain-pin breakage)                                                                                    |
+| Lint findings fixed                   | 18 (16 unused suppressions + 2 complexity suppressions)                                                       |
+| Harvested into TODO_LIST              | 4 items (version decision, import guard, hook ordering, `--all-systems`) + 1 rewritten (pnpm lockfile)        |
+| Dependabot alerts verified (live API) | 10 open, all website-side                                                                                     |
+| Quality gate                          | GREEN — build/test/race/vet/lint(0/0)/`nix flake check`, both JSON modes                                      |
+| Corners cut                           | 2 (dprint formatting not run — not on PATH; website build not attempted)                                      |
+| Auto-daemon commits of my work        | 3 (`489164e`, `cc23e7f`, `4f5a478`) — expected behavior                                                       |
