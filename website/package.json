@@ -2,7 +2,7 @@
   "name": "go-branded-id-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Website and documentation for go-branded-id — branded, strongly-typed identifiers for Go",
+  "description": "Website and documentation for go-branded-id \u2014 branded, strongly-typed identifiers for Go",
   "keywords": [
     "astro",
     "branded-types",
@@ -43,10 +43,6 @@
     "@astrojs/check": "^0.9.10",
     "html-validate": "^11.16.0",
     "typescript": "^7.0.2"
-  },
-  "overrides": {
-    "brace-expansion": "5.0.6",
-    "fast-uri": "^3.1.4"
   },
   "packageManager": "pnpm@11.20.0"
 }

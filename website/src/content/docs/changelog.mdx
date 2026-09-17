@@ -3,6 +3,25 @@ title: Changelog
 description: All notable changes to go-branded-id.
 ---
 
+## [0.6.0] — 2026-09-17
+
+### Added
+
+- **`ErrMarshal` and `ErrUnmarshal` sentinel errors**: all marshal/unmarshal failures (JSON, binary, SQL text, text) now wrap a library sentinel — every error path from ID operations is `errors.Is`-matchable. See the [Error Handling guide](/guides/error-handling/).
+- Fuzz tests for SQL `Scan` and Text round-trips; `errors.Is` coverage for all 9 exported sentinels.
+- Pre-push dual-mode test hook and a `nix flake check` CI job.
+
+### Changed
+
+- `ErrNotOrdered` message restored to its full form (was shortened in 0.5.0); `errors.Is` matching unaffected.
+- Website security refresh (astro 7.3.3, `fast-uri`, `brace-expansion` overrides) and package manager migrated to pnpm.
+
+### Fixed
+
+- `go.mod` toolchain regression (auto-bumped to `go 1.27.1`, breaking Nix/CI pins) — restored to `go 1.26`.
+- BuildFlow `go-auto-upgrade` no longer corrupts the build-tagged JSON v1 files (permanently skipped via `.buildflow.yml`).
+- `flake-check` CI job: supported systems declared inline in `flake.nix` after nixpkgs 26.11 dropped `x86_64-darwin`.
+
 ## [0.5.1] — 2026-07-28
 
 ### Fixed
@@ -15,7 +34,7 @@ description: All notable changes to go-branded-id.
 
 - **`cmd/namer` codemod tool**: CLI that scans Go source for brand types missing the `Name()` method and generates suggested stubs. See the [Namer Tool guide](/guides/namer-tool/).
 - **Dual JSON v1/v2 support**: The library now works with both `encoding/json` (default) and `encoding/json/v2` (via build tags). No `GOEXPERIMENT` required.
-- **Sentinel errors**: All ID operations return wrapped sentinel errors (`ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrMarshal`, `ErrUnmarshal`, `ErrInternal`, `ErrNilReceiver`). Use `errors.Is()` to branch on error category. See the [Error Handling guide](/guides/error-handling/).
+- **Sentinel errors**: All ID operations return wrapped sentinel errors (`ErrInvalidID`, `ErrNotOrdered`, `ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver`). Use `errors.Is()` to branch on error category. See the [Error Handling guide](/guides/error-handling/).
 
 ### Changed
 
@@ -66,7 +85,7 @@ description: All notable changes to go-branded-id.
 
 - `String()` now returns `"Brand:value"` for named brands (was value-only for all brands). Serialization unaffected — still uses raw values.
 
-## [0.2.0] — 2026-05-15
+## [0.2.0] — 2026-05-04
 
 ### Added
 
@@ -75,7 +94,7 @@ description: All notable changes to go-branded-id.
 - `Or()` for zero-value fallbacks.
 - SQL `Scan` type coercion for all driver types.
 
-## [0.1.0] — 2026-04-20
+## [0.1.0] — 2026-01-01
 
 ### Added
 
