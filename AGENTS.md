@@ -153,6 +153,15 @@ with a version error while no source changed, compare `go.mod` against
 `flake.nix`. Bump all three in one deliberate commit — the `go` directive is a
 consumer-facing minimum for a library, not something to auto-bump.
 
+**The recurring writer is BuildFlow's `go-mod-update` step** ("Updates Go
+toolchain and dependencies"), NOT `go-auto-upgrade` (that one rewrites JSON
+imports). It bumped `go 1.26` → `1.27.1` twice (documented pre-v0.6.0, and
+again on 2026-09-17 via daemon commit `1acc808`, caught by CI within minutes).
+Both steps are now in `skip_steps` in `.buildflow.yml`. The bump lands as a
+dirty file that the auto-commit daemon later sweeps into an unrelated commit —
+check `git log -p -- go.mod` when CI fails with `go.mod requires go >= ...`.
+CI is the reliable tripwire (it sets `GOTOOLCHAIN=local`).
+
 ### Nix Sandbox Build Cache (GOCACHE)
 
 `nix flake check` builds the `checks.build` derivation in a sandbox where `HOME=/homeless-shelter` (read-only). Go's build cache cannot initialize at `$HOME/.cache/go-build`. The flake's `checks.build` sets `GOCACHE=$TMPDIR/go-cache` to work around this. Any Go-based Nix check derivation needs this.

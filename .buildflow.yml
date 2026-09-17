@@ -3,5 +3,13 @@
 # Disable go-auto-upgrade: it rewrites encoding/json v1->v2, which corrupts
 # the dual-mode JSON files (id_json_v1.go, json_helpers_v1_test.go) on every
 # commit. This library deliberately supports BOTH v1 and v2 via build tags.
+#
+# Disable go-mod-update: it bumps the `go` directive to the latest toolchain
+# (e.g. 1.26 -> 1.27.1), breaking the Nix sandbox build (go_1_26), CI with
+# GOTOOLCHAIN=local, and gopls. The `go` directive is a consumer-facing
+# minimum for a library and must move in lockstep with flake.nix + CI.
+# This library is stdlib-only (zero dependencies), so the dependency-update
+# half of the step has nothing to do anyway.
 skip_steps:
   - go-auto-upgrade
+  - go-mod-update
