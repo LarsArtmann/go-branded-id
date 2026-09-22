@@ -97,7 +97,7 @@ Tests that compared `.String()` output against raw values were updated:
 
 ## B) PARTIALLY DONE
 
-### 1. v0.3.0 Release — Tag Points to Wrong Commit
+### ~~1. v0.3.0 Release — Tag Points to Wrong Commit~~ resolved — superseded: the proxy pinned v0.3.0 at `044bd67`; v0.3.1 through v0.6.0 shipped the fixes
 
 - **Current tag:** Points to commit `044bd67` (2 commits behind HEAD)
 - **Missing from tag:** MustValidateID feature, CHANGELOG/README updates, DOMAIN_LANGUAGE.md, final status report
@@ -105,7 +105,7 @@ Tests that compared `.String()` output against raw values were updated:
 - **Impact:** If someone `go get`s v0.3.0, they get MustValidateID but the tag is behind (the commit is the parent, so the tagged commit doesn't include MustValidateID)
 - **Fix needed:** Force-move tag to HEAD, force-push tag
 
-### 2. GitHub Release — CI Failed
+### ~~2. GitHub Release — CI Failed~~ resolved — release pipeline green since v0.3.1 (`8b30d92`); verified for v0.5.0/v0.5.1/v0.6.0
 
 - Release workflow triggered by tag push, but **golangci-lint failed** on the tagged commit (`044bd67`)
 - Tests passed, lint failed
@@ -113,7 +113,7 @@ Tests that compared `.String()` output against raw values were updated:
 - **No GitHub Release exists** for v0.3.0
 - **Fix needed:** Re-tag on HEAD → re-push → re-trigger Release workflow
 
-### 3. Ecosystem go.mod Upgrade — NOT Started
+### ~~3. Ecosystem go.mod Upgrade — NOT Started~~ superseded — the standing task is the v0.6.0 ecosystem bump (TODO_LIST)
 
 All 14 ecosystem repos still depend on `go-branded-id v0.1.0`. None have been bumped to `v0.3.0`.
 
@@ -203,40 +203,40 @@ Every single repo still depends on `v0.1.0`. The `Name()` methods are added to b
 
 ### Critical (Release Blockers)
 
-1. **Fix v0.3.0 tag position** — Force-move to HEAD (`117fbf4`), force-push tag
-2. **Re-trigger Release CI** — After tag fix, verify Release workflow passes
-3. **Verify GitHub Release exists** — Confirm release notes, correct tag, no draft
-4. **Fix `gh` CLI auth** — Run `gh auth login` to restore CLI access
+1. ~~**Fix v0.3.0 tag position** — Force-move to HEAD (`117fbf4`), force-push tag~~ **Won't implement — module proxy pinned v0.3.0; superseded by later releases.**
+2. ~~**Re-trigger Release CI** — After tag fix, verify Release workflow passes~~ done (green since v0.3.1 (8b30d92))
+3. ~~**Verify GitHub Release exists** — Confirm release notes, correct tag, no draft~~ done (verified for v0.5.0/v0.5.1/v0.6.0)
+4. ~~**Fix `gh` CLI auth** — Run `gh auth login` to restore CLI access~~ **Won't implement — environment concern; gh verified working in later sessions.**
 
 ### High Priority (Ecosystem Activation)
 
-5. **Bump InboxClean to v0.3.0** — `go get github.com/larsartmann/go-branded-id@v0.3.0`
-6. **Bump CreditReformBilanzampel to v0.3.0** (indirect dep)
-7. **Bump ActaFlow to v0.3.0**
-8. **Bump SEC to v0.3.0**
-9. **Bump storbi to v0.3.0** — Also fix pre-existing `:=` build errors
-10. **Bump ChastityAPI to v0.3.0**
-11. **Bump smart-configs to v0.3.0**
-12. **Bump StopTube to v0.3.0**
-13. **Bump universal-workflow to v0.3.0**
-14. **Bump Zlota44 to v0.3.0** (indirect dep)
-15. **Bump timesheets to v0.3.0**
-16. **Bump complaints-mcp to v0.3.0** — Also fix pre-existing build errors
-17. **Bump cqrs-htmx to v0.3.0** (indirect dep)
-18. **Bump emeet-pixyd to v0.3.0**
+5. ~~**Bump InboxClean to v0.3.0** — `go get github.com/larsartmann/go-branded-id@v0.3.0`~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+6. ~~**Bump CreditReformBilanzampel to v0.3.0** (indirect dep)~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+7. ~~**Bump ActaFlow to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+8. ~~**Bump SEC to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+9. ~~**Bump storbi to v0.3.0** — Also fix pre-existing `:=` build errors~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+10. ~~**Bump ChastityAPI to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+11. ~~**Bump smart-configs to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+12. ~~**Bump StopTube to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+13. ~~**Bump universal-workflow to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+14. ~~**Bump Zlota44 to v0.3.0** (indirect dep)~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+15. ~~**Bump timesheets to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+16. ~~**Bump complaints-mcp to v0.3.0** — Also fix pre-existing build errors~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+17. ~~**Bump cqrs-htmx to v0.3.0** (indirect dep)~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+18. ~~**Bump emeet-pixyd to v0.3.0**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
 
 ### Verification
 
-19. **Run full test suites after bump** — Each repo after v0.3.0 bump, especially repos with Name()
-20. **Audit for missed .String() calls** — Search all repos for `.String()` usages that should be `.Get()`
+19. ~~**Run full test suites after bump** — Each repo after v0.3.0 bump, especially repos with Name()~~ **Won't implement — folds into the standing v0.6.0 bump task.**
+20. ~~**Audit for missed .String() calls** — Search all repos for `.String()` usages that should be `.Get()`~~ done (cmd/namer and the 2026-05-20 pass audited .String() usages)
 
 ### Improvements
 
-21. **Create codemod tool** — Auto-generate Name() stubs for brand types
-22. **Add CI integration test** — Test go-branded-id against representative repos
-23. **Document go-cqris-lite decision** — Why Name() was deliberately skipped
-24. **Fix storbi pre-existing build errors** — `:=` → `=` in container.go
-25. **Fix complaints-mcp pre-existing build errors** — Syntax error + undefined v2
+21. ~~**Create codemod tool** — Auto-generate Name() stubs for brand types~~ done (cmd/namer shipped v0.5.0 (5c4f995))
+22. ~~**Add CI integration test** — Test go-branded-id against representative repos~~ **Won't implement — not built; downstream pins verified manually (2026-09-17 pass).**
+23. ~~**Document go-cqris-lite decision** — Why Name() was deliberately skipped~~ done (AGENTS.md 'Brands That Deliberately Skip Name()' section)
+24. ~~**Fix storbi pre-existing build errors** — `:=` → `=` in container.go~~ **Won't implement — pre-existing upstream issues.**
+25. ~~**Fix complaints-mcp pre-existing build errors** — Syntax error + undefined v2~~ **Won't implement — pre-existing upstream issues.**
 
 ---
 

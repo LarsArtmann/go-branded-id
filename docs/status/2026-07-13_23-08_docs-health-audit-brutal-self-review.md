@@ -67,14 +67,14 @@ I verified README against FEATURES.md conceptually but did NOT:
 
 | Item                                      | Why it was skipped                                                                                                                                                        |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ROADMAP.md**                            | Decided "N/A for a library" (skill says optional). But the old TODO_LIST had long-term items (ecosystem bump strategy, CI integration vision) that could have lived here. |
-| **MIGRATION.md** freshness check          | Never read it (124 lines). The skill's documentation model doesn't list it, but it exists and could be stale.                                                             |
-| **CONTRIBUTING.md** fix                   | AGENTS.md says "references `just`, `pkg/errors/`, `go-arch-lint`, and a directory structure that does not exist." I flagged it as stale but never fixed it.               |
-| **README performance table verification** | Never ran `go test -bench=.` to confirm the latency/alloc numbers.                                                                                                        |
-| **`nix flake check`**                     | Never ran it. Only ran `go build`, `go test`, and `nix run .#lint`.                                                                                                       |
-| **doc-files-age-check (BuildFlow)**       | AGENTS.md warns this pre-commit hook requires README + TODO_LIST to be fresh within 3 weeks. I updated both, but never ran the check to confirm it passes.                |
-| **Release workflow investigation**        | Surfaced that v0.3.1 has no GitHub Release but did NOT read `.github/workflows/release.yml` to diagnose why.                                                              |
-| **`.github/workflows/validate-docs.yml`** | Never read it; don't know what it validates or if my changes pass it.                                                                                                     |
+| ~~**ROADMAP.md**~~ done (created in v0.3.2)                            | ~~Decided "N/A for a library" (skill says optional). But the old TODO_LIST had long-term items (ecosystem bump strategy, CI integration vision) that could have lived here.~~ |
+| ~~**MIGRATION.md** freshness check~~ done (maintained through v0.6.0; troubleshooting rewritten 2026-09-17)          | ~~Never read it (124 lines). The skill's documentation model doesn't list it, but it exists and could be stale.~~                                                             |
+| ~~**CONTRIBUTING.md** fix~~ done (rebuilt in v0.3.2)                   | ~~AGENTS.md says "references `just`, `pkg/errors/`, `go-arch-lint`, and a directory structure that does not exist." I flagged it as stale but never fixed it.~~               |
+| ~~**README performance table verification**~~ done (v0.3.2 re-benchmarked the table; later README rewrite removed it) | ~~Never ran `go test -bench=.` to confirm the latency/alloc numbers.~~                                                                                                        |
+| ~~**`nix flake check`**~~ done (green 2026-09-22)                      | ~~Never ran it. Only ran `go build`, `go test`, and `nix run .#lint`.~~                                                                                                       |
+| ~~**doc-files-age-check (BuildFlow)**~~ done (continuous via BuildFlow pre-commit; docs fresh 2026-09-22)   | ~~AGENTS.md warns this pre-commit hook requires README + TODO_LIST to be fresh within 3 weeks. I updated both, but never ran the check to confirm it passes.~~                |
+| ~~**Release workflow investigation**~~ done (v0.3.2 fixed the GOEXPERIMENT root cause)        | ~~Surfaced that v0.3.1 has no GitHub Release but did NOT read `.github/workflows/release.yml` to diagnose why.~~                                                              |
+| ~~**`.github/workflows/validate-docs.yml`**~~ done (read and its install path fixed on 2026-07-28) | ~~Never read it; don't know what it validates or if my changes pass it.~~                                                                                                     |
 
 ---
 
@@ -100,21 +100,21 @@ I verified README against FEATURES.md conceptually but did NOT:
 
 ### Process improvements for next docs-health run
 
-1. **Read EVERY source file before writing FEATURES.md.** Don't trust AGENTS.md descriptions for feature claims. Open `id_json.go`, `id_sql.go`, `id_text.go`, `id_binary.go`, `id_gob.go` and verify each serialization implementation.
-2. **Run benchmarks before trusting performance tables.** `go test -bench=. -benchmem` takes 30 seconds and confirms or denies every number in README.
-3. **Run `nix flake check`**, not just `nix run .#lint`. The flake check includes build-in-sandbox which catches issues lint misses.
-4. **Investigate high-impact findings immediately.** A missing release is more important than a placeholder in DOMAIN_LANGUAGE.md.
-5. **Preserve useful detail when rebuilding docs.** The old TODO_LIST's per-repo migration table had actionable granularity. Collapsing it into a paragraph lost information. Either keep the table (as reference, not active TODO) or point to where the detail lives.
-6. **Check CONTRIBUTING.md during audit.** It's stale, misleading, and the skill says "fix ghosts immediately." I deferred it.
-7. **Create ROADMAP.md for long-term ecosystem items.** The dependency bump strategy across 14 repos is long-term work that doesn't belong in TODO_LIST's short-term scope.
+1. ~~**Read EVERY source file before writing FEATURES.md.** Don't trust AGENTS.md descriptions for feature claims. Open `id_json.go`, `id_sql.go`, `id_text.go`, `id_binary.go`, `id_gob.go` and verify each serialization implementation.~~ done (adopted — later audits swept every FEATURES citation against source (2026-07-28, 2026-09-17))
+2. ~~**Run benchmarks before trusting performance tables.** `go test -bench=. -benchmem` takes 30 seconds and confirms or denies every number in README.~~ done (v0.3.2 re-benchmarked the table; the later README rewrite removed it)
+3. ~~**Run `nix flake check`**, not just `nix run .#lint`. The flake check includes build-in-sandbox which catches issues lint misses.~~ done (green (2026-09-22))
+4. ~~**Investigate high-impact findings immediately.** A missing release is more important than a placeholder in DOMAIN_LANGUAGE.md.~~ done (adopted — the v0.3.2 session fixed the release root cause)
+5. ~~**Preserve useful detail when rebuilding docs.** The old TODO_LIST's per-repo migration table had actionable granularity. Collapsing it into a paragraph lost information. Either keep the table (as reference, not active TODO) or point to where the detail lives.~~ done (TODO_LIST ecosystem-detail section carries the per-repo context)
+6. ~~**Check CONTRIBUTING.md during audit.** It's stale, misleading, and the skill says "fix ghosts immediately." I deferred it.~~ done (CONTRIBUTING.md rebuilt in v0.3.2 (ed5ee4b))
+7. ~~**Create ROADMAP.md for long-term ecosystem items.** The dependency bump strategy across 14 repos is long-term work that doesn't belong in TODO_LIST's short-term scope.~~ done (ROADMAP.md created in v0.3.2)
 
 ### Documentation quality improvements
 
-8. **README `%#v` format is misleading.** `id.User(user-123)` is not valid Go. Either document this as display-only or add quotes.
-9. **README performance table is unverified.** Numbers from v0.3.1 may have drifted.
-10. **CONTRIBUTING.md is comprehensively stale.** References `just`, `pkg/errors/`, `go-arch-lint`, nonexistent directories. Either fix or delete with a pointer to AGENTS.md.
-11. **No ROADMAP.md** — long-term direction is scattered across TODO_LIST and AGENTS.md.
-12. **CHANGELOG has no link references** at the bottom (e.g., `[0.3.1]: ...compare/v0.3.0...v0.3.1`). Keep a Changelog recommends these.
+8. ~~**README `%#v` format is misleading.** `id.User(user-123)` is not valid Go. Either document this as display-only or add quotes.~~ **Won't implement — display format kept; behavior documented (AGENTS.md BrandName fallback).**
+9. ~~**README performance table is unverified.** Numbers from v0.3.1 may have drifted.~~ done (re-benchmarked in v0.3.2; table removed in the 2026-07-14 README rewrite)
+10. ~~**CONTRIBUTING.md is comprehensively stale.** References `just`, `pkg/errors/`, `go-arch-lint`, nonexistent directories. Either fix or delete with a pointer to AGENTS.md.~~ done (rebuilt in v0.3.2)
+11. ~~**No ROADMAP.md** — long-term direction is scattered across TODO_LIST and AGENTS.md.~~ done (created in v0.3.2)
+12. ~~**CHANGELOG has no link references** at the bottom (e.g., `[0.3.1]: ...compare/v0.3.0...v0.3.1`). Keep a Changelog recommends these.~~ done (compare links present at the bottom of CHANGELOG.md)
 
 ---
 
@@ -122,71 +122,71 @@ I verified README against FEATURES.md conceptually but did NOT:
 
 ### Release & Distribution (Critical)
 
-1. **Investigate why v0.3.1 GitHub Release didn't fire** — read `.github/workflows/release.yml`, check if tag pattern matches, check CI run history
-2. **Manually create v0.3.1 GitHub Release** if workflow is broken: `gh release create v0.3.1 --notes-from-tag`
-3. **Fix release workflow if broken** — could be trigger pattern, permissions, or runner issue
-4. **Verify v0.3.1 is consumable** — `go get github.com/larsartmann/go-branded-id@v0.3.1` in a clean module
+1. ~~**Investigate why v0.3.1 GitHub Release didn't fire** — read `.github/workflows/release.yml`, check if tag pattern matches, check CI run history~~ done (v0.3.2 (ed5ee4b) fixed the root cause — CI lacked GOEXPERIMENT)
+2. ~~**Manually create v0.3.1 GitHub Release** if workflow is broken: `gh release create v0.3.1 --notes-from-tag`~~ **Won't implement — v0.3.1 stayed release-less on GitHub; the module proxy serves the tag and later releases superseded it.**
+3. ~~**Fix release workflow if broken** — could be trigger pattern, permissions, or runner issue~~ done (fixed across v0.3.2 and v0.6.0 (a03780b extracts CHANGELOG notes))
+4. ~~**Verify v0.3.1 is consumable** — `go get github.com/larsartmann/go-branded-id@v0.3.1` in a clean module~~ done (module proxy serves v0.3.1 (8b30d92))
 
 ### Ecosystem Migration (High)
 
-5. **Bump go.mod in InboxClean to v0.3.1** — run tests, commit
-6. **Bump go.mod in CreditReformBilanzampel to v0.3.1**
-7. **Bump go.mod in ActaFlow to v0.3.1**
-8. **Bump go.mod in SEC to v0.3.1**
-9. **Bump go.mod in storbi to v0.3.1** (verify build is clean first)
-10. **Bump go.mod in ChastityAPI to v0.3.1**
-11. **Bump go.mod in smart-configs to v0.3.1**
-12. **Bump go.mod in StopTube to v0.3.1**
-13. **Bump go.mod in universal-workflow to v0.3.1**
-14. **Bump go.mod in Zlota44 to v0.3.1**
-15. **Bump go.mod in timesheets to v0.3.1**
-16. **Bump go.mod in cqrs-htmx to v0.3.1**
-17. **Bump go.mod in emeet-pixyd to v0.3.1**
-18. **Document go-cqrs-lite decision** — why marker types skip `Name()`
-19. **Create CI integration test** — compile representative ecosystem repo against new versions
+5. ~~**Bump go.mod in InboxClean to v0.3.1** — run tests, commit~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+6. ~~**Bump go.mod in CreditReformBilanzampel to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+7. ~~**Bump go.mod in ActaFlow to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+8. ~~**Bump go.mod in SEC to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+9. ~~**Bump go.mod in storbi to v0.3.1** (verify build is clean first)~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+10. ~~**Bump go.mod in ChastityAPI to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+11. ~~**Bump go.mod in smart-configs to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+12. ~~**Bump go.mod in StopTube to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+13. ~~**Bump go.mod in universal-workflow to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+14. ~~**Bump go.mod in Zlota44 to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+15. ~~**Bump go.mod in timesheets to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+16. ~~**Bump go.mod in cqrs-htmx to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+17. ~~**Bump go.mod in emeet-pixyd to v0.3.1**~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+18. ~~**Document go-cqrs-lite decision** — why marker types skip `Name()`~~ done (AGENTS.md 'Brands That Deliberately Skip Name()' section)
+19. ~~**Create CI integration test** — compile representative ecosystem repo against new versions~~ **Won't implement — not built; downstream pins verified manually (2026-09-17 pass).**
 
 ### Documentation Fixes (Medium)
 
-20. **Fix README `%#v` format** — `id.User(user-123)` → either quote strings or document as display-only
-21. **Verify README performance table** — run `go test -bench=. -benchmem`, update if drifted
-22. **Read `id_json.go` and verify FEATURES.md JSON claims**
-23. **Read `id_sql.go` and verify FEATURES.md SQL claims**
-24. **Read `id_text.go` and verify FEATURES.md Text claims**
-25. **Read `id_binary.go` and verify FEATURES.md Binary claims**
-26. **Read `id_gob.go` and verify FEATURES.md Gob claims**
-27. **Fix or delete CONTRIBUTING.md** — remove `just`, `pkg/errors/`, `go-arch-lint` references
-28. **Create ROADMAP.md** — long-term ecosystem strategy, v1.0 stability goals
-29. **Add CHANGELOG compare links** — `[0.3.1]: https://github.com/.../compare/v0.3.0...v0.3.1`
-30. **Read and verify MIGRATION.md** — check if migration steps are still accurate
-31. **Run `nix flake check`** — confirm sandbox build still works
-32. **Run doc-files-age-check** — `buildflow --step doc-files-age-check --format sarif`
-33. **Read `.github/workflows/validate-docs.yml`** — understand what it checks, verify our docs pass
+20. ~~**Fix README `%#v` format** — `id.User(user-123)` → either quote strings or document as display-only~~ **Won't implement — kept as display-only; documented behavior.**
+21. ~~**Verify README performance table** — run `go test -bench=. -benchmem`, update if drifted~~ done (v0.3.2 re-benchmarked; table later removed)
+22. ~~**Read `id_json.go` and verify FEATURES.md JSON claims**~~ done (FEATURES JSON claims swept against source in later audits)
+23. ~~**Read `id_sql.go` and verify FEATURES.md SQL claims**~~ done (FEATURES SQL claims swept against source in later audits)
+24. ~~**Read `id_text.go` and verify FEATURES.md Text claims**~~ done (FEATURES Text claims swept against source in later audits)
+25. ~~**Read `id_binary.go` and verify FEATURES.md Binary claims**~~ done (FEATURES Binary claims swept against source in later audits)
+26. ~~**Read `id_gob.go` and verify FEATURES.md Gob claims**~~ done (FEATURES Gob claims swept against source in later audits)
+27. ~~**Fix or delete CONTRIBUTING.md** — remove `just`, `pkg/errors/`, `go-arch-lint` references~~ done (rebuilt in v0.3.2)
+28. ~~**Create ROADMAP.md** — long-term ecosystem strategy, v1.0 stability goals~~ done (created in v0.3.2)
+29. ~~**Add CHANGELOG compare links** — `[0.3.1]: https://github.com/.../compare/v0.3.0...v0.3.1`~~ done (compare links added)
+30. ~~**Read and verify MIGRATION.md** — check if migration steps are still accurate~~ done (maintained through v0.6.0; troubleshooting rewritten 2026-09-17)
+31. ~~**Run `nix flake check`** — confirm sandbox build still works~~ done (green (2026-09-22))
+32. ~~**Run doc-files-age-check** — `buildflow --step doc-files-age-check --format sarif`~~ done (continuous via the BuildFlow pre-commit hook)
+33. ~~**Read `.github/workflows/validate-docs.yml`** — understand what it checks, verify our docs pass~~ done (read; install path fixed 2026-07-28)
 
 ### Testing & Quality (Medium)
 
-34. **Add tests for `cmd/namer`** — currently 0% coverage
-35. **Add fuzz test for `Compare` with non-ordered types** — verify `ErrNotOrdered` path
-36. **Add fuzz test for `Format` with all verbs** — `%s %d %v %#v %q` and invalid verbs
-37. **Add test for `GoString()` output format** — verify exact string for named vs unnamed brands
-38. **Add test for `Or()` chain** — `id1.Or(id2).Or(id3)` behavior
-39. **Consider compile-time test for type safety** — `// this should not compile` pattern via build tags
+34. ~~**Add tests for `cmd/namer`** — currently 0% coverage~~ done (cmd/namer at 93.2% coverage (63fe921 and later passes))
+35. ~~**Add fuzz test for `Compare` with non-ordered types** — verify `ErrNotOrdered` path~~ **Won't implement — not added; Compare is covered by table-driven tests.**
+36. ~~**Add fuzz test for `Format` with all verbs** — `%s %d %v %#v %q` and invalid verbs~~ **Won't implement — not added.**
+37. ~~**Add test for `GoString()` output format** — verify exact string for named vs unnamed brands~~ done (id_test.go asserts the exact %#v output format)
+38. ~~**Add test for `Or()` chain** — `id1.Or(id2).Or(id3)` behavior~~ done (Or() covered in id_test.go:346,356)
+39. ~~**Consider compile-time test for type safety** — `// this should not compile` pattern via build tags~~ **Won't implement — not attempted.**
 
 ### Code Improvements (Low)
 
-40. **Consider compile-time constraint for `Compare`** — currently runtime `ErrNotOrdered`; could use `cmp.Ordered` constraint on a separate method
-41. **Consider `fmt.Stringer` interface compliance test** — verify all code paths
-42. **Review `valueString()` fallback** — `encoding.TextMarshaler` path is untested for custom types
-43. **Add `MustNewID` constructor** — panic on zero value (symmetric with `MustValidateID`)
-44. **Consider `ID[B, V].Stringer()` method** — explicit stringer for branding without changing `String()`
-45. **Review SQL `Scan` for `[]byte` handling** — some drivers return `[]byte` for string columns
-46. **Add `encoding/json` stream support** — `MarshalJSON`/`UnmarshalJSON` exist but no streaming
+40. ~~**Consider compile-time constraint for `Compare`** — currently runtime `ErrNotOrdered`; could use `cmp.Ordered` constraint on a separate method~~ **Won't implement — routed to ROADMAP Theme 2.**
+41. ~~**Consider `fmt.Stringer` interface compliance test** — verify all code paths~~ **Won't implement — not added.**
+42. ~~**Review `valueString()` fallback** — `encoding.TextMarshaler` path is untested for custom types~~ done (delegate-path tests added 2026-09-22 (id_errors_test.go))
+43. ~~**Add `MustNewID` constructor** — panic on zero value (symmetric with `MustValidateID`)~~ **Won't implement — not added; MustValidateID covers the init-time pattern.**
+44. ~~**Consider `ID[B, V].Stringer()` method** — explicit stringer for branding without changing `String()`~~ **Won't implement — not added.**
+45. ~~**Review SQL `Scan` for `[]byte` handling** — some drivers return `[]byte` for string columns~~ done (Scan accepts []byte (FEATURES SQL row))
+46. ~~**Add `encoding/json` stream support** — `MarshalJSON`/`UnmarshalJSON` exist but no streaming~~ **Won't implement — not applicable to a scalar ID type.**
 
 ### Project Hygiene (Low)
 
-47. **Verify `.config/metadata.yaml`** — never read it, don't know what it contains
-48. **Check `.gitattributes`** — ensure line endings and binary detection are correct
-49. **Review `git-town.toml`** — verify branch config is still accurate
-50. **Archive or delete `docs/status/` old reports** — 4 reports from May, some may be obsolete
+47. ~~**Verify `.config/metadata.yaml`** — never read it, don't know what it contains~~ done (.config/metadata.yaml inspected — tooling metadata, no action needed)
+48. ~~**Check `.gitattributes`** — ensure line endings and binary detection are correct~~ done (.gitattributes present (documentation + language stats rules))
+49. ~~**Review `git-town.toml`** — verify branch config is still accurate~~ done (git-town.toml main = master still correct)
+50. ~~**Archive or delete `docs/status/` old reports** — 4 reports from May, some may be obsolete~~ done (resolved reports archived to docs/status/archived/ in this pass (2026-09-22))
 
 ---
 
