@@ -145,37 +145,37 @@ working cache. The quality gate covers what CI runs (`go.yml` uses
 ## c) NOT STARTED
 
 ~~1. **Did not fix the tracked `namer` binary** — `git ls-files namer` confirms it's
-   tracked at repo root. BuildFlow flags it. I put it in TODO_LIST as a 5-minute
-   task instead of just doing `git rm --cached namer` + adding to `.gitignore`.
-   This is a fix-on-sight violation.~~ done — removed in `c29a034` (v0.5.1); see Resolution below.
+tracked at repo root. BuildFlow flags it. I put it in TODO_LIST as a 5-minute
+task instead of just doing `git rm --cached namer` + adding to `.gitignore`.
+This is a fix-on-sight violation.~~ done — removed in `c29a034` (v0.5.1); see Resolution below.
 
 ~~2. **Did not fix the Validate Docs CI failure** — `validate-docs.yml` fails
-   because `md-go-validator@latest` module v1.2.0 exists but the root package
-   doesn't. Likely needs install path corrected (e.g.,
-   `github.com/larsartmann/md-go-validator/cmd/md-go-validator`). Put in TODO_LIST
-   instead of investigating.~~ done — install path fixed in the 23-01 session.
+because `md-go-validator@latest` module v1.2.0 exists but the root package
+doesn't. Likely needs install path corrected (e.g.,
+`github.com/larsartmann/md-go-validator/cmd/md-go-validator`). Put in TODO_LIST
+instead of investigating.~~ done — install path fixed in the 23-01 session.
 
 ~~3. **Did not update AGENTS.md** — it's a living doc in the docs-health model. I
-   discovered the goimports corruption recurred AGAIN, encountered a GOCACHE
-   corruption issue, and confirmed the `namer` binary is tracked. None of these
-   made it into AGENTS.md. The `outputs` pattern gotcha (from the 10-39 report)
-   is also still missing.~~ done — every item is documented in AGENTS.md now (go-auto-upgrade root cause, `outputs` gotcha, GOCACHE hazard).
+discovered the goimports corruption recurred AGAIN, encountered a GOCACHE
+corruption issue, and confirmed the `namer` binary is tracked. None of these
+made it into AGENTS.md. The `outputs` pattern gotcha (from the 10-39 report)
+is also still missing.~~ done — every item is documented in AGENTS.md now (go-auto-upgrade root cause, `outputs` gotcha, GOCACHE hazard).
 
 ~~4. **Did not update MIGRATION.md** — v0.5.0 sentinel errors are not documented
-   for downstream consumers. `grep -c 'sentinel\|v0.5.0' MIGRATION.md` → 0.~~ done — MIGRATION.md gained a v0.5.0+ Sentinel Errors section (2026-09-22).
+for downstream consumers. `grep -c 'sentinel\|v0.5.0' MIGRATION.md` → 0.~~ done — MIGRATION.md gained a v0.5.0+ Sentinel Errors section (2026-09-22).
 
 ~~5. **Did not update website `changelog.mdx`** — only goes up to 0.3.2. Missing
-   0.3.3, 0.4.0, and 0.5.0 entries. The dual-mode support, namer tool, and
-   sentinel errors are invisible on the public site.~~ done — entries added through v0.6.0 in the release session.
+0.3.3, 0.4.0, and 0.5.0 entries. The dual-mode support, namer tool, and
+sentinel errors are invisible on the public site.~~ done — entries added through v0.6.0 in the release session.
 
 ~~6. **Did not add sentinel error docs to README** — consumers don't know they can
-   use `errors.Is(err, id.ErrUnsupportedType)`.~~ done — README Error Handling section added in the 23-01 session.
+use `errors.Is(err, id.ErrUnsupportedType)`.~~ done — README Error Handling section added in the 23-01 session.
 
 ~~7. **Did not add `errors.Is` tests** — 5 of 7 sentinel errors have zero test
-   coverage demonstrating `errors.Is` matching.~~ done — 9/9 tested (23-01, id_errors_test.go); delegate paths added 2026-09-22.
+coverage demonstrating `errors.Is` matching.~~ done — 9/9 tested (23-01, id_errors_test.go); delegate paths added 2026-09-22.
 
 ~~8. **Did not investigate Dependabot vulnerabilities** — 2 alerts (1 high, 1
-   moderate) reported on v0.5.0 push. Not investigated.~~ done — astro/fast-uri fixed via the v0.6.0 lockfile regeneration; 7 newer alerts tracked in TODO_LIST.
+moderate) reported on v0.5.0 push. Not investigated.~~ done — astro/fast-uri fixed via the v0.6.0 lockfile regeneration; 7 newer alerts tracked in TODO_LIST.
 
 ---
 

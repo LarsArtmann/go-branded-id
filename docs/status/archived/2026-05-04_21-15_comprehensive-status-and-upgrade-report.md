@@ -124,33 +124,33 @@
 
 ## f) Top #25 Things We Should Get Done Next
 
-| #  | Priority | Task                                                                  | Est. Effort |
-| --- | ------------ | ------------------------------------------------------------------------------------------------------- | ---------------- |
-| ~~1~~  | ~~P0~~ done — shipped inside v0.3.0 (044bd67) | ~~Tag `v0.2.0` and push to remote~~ | ~~1 min~~ |
-| ~~2~~  | ~~P0~~ done — in the 2026-05-20 ecosystem migration | ~~Remove `replace` directive from `go-composable-business-types/go.mod`~~ | ~~2 min~~ |
-| ~~3~~  | ~~P0~~ done — in the 2026-05-20 ecosystem migration | ~~Update consumer to `v0.2.0` (remove local replace)~~ | ~~2 min~~ |
-| ~~4~~  | ~~P0~~ done — *.out in .gitignore | ~~Add `coverage.out` to `.gitignore`~~ | ~~1 min~~ |
-| ~~5~~  | ~~P0~~ done — file absent from the repo | ~~Delete stale `coverage.out` from project root~~ | ~~1 min~~ |
-| ~~6~~  | ~~P1~~ done — coverage passes closed the gap (id_sql_test.go, id_alltypes_test.go) | ~~Add tests for `scanIntegerID` (33.3% → 90%+)~~ | ~~30 min~~ |
-| ~~7~~  | ~~P1~~ done — coverage passes closed the gap | ~~Add tests for `UnmarshalText` error paths (65.6% → 90%+)~~ | ~~20 min~~ |
-| ~~8~~  | ~~P1~~ done — coverage passes closed the gap | ~~Add tests for `String()` `TextMarshaler` fallback path (66.7% → 90%+)~~ | ~~15 min~~ |
-| ~~9~~  | ~~P1~~ done — coverage passes closed the gap | ~~Add tests for `Value()` all int/uint types (70% → 90%+)~~ | ~~20 min~~ |
-| ~~10~~ | ~~P1~~ done — coverage passes closed the gap | ~~Add tests for `Scan()` all int/uint types (70.2% → 90%+)~~ | ~~20 min~~ |
-| ~~11~~ | ~~P1~~ done — coverage passes closed the gap | ~~Add tests for `UnmarshalBinary` error paths (78.7% → 90%+)~~ | ~~15 min~~ |
-| ~~12~~ | ~~P1~~ done — id_test.go Format verb table covers %q, %#v and friends | ~~Add tests for `Format` all verbs (80% → 95%+)~~ | ~~15 min~~ |
-| ~~13~~ | ~~P1~~ **Won't implement — FEATURES.md snapshot re-derives coverage every docs pass.** | ~~Add coverage threshold to CI (`go.yml`) — fail below 85%~~ | ~~5 min~~ |
-| ~~14~~ | ~~P1~~ done — SECURITY.md created 2026-09-22 | ~~Add `SECURITY.md`~~ | ~~10 min~~ |
-| ~~15~~ | ~~P2~~ done — rebuilt in v0.3.2 (ed5ee4b) | ~~Add `CONTRIBUTING.md`~~ | ~~15 min~~ |
-| ~~16~~ | ~~P2~~ **Won't implement — pkg.go.dev plus Example_ functions suffice.** | ~~Add `doc.go` with package examples~~ | ~~10 min~~ |
-| ~~17~~ | ~~P2~~ done — pkg.go.dev badge in README | ~~Add pkg.go.dev badge to README~~ | ~~5 min~~ |
-| ~~18~~ | ~~P2~~ done — release.yml ships CHANGELOG-derived notes (a03780b) | ~~Add tag-triggered release GitHub Action~~ | ~~30 min~~ |
-| ~~19~~ | ~~P2~~ **Won't implement — serialization docs live on the website guides and pkg.go.dev; README stays lean.** | ~~Add `UnmarshalText` example to README~~ | ~~5 min~~ |
-| ~~20~~ | ~~P2~~ **Won't implement — serialization docs live on the website guides and pkg.go.dev; README stays lean.** | ~~Add `Gob` example to README~~ | ~~5 min~~ |
-| ~~21~~ | ~~P2~~ done — README Named Brand Types section demonstrates %#v | ~~Add `Format` verb examples to README~~ | ~~5 min~~ |
-| ~~22~~ | ~~P3~~ **Won't implement — single-maintainer direct-push repo.** | ~~Add `.github/ISSUE_TEMPLATE/` (bug + feature)~~ | ~~15 min~~ |
-| ~~23~~ | ~~P3~~ **Won't implement — single-maintainer direct-push repo.** | ~~Add `.github/PULL_REQUEST_TEMPLATE.md`~~ | ~~10 min~~ |
-| ~~24~~ | ~~P3~~ **Won't implement — source-only library; no binaries to reproduce.** | ~~Add reproducible build flags to CI (`GOFLAGS=-trimpath`)~~ | ~~5 min~~ |
-| ~~25~~ | ~~P3~~ **Won't implement — type switches locked by exhaustive tests; codegen not worth the complexity.** | ~~Explore code generation for repetitive type-switch patterns~~ | ~~2 hr~~ |
+| #      | Priority                                                                                                      | Task                                                                      | Est. Effort |
+| ------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------- |
+| ~~1~~  | ~~P0~~ done — shipped inside v0.3.0 (044bd67)                                                                 | ~~Tag `v0.2.0` and push to remote~~                                       | ~~1 min~~   |
+| ~~2~~  | ~~P0~~ done — in the 2026-05-20 ecosystem migration                                                           | ~~Remove `replace` directive from `go-composable-business-types/go.mod`~~ | ~~2 min~~   |
+| ~~3~~  | ~~P0~~ done — in the 2026-05-20 ecosystem migration                                                           | ~~Update consumer to `v0.2.0` (remove local replace)~~                    | ~~2 min~~   |
+| ~~4~~  | ~~P0~~ done — *.out in .gitignore                                                                             | ~~Add `coverage.out` to `.gitignore`~~                                    | ~~1 min~~   |
+| ~~5~~  | ~~P0~~ done — file absent from the repo                                                                       | ~~Delete stale `coverage.out` from project root~~                         | ~~1 min~~   |
+| ~~6~~  | ~~P1~~ done — coverage passes closed the gap (id_sql_test.go, id_alltypes_test.go)                            | ~~Add tests for `scanIntegerID` (33.3% → 90%+)~~                          | ~~30 min~~  |
+| ~~7~~  | ~~P1~~ done — coverage passes closed the gap                                                                  | ~~Add tests for `UnmarshalText` error paths (65.6% → 90%+)~~              | ~~20 min~~  |
+| ~~8~~  | ~~P1~~ done — coverage passes closed the gap                                                                  | ~~Add tests for `String()` `TextMarshaler` fallback path (66.7% → 90%+)~~ | ~~15 min~~  |
+| ~~9~~  | ~~P1~~ done — coverage passes closed the gap                                                                  | ~~Add tests for `Value()` all int/uint types (70% → 90%+)~~               | ~~20 min~~  |
+| ~~10~~ | ~~P1~~ done — coverage passes closed the gap                                                                  | ~~Add tests for `Scan()` all int/uint types (70.2% → 90%+)~~              | ~~20 min~~  |
+| ~~11~~ | ~~P1~~ done — coverage passes closed the gap                                                                  | ~~Add tests for `UnmarshalBinary` error paths (78.7% → 90%+)~~            | ~~15 min~~  |
+| ~~12~~ | ~~P1~~ done — id_test.go Format verb table covers %q, %#v and friends                                         | ~~Add tests for `Format` all verbs (80% → 95%+)~~                         | ~~15 min~~  |
+| ~~13~~ | ~~P1~~ **Won't implement — FEATURES.md snapshot re-derives coverage every docs pass.**                        | ~~Add coverage threshold to CI (`go.yml`) — fail below 85%~~              | ~~5 min~~   |
+| ~~14~~ | ~~P1~~ done — SECURITY.md created 2026-09-22                                                                  | ~~Add `SECURITY.md`~~                                                     | ~~10 min~~  |
+| ~~15~~ | ~~P2~~ done — rebuilt in v0.3.2 (ed5ee4b)                                                                     | ~~Add `CONTRIBUTING.md`~~                                                 | ~~15 min~~  |
+| ~~16~~ | ~~P2~~ **Won't implement — pkg.go.dev plus Example_ functions suffice.**                                      | ~~Add `doc.go` with package examples~~                                    | ~~10 min~~  |
+| ~~17~~ | ~~P2~~ done — pkg.go.dev badge in README                                                                      | ~~Add pkg.go.dev badge to README~~                                        | ~~5 min~~   |
+| ~~18~~ | ~~P2~~ done — release.yml ships CHANGELOG-derived notes (a03780b)                                             | ~~Add tag-triggered release GitHub Action~~                               | ~~30 min~~  |
+| ~~19~~ | ~~P2~~ **Won't implement — serialization docs live on the website guides and pkg.go.dev; README stays lean.** | ~~Add `UnmarshalText` example to README~~                                 | ~~5 min~~   |
+| ~~20~~ | ~~P2~~ **Won't implement — serialization docs live on the website guides and pkg.go.dev; README stays lean.** | ~~Add `Gob` example to README~~                                           | ~~5 min~~   |
+| ~~21~~ | ~~P2~~ done — README Named Brand Types section demonstrates %#v                                               | ~~Add `Format` verb examples to README~~                                  | ~~5 min~~   |
+| ~~22~~ | ~~P3~~ **Won't implement — single-maintainer direct-push repo.**                                              | ~~Add `.github/ISSUE_TEMPLATE/` (bug + feature)~~                         | ~~15 min~~  |
+| ~~23~~ | ~~P3~~ **Won't implement — single-maintainer direct-push repo.**                                              | ~~Add `.github/PULL_REQUEST_TEMPLATE.md`~~                                | ~~10 min~~  |
+| ~~24~~ | ~~P3~~ **Won't implement — source-only library; no binaries to reproduce.**                                   | ~~Add reproducible build flags to CI (`GOFLAGS=-trimpath`)~~              | ~~5 min~~   |
+| ~~25~~ | ~~P3~~ **Won't implement — type switches locked by exhaustive tests; codegen not worth the complexity.**      | ~~Explore code generation for repetitive type-switch patterns~~           | ~~2 hr~~    |
 
 ---
 

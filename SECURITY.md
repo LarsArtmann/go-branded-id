@@ -4,10 +4,10 @@
 
 Only the latest tagged release receives security fixes:
 
-| Version | Supported |
-| ------- | --------- |
-| latest `v0.x.y` tag | Yes |
-| older tags          | No       |
+| Version             | Supported |
+| ------------------- | --------- |
+| latest `v0.x.y` tag | Yes       |
+| older tags          | No        |
 
 ## Reporting a Vulnerability
 

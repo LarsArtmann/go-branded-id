@@ -45,7 +45,7 @@
 2. **`hygiene` CI job validation** — `actionlint` passed and the logic was reviewed, but the local "GUARD_PASSES_LOCALLY" run was a **false green**: `file` is not installed here, so `xargs file` failed, the grep saw nothing, and `|| true` swallowed it (see d.3). The job itself is correct for GH runners (where `file` exists); it has never actually run anywhere.
 3. **check-rows separator conflict** — the tool's `is_separator` requires 3+ dashes; dprint formats table separators with 2. I widened 7 separator rows in archived files to `---` (valid GFM, renders identically) to make the gate pass. Symptom patched in the docs; the tool-side fix (upstream) is still open. If dprint reformats those tables back to `--`, the gate false-positives again.
 4. **dprint over this session's markdown** — still not on PATH in this environment; all edited `.md` files (reports + living docs) are format-unverified by `dprint.json`. Carried from 08-47 c.5.
-5. **BuildFlow pre-commit suite not run as a whole** — I ran the individual gates (go test/lint/flake check/actionlint) but not the full hook profile (statix, gitleaks, treefmt, doc-files-age-check). `doc-files-age-check` *should* pass (README/TODO_LIST touched today), but that is inference, not a run.
+5. **BuildFlow pre-commit suite not run as a whole** — I ran the individual gates (go test/lint/flake check/actionlint) but not the full hook profile (statix, gitleaks, treefmt, doc-files-age-check). `doc-files-age-check` _should_ pass (README/TODO_LIST touched today), but that is inference, not a run.
 6. **`check-rows` on the two remaining status files** — the postmortem's f-items and the HTML dashboard were deliberately left with open items (correct), so a full-file uniformity check doesn't apply to them; only the archived corpus is gated.
 
 ## c) NOT STARTED
@@ -61,11 +61,11 @@
 ## d) TOTALLY FUCKED UP
 
 1. **I repeated the "assert before grepping" failure the 23-22 report confessed — twice.**
-   (a) I annotated 11-27 F.24 as "documented in CONTRIBUTING.md and AGENTS.md" from memory; a later grep showed CONTRIBUTING.md has no contract-test section (only a passing mode mention at line 40) and I had to rewrite the marker. (b) My initial verdict plan for the MIGRATION-sentinel items said "done (verify)" with zero evidence; the grep found 0 mentions. The skill's core rule — verify before writing — was followed *eventually*, not *first*, in both cases. Caught by re-grepping, not by discipline.
+   (a) I annotated 11-27 F.24 as "documented in CONTRIBUTING.md and AGENTS.md" from memory; a later grep showed CONTRIBUTING.md has no contract-test section (only a passing mode mention at line 40) and I had to rewrite the marker. (b) My initial verdict plan for the MIGRATION-sentinel items said "done (verify)" with zero evidence; the grep found 0 mentions. The skill's core rule — verify before writing — was followed _eventually_, not _first_, in both cases. Caught by re-grepping, not by discipline.
 
 2. **I hand-rolled a table-striker in raw python instead of using/extending the provided `annotate-rows.py`** — and it produced exactly the bug class the script was hardened against (2026-08-27 newline-collapse; marker placement): my version appended markers AFTER the final table pipe, creating malformed PARTIAL rows in 21 rows across 2 files. Caught by the `check-rows.py` gate at the end (as designed), then repaired — but the correct move was dry-running the official script's behavior first and extending it, not reinventing it under time pressure.
 
-3. **False-green local validation of the hygiene job.** My "GUARD_PASSES_LOCALLY" output was produced by a broken pipeline: `file` isn't installed here → `xargs` failed → grep matched nothing → `|| true` turned the failure into "no offenders". This is the *exact* pipeline-masking class (green lie from `cmd | filter; $?`) documented in the 08-47 report — re-committed in a session about verification rigor. The job is still correct on GH runners, but my local "test" proved nothing, and I initially presented it as a pass.
+3. **False-green local validation of the hygiene job.** My "GUARD_PASSES_LOCALLY" output was produced by a broken pipeline: `file` isn't installed here → `xargs` failed → grep matched nothing → `|| true` turned the failure into "no offenders". This is the _exact_ pipeline-masking class (green lie from `cmd | filter; $?`) documented in the 08-47 report — re-committed in a session about verification rigor. The job is still correct on GH runners, but my local "test" proved nothing, and I initially presented it as a pass.
 
 4. **Atomic-failure round trips.** First `annotate-rows` batch on 05-04 died on an invalid kind `u` (meant NOT-DO; the script supports h/v/p/w only) and rolled back all 25 rows — then my retry annotated only 19/20 before I noticed the rollback shape. Same class on 14-55 (B-section headings aren't list items) and 10-58/08-02 (inline numbered blocks the scripts can't reach). Cost ~6 wasted invocations. The skill says: ALWAYS dry-run the full spec against a new file shape first; I dry-ran one spec, not the batch.
 
@@ -73,7 +73,7 @@
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Verify-then-write must be mechanical, not aspirational.** Both d.1 slips happened while annotating *fast*. Rule for next passes: no marker without a grep/`git` evidence line captured *in the same command* that produces it.
+1. **Verify-then-write must be mechanical, not aspirational.** Both d.1 slips happened while annotating _fast_. Rule for next passes: no marker without a grep/`git` evidence line captured _in the same command_ that produces it.
 2. **Fix the tooling, not the docs**: `check-rows.py` `is_separator` should accept dprint's 2-dash separators (or treefmt/dprint should emit 3+). My `---` widening works but will re-false-positive after the next dprint pass over those tables.
 3. **Extend the annotate scripts** rather than side-rolling: inline-numbered-item support (`**Intro:** 8. … 9. …` blocks), a real NOT-DO kind, and heading-level resolution (several reports use `### N. Title` as item headings).
 4. **Never present a filtered-pipeline exit as a check** (d.3). `set -o pipefail` or explicit command-existence assertions before any "passes locally" claim. Third fleet instance of this class.
@@ -83,60 +83,60 @@
 
 ## f) Up to 50 things we should get done next
 
-*(ranked; items 1–10 are this session's direct continuations)*
+_(ranked; items 1–10 are this session's direct continuations)_
 
-| # | Task | Impact | Effort |
-| -- | --- | ------ | ------ |
-| 1 | Refresh website overrides for fast-uri/svgo/devalue to patched versions; `pnpm install`; verify 7 alerts dismiss | High | M |
-| 2 | Add Go-pins consistency CI job (go.mod directive vs flake pin) | High | S |
-| 3 | Watch first `hygiene` job run in CI; confirm green | High | S |
-| 4 | Website staleness audit beyond `/changelog/` (API reference vs v0.6.0) | Med | M |
-| 5 | Fix `check-rows.py` `is_separator` for dprint 2-dash tables (upstream) | Med | S |
-| 6 | Extend annotate scripts: inline-numbered items, NOT-DO kind, `### N.` heading items | Med | M |
-| 7 | Run full BuildFlow pre-commit profile once over this session's edits (statix, gitleaks, treefmt, doc-files-age-check) | Med | S |
-| 8 | Get dprint runnable in this environment (nix app or flake devShell) so markdown isn't format-unverified | Med | S |
-| 9 | Expand ROADMAP Theme 3 with the golden-corpus / discrimination-proof / suppression-design sub-items from 17-10 | Med | S |
-| 10 | Bump 14 downstream repos to v0.6.0 (BLOCKED: per-repo access) | Med | L |
-| 11 | Decide archived-reports retention (see g.2) | Low | S |
-| 12 | Add `docs/status/archived/` README index (one line per report: date, topic, disposition) | Low | S |
-| 13 | `Compare` fuzz test for ordered types | Low | S |
-| 14 | Run existing fuzz functions longer (`-fuzztime=30s` each) | Low | S |
-| 15 | Capture benchmark baselines (`bench-v1.txt`/`bench-v2.txt`) for benchstat | Low | S |
-| 16 | `errorlint` in `.golangci.yml` — decide yes/no, record the decision somewhere durable | Low | S |
-| 17 | `version.go` with a `Version` constant — decide yes/no | Low | S |
-| 18 | Coverage report upload as CI artifact | Low | S |
-| 19 | Add `golangci-lint` to the `flake-check` CI job | Low | S |
-| 20 | SARIF output for the GitHub Security tab | Low | S |
-| 21 | SECURITY.md: consider a security.txt / `.github/SECURITY.md` path convention check | Low | S |
-| 22 | Dependabot config for pnpm ecosystem in `website/` (alerts exist but no automated PRs) | Low | S |
-| 23 | Add a release checklist item: run `check-rows.py` + grep gate after any docs pass (habit, not tooling) | Low | S |
-| 24 | Consider `pnpm update --latest` vs targeted overrides for the website (see g.1) | Med | S |
-| 25 | Verify `hygiene` job doesn't false-positive on future root-level non-Go binaries (e.g. testdata) | Low | S |
-| 26 | Postmortem f.2: cut the next release following the AGENTS.md checklist verbatim (E2E test of release-notes automation) | Med | M |
-| 27 | Postmortem f.9: file the BuildFlow upstream issue — `go-mod-update` shouldn't raise a library's `go` directive | Med | S |
-| 28 | Postmortem f.13: `--dry-run` E2E simulation of `release.yml` (act or workflow_dispatch) | Low | M |
-| 29 | Postmortem f.11: dependabot manifest-view investigation if alerts persist >24h after the dep refresh | Low | S |
-| 30 | Re-derive FEATURES.md snapshot numbers at the START of every docs pass (they drifted once already) | Med | S |
-| 31 | Add `dprint check` to CI or BuildFlow so markdown formatting is gated somewhere it can actually run | Med | S |
-| 32 | Consider annotating future status reports IN-SESSION (harvest+annotate at writing time) instead of batch passes 5 reports later | Med | — |
-| 33 | Prune `dedup-acceptance.md` if the parity tests fully supersede it (verify first) | Low | S |
-| 34 | `cmd/namer` JSON output mode (ROADMAP Theme 3) | Low | M |
-| 35 | `cmd/namer -diff` mode (ROADMAP Theme 3) | Low | M |
-| 36 | `constraints.Ordered` decision for `Compare` (ROADMAP Theme 2) — decide, don't re-surface | Low | S |
-| 37 | `ErrMarshal`/`ErrUnmarshal` per-format split decision (ROADMAP Theme 2) — decide, don't re-surface | Low | S |
-| 38 | `ErrInternal` disposition decision (ROADMAP Theme 2) — decide, don't re-surface | Low | S |
-| 39 | Deprecate `go-composable-business-types/id` with a redirect tag (ROADMAP Theme 1) | Low | S |
-| 40 | Cross-language binary compatibility tests (ROADMAP Theme 4) | Low | L |
-| 41 | `NullID[B, V]` nullable SQL type (ROADMAP Theme 4) | Low | M |
-| 42 | jsontext streaming exploration (ROADMAP Theme 4) | Low | M |
-| 43 | msgpack/protobuf support (ROADMAP Theme 4) | Low | L |
-| 44 | Push statement coverage 88.5% → 90%+ (`valueString()` fallbacks) | Low | M |
-| 45 | `Example*` tests for the sentinel pattern (documentation-driven) | Low | S |
-| 46 | Review `id_ptr.go` edge-case coverage | Low | S |
-| 47 | Add round-trip property test across all serialization formats | Low | M |
-| 48 | Website guide: zero-value semantics (`IsZero`, `Or`, `Ptr`) | Low | M |
-| 49 | Website guide: dual JSON v1/v2 architecture | Low | M |
-| 50 | Blog post: the dual-mode build-tag architecture (or formally Won't it) | Low | M |
+| #  | Task                                                                                                                            | Impact | Effort |
+| -- | ------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ |
+| 1  | Refresh website overrides for fast-uri/svgo/devalue to patched versions; `pnpm install`; verify 7 alerts dismiss                | High   | M      |
+| 2  | Add Go-pins consistency CI job (go.mod directive vs flake pin)                                                                  | High   | S      |
+| 3  | Watch first `hygiene` job run in CI; confirm green                                                                              | High   | S      |
+| 4  | Website staleness audit beyond `/changelog/` (API reference vs v0.6.0)                                                          | Med    | M      |
+| 5  | Fix `check-rows.py` `is_separator` for dprint 2-dash tables (upstream)                                                          | Med    | S      |
+| 6  | Extend annotate scripts: inline-numbered items, NOT-DO kind, `### N.` heading items                                             | Med    | M      |
+| 7  | Run full BuildFlow pre-commit profile once over this session's edits (statix, gitleaks, treefmt, doc-files-age-check)           | Med    | S      |
+| 8  | Get dprint runnable in this environment (nix app or flake devShell) so markdown isn't format-unverified                         | Med    | S      |
+| 9  | Expand ROADMAP Theme 3 with the golden-corpus / discrimination-proof / suppression-design sub-items from 17-10                  | Med    | S      |
+| 10 | Bump 14 downstream repos to v0.6.0 (BLOCKED: per-repo access)                                                                   | Med    | L      |
+| 11 | Decide archived-reports retention (see g.2)                                                                                     | Low    | S      |
+| 12 | Add `docs/status/archived/` README index (one line per report: date, topic, disposition)                                        | Low    | S      |
+| 13 | `Compare` fuzz test for ordered types                                                                                           | Low    | S      |
+| 14 | Run existing fuzz functions longer (`-fuzztime=30s` each)                                                                       | Low    | S      |
+| 15 | Capture benchmark baselines (`bench-v1.txt`/`bench-v2.txt`) for benchstat                                                       | Low    | S      |
+| 16 | `errorlint` in `.golangci.yml` — decide yes/no, record the decision somewhere durable                                           | Low    | S      |
+| 17 | `version.go` with a `Version` constant — decide yes/no                                                                          | Low    | S      |
+| 18 | Coverage report upload as CI artifact                                                                                           | Low    | S      |
+| 19 | Add `golangci-lint` to the `flake-check` CI job                                                                                 | Low    | S      |
+| 20 | SARIF output for the GitHub Security tab                                                                                        | Low    | S      |
+| 21 | SECURITY.md: consider a security.txt / `.github/SECURITY.md` path convention check                                              | Low    | S      |
+| 22 | Dependabot config for pnpm ecosystem in `website/` (alerts exist but no automated PRs)                                          | Low    | S      |
+| 23 | Add a release checklist item: run `check-rows.py` + grep gate after any docs pass (habit, not tooling)                          | Low    | S      |
+| 24 | Consider `pnpm update --latest` vs targeted overrides for the website (see g.1)                                                 | Med    | S      |
+| 25 | Verify `hygiene` job doesn't false-positive on future root-level non-Go binaries (e.g. testdata)                                | Low    | S      |
+| 26 | Postmortem f.2: cut the next release following the AGENTS.md checklist verbatim (E2E test of release-notes automation)          | Med    | M      |
+| 27 | Postmortem f.9: file the BuildFlow upstream issue — `go-mod-update` shouldn't raise a library's `go` directive                  | Med    | S      |
+| 28 | Postmortem f.13: `--dry-run` E2E simulation of `release.yml` (act or workflow_dispatch)                                         | Low    | M      |
+| 29 | Postmortem f.11: dependabot manifest-view investigation if alerts persist >24h after the dep refresh                            | Low    | S      |
+| 30 | Re-derive FEATURES.md snapshot numbers at the START of every docs pass (they drifted once already)                              | Med    | S      |
+| 31 | Add `dprint check` to CI or BuildFlow so markdown formatting is gated somewhere it can actually run                             | Med    | S      |
+| 32 | Consider annotating future status reports IN-SESSION (harvest+annotate at writing time) instead of batch passes 5 reports later | Med    | —      |
+| 33 | Prune `dedup-acceptance.md` if the parity tests fully supersede it (verify first)                                               | Low    | S      |
+| 34 | `cmd/namer` JSON output mode (ROADMAP Theme 3)                                                                                  | Low    | M      |
+| 35 | `cmd/namer -diff` mode (ROADMAP Theme 3)                                                                                        | Low    | M      |
+| 36 | `constraints.Ordered` decision for `Compare` (ROADMAP Theme 2) — decide, don't re-surface                                       | Low    | S      |
+| 37 | `ErrMarshal`/`ErrUnmarshal` per-format split decision (ROADMAP Theme 2) — decide, don't re-surface                              | Low    | S      |
+| 38 | `ErrInternal` disposition decision (ROADMAP Theme 2) — decide, don't re-surface                                                 | Low    | S      |
+| 39 | Deprecate `go-composable-business-types/id` with a redirect tag (ROADMAP Theme 1)                                               | Low    | S      |
+| 40 | Cross-language binary compatibility tests (ROADMAP Theme 4)                                                                     | Low    | L      |
+| 41 | `NullID[B, V]` nullable SQL type (ROADMAP Theme 4)                                                                              | Low    | M      |
+| 42 | jsontext streaming exploration (ROADMAP Theme 4)                                                                                | Low    | M      |
+| 43 | msgpack/protobuf support (ROADMAP Theme 4)                                                                                      | Low    | L      |
+| 44 | Push statement coverage 88.5% → 90%+ (`valueString()` fallbacks)                                                                | Low    | M      |
+| 45 | `Example*` tests for the sentinel pattern (documentation-driven)                                                                | Low    | S      |
+| 46 | Review `id_ptr.go` edge-case coverage                                                                                           | Low    | S      |
+| 47 | Add round-trip property test across all serialization formats                                                                   | Low    | M      |
+| 48 | Website guide: zero-value semantics (`IsZero`, `Or`, `Ptr`)                                                                     | Low    | M      |
+| 49 | Website guide: dual JSON v1/v2 architecture                                                                                     | Low    | M      |
+| 50 | Blog post: the dual-mode build-tag architecture (or formally Won't it)                                                          | Low    | M      |
 
 ## g) Questions I CANNOT answer myself
 
@@ -146,4 +146,4 @@
 
 ---
 
-*Point-in-time snapshot. All session changes are committed by the auto-commit daemon (85a858d, 320cee4, acd8918 at time of writing). Per skill contract: report written, WAITING FOR INSTRUCTIONS.*
+_Point-in-time snapshot. All session changes are committed by the auto-commit daemon (85a858d, 320cee4, acd8918 at time of writing). Per skill contract: report written, WAITING FOR INSTRUCTIONS._

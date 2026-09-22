@@ -73,4 +73,3 @@ on origin; the ecosystem `Name()`/`.Get()` work is documented in the same-day
 follow-up report (`2026-05-20_14-55`). The deliberately-skipped repos
 (go-cqrs-lite, BerryBig, Cyberdom) remain correct as-is — see AGENTS.md
 "Brands That Deliberately Skip `Name()`".
-
