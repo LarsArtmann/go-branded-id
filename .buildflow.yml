@@ -1,8 +1,12 @@
 # BuildFlow Configuration
 # See: https://github.com/larsartmann/buildflow
-# Disable go-auto-upgrade: it rewrites encoding/json v1->v2, which corrupts
-# the dual-mode JSON files (id_json_v1.go, json_helpers_v1_test.go) on every
-# commit. This library deliberately supports BOTH v1 and v2 via build tags.
+# go-auto-upgrade: UNSKIPPED 2026-09-22 (retested against gau v0.6.2). The
+# old corruption bug (import rewrites breaking the dual-mode build-tag file
+# pairs) is fixed upstream: the dual-mode guard detects the
+# //go:build goexperiment.jsonv2 pairs and skips them with info findings, and
+# the module go-version gate (go directive 1.26 < 1.27) blocks any remaining
+# v1->v2 swaps. A run is a green no-op emitting info-level dual-mode notes.
+# This library deliberately supports BOTH v1 and v2 via build tags.
 #
 # Disable go-mod-update: it bumps the `go` directive to the latest toolchain
 # (e.g. 1.26 -> 1.27.1), breaking the Nix sandbox build (go_1_26), CI with
@@ -11,5 +15,4 @@
 # This library is stdlib-only (zero dependencies), so the dependency-update
 # half of the step has nothing to do anyway.
 skip_steps:
-  - go-auto-upgrade
   - go-mod-update
