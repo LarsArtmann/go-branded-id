@@ -51,7 +51,7 @@
 
 | #     | Task                               | Status                          | What remains                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ----- | ---------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **9** | Bump 14 downstream repos to v0.4.0 | **Documented but not executed** | The bump procedure is fully documented in MIGRATION.md ("Bumping Downstream Repositories"). The 14 repos (InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI, smart-configs, StopTube, universal-workflow, Zlota44, timesheets, complaints-mcp, cqrs-htmx, emeet-pixyd) require access to each repo. Cannot be done autonomously — requires cloning each, running `go get`, testing, committing, PR. |
+|~~ **9** ~~|~~ Bump 14 downstream repos to v0.4.0 ~~|~~ **Documented but not executed** ~~|~~ The bump procedure is fully documented in MIGRATION.md ("Bumping Downstream Repositories"). The 14 repos (InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI, smart-configs, StopTube, universal-workflow, Zlota44, timesheets, complaints-mcp, cqrs-htmx, emeet-pixyd) require access to each repo. Cannot be done autonomously — requires cloning each, running `go get`, testing, committing, PR. ~~| **Won't implement — superseded; the standing task is the v0.6.0 ecosystem bump (TODO_LIST).**
 
 ---
 
@@ -90,31 +90,31 @@ imports encoding/json/v2: build constraints exclude all Go files in .../encoding
 
 ### Architectural
 
-1. **The goimports corruption will recur.** The contract test catches it _after_ it happens. The root cause is that goimports has no build-tag awareness and picks `encoding/json/v2` when re-adding the json import from scratch. A pre-commit hook or a `goimports -local` configuration that pins the import would be more preventive. The contract test is a safety net, not a cure.
+1. ~~**The goimports corruption will recur.** The contract test catches it _after_ it happens. The root cause is that goimports has no build-tag awareness and picks `encoding/json/v2` when re-adding the json import from scratch. A pre-commit hook or a `goimports -local` configuration that pins the import would be more preventive. The contract test is a safety net, not a cure.~~ **Won't implement — superseded — the root cause was go-auto-upgrade; skip guard 2026-08-02, upstream fix unskipped it 2026-09-22.**
 
-2. **The dual-mode file pairs are a maintenance liability.** Every logic change must be made in both files. The parity test catches divergence, but the duplication remains. If a third mode is ever needed, code generation becomes worth the complexity.
+2. ~~**The dual-mode file pairs are a maintenance liability.** Every logic change must be made in both files. The parity test catches divergence, but the duplication remains. If a third mode is ever needed, code generation becomes worth the complexity.~~ done (parity tests guard the pair; codegen rejected (dedup-acceptance.md))
 
-3. **The `err113` nolint approach is a code smell.** 12 `//nolint:err113` directives on diagnostic errors that embed `%T` formatting. The "correct" fix would be sentinel errors with `fmt.Errorf("...: %w", ErrUnsupportedType)` — but the current errors embed runtime type information that can't be a static sentinel. The nolint is honest; the alternative would be worse.
+3. ~~**The `err113` nolint approach is a code smell.** 12 `//nolint:err113` directives on diagnostic errors that embed `%T` formatting. The "correct" fix would be sentinel errors with `fmt.Errorf("...: %w", ErrUnsupportedType)` — but the current errors embed runtime type information that can't be a static sentinel. The nolint is honest; the alternative would be worse.~~ done (superseded — the v0.5.0 sentinel refactor removed all 12 nolint directives)
 
 ### Testing
 
-4. **No integration test for the full CI matrix locally.** You have to remember to run both `go test` and `GOEXPERIMENT=jsonv2 go test`. The `nix run .#test` app does this, but a developer running plain `go test` only tests one mode. A pre-commit hook running both modes would help.
+4. ~~**No integration test for the full CI matrix locally.** You have to remember to run both `go test` and `GOEXPERIMENT=jsonv2 go test`. The `nix run .#test` app does this, but a developer running plain `go test` only tests one mode. A pre-commit hook running both modes would help.~~ done (pre-push dual-mode hook (23-01 session))
 
-5. **The namer tool has no integration test that actually runs the binary.** `TestRun_*` tests the `run()` function directly, but doesn't test `go run ./cmd/namer testdata/`. The binary could theoretically behave differently (flag parsing edge cases, exit codes).
+5. ~~**The namer tool has no integration test that actually runs the binary.** `TestRun_*` tests the `run()` function directly, but doesn't test `go run ./cmd/namer testdata/`. The binary could theoretically behave differently (flag parsing edge cases, exit codes).~~ **Won't implement — not added.**
 
-6. **Benchmark results are not captured anywhere.** The v1-vs-v2 benchmarks exist but there's no baseline file checked in. Without a baseline, `benchstat` comparisons require re-running the old version.
+6. ~~**Benchmark results are not captured anywhere.** The v1-vs-v2 benchmarks exist but there's no baseline file checked in. Without a baseline, `benchstat` comparisons require re-running the old version.~~ **Won't implement — not captured.**
 
 ### CI/CD
 
-7. **The release workflow runs lint in both modes but doesn't run the contract tests explicitly.** They're part of the test suite, so they run — but naming them explicitly in the release workflow would make the gating intent clearer.
+7. ~~**The release workflow runs lint in both modes but doesn't run the contract tests explicitly.** They're part of the test suite, so they run — but naming them explicitly in the release workflow would make the gating intent clearer.~~ **Won't implement — not renamed; the tests run via the suite in both modes.**
 
-8. **No `nix flake check` in CI.** The GitHub workflows use `actions/setup-go` directly. `nix flake check` (which includes the sandbox build in both json modes) is only run locally. Adding it to CI would catch Nix-specific issues.
+8. ~~**No `nix flake check` in CI.** The GitHub workflows use `actions/setup-go` directly. `nix flake check` (which includes the sandbox build in both json modes) is only run locally. Adding it to CI would catch Nix-specific issues.~~ done (flake-check job added to go.yml)
 
 ### Documentation
 
-9. **The website changelog only goes up to 0.3.2.** The dual-mode work (0.4.0) is documented in MIGRATION.md and CHANGELOG.md has `[Unreleased]`, but the website `changelog.mdx` doesn't have a 0.4.0 entry yet.
+9. ~~**The website changelog only goes up to 0.3.2.** The dual-mode work (0.4.0) is documented in MIGRATION.md and CHANGELOG.md has `[Unreleased]`, but the website `changelog.mdx` doesn't have a 0.4.0 entry yet.~~ done (entries added through v0.6.0)
 
-10. **CONTRIBUTING.md doesn't mention the dual-mode contract tests.** A contributor who edits one half of a json file pair needs to know the parity test exists and will fail if they forget the other half.
+10. ~~**CONTRIBUTING.md doesn't mention the dual-mode contract tests.** A contributor who edits one half of a json file pair needs to know the parity test exists and will fail if they forget the other half.~~ **Won't implement — not added — AGENTS.md owns the dual-mode gotcha; CONTRIBUTING.md mentions both modes only in passing.**
 
 ---
 
@@ -122,62 +122,62 @@ imports encoding/json/v2: build constraints exclude all Go files in .../encoding
 
 ### High Priority
 
-1. **Release v0.4.0** — tag, push, let CI create the GitHub release
-2. **Add 0.4.0 entry to website `changelog.mdx`** — the dual-mode work is invisible on the website
-3. **Actually bump the 14 downstream repos** — procedure is documented, needs execution
-4. **Add `nix flake check` to CI** — currently only runs locally
-5. **Add pre-commit hook for dual-mode `go test`** — prevents single-mode blind spots
-6. **Add the dual-mode contract test pattern to CONTRIBUTING.md** — so contributors know about the parity requirement
+1. ~~**Release v0.4.0** — tag, push, let CI create the GitHub release~~ done (v0.4.0/v0.5.0 tagged; v0.6.0 current)
+2. ~~**Add 0.4.0 entry to website `changelog.mdx`** — the dual-mode work is invisible on the website~~ done (entries added through v0.6.0)
+3. ~~**Actually bump the 14 downstream repos** — procedure is documented, needs execution~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+4. ~~**Add `nix flake check` to CI** — currently only runs locally~~ done (flake-check job (go.yml))
+5. ~~**Add pre-commit hook for dual-mode `go test`** — prevents single-mode blind spots~~ done (pre-push dual-mode hook (23-01))
+6. ~~**Add the dual-mode contract test pattern to CONTRIBUTING.md** — so contributors know about the parity requirement~~ **Won't implement — not added — AGENTS.md owns the gotcha.**
 
 ### Medium Priority
 
-7. **Capture benchmark baseline files** — check in `bench-v1.txt` and `bench-v2.txt` for benchstat comparison
-8. **Add integration test that runs the namer binary** — `exec.Command("go", "run", "./cmd/namer", "testdata/")`
-9. **Investigate goimports pinning** — can `.goimports` or editor config pin the json import path?
-10. **Add `go vet` in both json modes to CI** — currently only `golangci-lint` runs
-11. **Consider a `make dual-test` or `just dual-test` equivalent in flake** — convenience alias for both-mode testing
-12. **Add fuzz tests for SQL Scan with arbitrary `src any`** — currently only JSON and Binary have fuzz tests
-13. **Add fuzz test for Text unmarshal** — no fuzz coverage for `UnmarshalText`
-14. **Benchmark SQL Scan/Value** — no performance characterization for the SQL path
-15. **Add `GOEXPERIMENT=jsonv2` to the devShell `.envrc`** — optional, but convenient for v2-focused development
-16. **Document the goimports corruption in CONTRIBUTING.md** — warn contributors about the hazard
-17. **Add a `// Code generated DO NOT EDIT` header to the json file pairs** — even though they're hand-written, this signals to tools that they should not be auto-formatted (debatable)
-18. **Consider `go:generate` directive that runs the parity test** — `go generate ./...` could verify the contract before building
-19. **Add coverage report to CI** — `go test -cover` runs but the report isn't uploaded as an artifact
-20. **Add race detector to the namer tests** — currently only the library tests run with `-race`
+7. ~~**Capture benchmark baseline files** — check in `bench-v1.txt` and `bench-v2.txt` for benchstat comparison~~ **Won't implement — not captured.**
+8. ~~**Add integration test that runs the namer binary** — `exec.Command("go", "run", "./cmd/namer", "testdata/")`~~ **Won't implement — not added.**
+9. ~~**Investigate goimports pinning** — can `.goimports` or editor config pin the json import path?~~ done (superseded — root cause was go-auto-upgrade; fixed upstream (gau v0.6.2), unskipped 2026-09-22)
+10. ~~**Add `go vet` in both json modes to CI** — currently only `golangci-lint` runs~~ **Won't implement — not added — go vet runs via nix run .#vet and golangci includes govet.**
+11. ~~**Consider a `make dual-test` or `just dual-test` equivalent in flake** — convenience alias for both-mode testing~~ done (apps.test runs both modes)
+12. ~~**Add fuzz tests for SQL Scan with arbitrary `src any`** — currently only JSON and Binary have fuzz tests~~ done (FuzzSQLScanRoundTrip* (23-01))
+13. ~~**Add fuzz test for Text unmarshal** — no fuzz coverage for `UnmarshalText`~~ done (FuzzTextRoundTrip* (23-01))
+14. ~~**Benchmark SQL Scan/Value** — no performance characterization for the SQL path~~ **Won't implement — not added.**
+15. ~~**Add `GOEXPERIMENT=jsonv2` to the devShell `.envrc`** — optional, but convenient for v2-focused development~~ **Won't implement — not needed — no GOEXPERIMENT requirement since v0.5.0.**
+16. ~~**Document the goimports corruption in CONTRIBUTING.md** — warn contributors about the hazard~~ done (root cause corrected in AGENTS.md/MIGRATION (2026-09-17))
+17. ~~**Add a `// Code generated DO NOT EDIT` header to the json file pairs** — even though they're hand-written, this signals to tools that they should not be auto-formatted (debatable)~~ **Won't implement — not added.**
+18. ~~**Consider `go:generate` directive that runs the parity test** — `go generate ./...` could verify the contract before building~~ **Won't implement — not added.**
+19. ~~**Add coverage report to CI** — `go test -cover` runs but the report isn't uploaded as an artifact~~ **Won't implement — not uploaded.**
+20. ~~**Add race detector to the namer tests** — currently only the library tests run with `-race`~~ done (the pre-push hook races ./... including cmd/namer)
 
 ### Lower Priority
 
-21. **Explore `encoding/json/v2` jsontext API** — v2 has a streaming `jsontext` API that could be more efficient for the ID type
-22. **Add `ID[B, V]` to the `encoding/json/v2` marshaler registry** — v2 supports per-type marshalers without methods
-23. **Consider a `Compare` method that works at compile time** — currently runtime-checked via type switch
-24. **Add `Hash()` method** — for use with `map[ID[B,V]]` (currently works via comparability but no explicit hash)
-25. **Add `ID[B, V]` support for `encoding/gob` with interface fields** — current gob implementation delegates to binary
-26. **Explore generic constraints for `Compare`** — `constraints.Ordered` would make `ErrNotOrdered` a compile-time error
-27. **Add `Stringer` benchmark for named vs unnamed brands** — performance impact of `BrandName[B]()` reflection
-28. **Profile JSON marshal allocations** — `json.Marshal` allocates; could use `json.MarshalWrite` in v2 mode
-29. **Add `Format` method benchmark** — `%s`, `%v`, `%#v` formatting performance
-30. **Consider `ID[B, V]` implementing `fmt.Stringer` only for named brands** — unnamed brands return raw value, which is already the behavior
-31. **Add `Scan` benchmark for all SQL driver types** — int64, int, float64, []byte, string
-32. **Add `Value` benchmark** — SQL `driver.Valuer` performance
-33. **Explore `sync.Pool` for marshal buffers** — reduce allocations for hot paths
-34. **Add `ID[B, V]` support for `encoding/xml`** — currently only Text (which covers XML indirectly)
-35. **Consider `ID[B, V]` implementing `sql/driver.Valuer` with nullable support** — `NullID[B,V]` type?
-36. **Add property-based testing with rapid** — generate random IDs and verify invariants
-37. **Add `ID[B, V]` JSON marshaling with `omitempty` support** — via a wrapper type?
-38. **Document the little-endian binary format** — in a separate spec or RFC-style doc
-39. **Add cross-language binary compatibility tests** — marshal in Go, verify bytes match a Python/TS reference
-40. **Consider `ID[B, V]` for protobuf** — `proto.Marshal` support via custom message
-41. **Add `ID[B, V]` support for `msgpack`** — common binary format
-42. **Explore `ID[B, V]` with `cmp` package** — `cmp.Equal` and `cmp.Diff` support
-43. **Add `ID[B, V]` to `gob` codec registry** — for `encoding/gob` v2 if it materializes
-44. **Consider `ID[B, V]` implementing `crypto/hash.Hash`** — for content-addressable IDs?
-45. **Add `ID[B, V]` support for `database/sql` `NullX` types** — `NullInt64`, `NullString` interop
-46. **Explore `ID[B, V]` with generics methods on `[]ID`** — batch operations
-47. **Add `ID[B, V]` implementing `sort.Interface`** — or helper functions for sorting
-48. **Consider `ID[B, V]` with `context.Context`** — trace context propagation?
-49. **Add `ID[B, V]` support for `encoding/csv`** — via Text marshal
-50. **Write a blog post about the dual-mode architecture** — the pattern is novel and reusable
+21. ~~**Explore `encoding/json/v2` jsontext API** — v2 has a streaming `jsontext` API that could be more efficient for the ID type~~ **Won't implement — routed to ROADMAP Theme 4.**
+22. ~~**Add `ID[B, V]` to the `encoding/json/v2` marshaler registry** — v2 supports per-type marshalers without methods~~ **Won't implement — routed to ROADMAP Theme 4.**
+23. ~~**Consider a `Compare` method that works at compile time** — currently runtime-checked via type switch~~ **Won't implement — routed to ROADMAP Theme 2.**
+24. ~~**Add `Hash()` method** — for use with `map[ID[B,V]]` (currently works via comparability but no explicit hash)~~ **Won't implement — not added.**
+25. ~~**Add `ID[B, V]` support for `encoding/gob` with interface fields** — current gob implementation delegates to binary~~ **Won't implement — not added.**
+26. ~~**Explore generic constraints for `Compare`** — `constraints.Ordered` would make `ErrNotOrdered` a compile-time error~~ **Won't implement — routed to ROADMAP Theme 2.**
+27. ~~**Add `Stringer` benchmark for named vs unnamed brands** — performance impact of `BrandName[B]()` reflection~~ **Won't implement — not added.**
+28. ~~**Profile JSON marshal allocations** — `json.Marshal` allocates; could use `json.MarshalWrite` in v2 mode~~ **Won't implement — not done.**
+29. ~~**Add `Format` method benchmark** — `%s`, `%v`, `%#v` formatting performance~~ **Won't implement — not added.**
+30. ~~**Consider `ID[B, V]` implementing `fmt.Stringer` only for named brands** — unnamed brands return raw value, which is already the behavior~~ **Won't implement — already the behavior.**
+31. ~~**Add `Scan` benchmark for all SQL driver types** — int64, int, float64, []byte, string~~ **Won't implement — not added.**
+32. ~~**Add `Value` benchmark** — SQL `driver.Valuer` performance~~ **Won't implement — not added.**
+33. ~~**Explore `sync.Pool` for marshal buffers** — reduce allocations for hot paths~~ **Won't implement — not done.**
+34. ~~**Add `ID[B, V]` support for `encoding/xml`** — currently only Text (which covers XML indirectly)~~ **Won't implement — not added — Text covers XML use cases.**
+35. ~~**Consider `ID[B, V]` implementing `sql/driver.Valuer` with nullable support** — `NullID[B,V]` type?~~ **Won't implement — not added.**
+36. ~~**Add property-based testing with rapid** — generate random IDs and verify invariants~~ **Won't implement — not added.**
+37. ~~**Add `ID[B, V]` JSON marshaling with `omitempty` support** — via a wrapper type?~~ **Won't implement — not added.**
+38. ~~**Document the little-endian binary format** — in a separate spec or RFC-style doc~~ done (AGENTS.md documents the little-endian format)
+39. ~~**Add cross-language binary compatibility tests** — marshal in Go, verify bytes match a Python/TS reference~~ **Won't implement — routed to ROADMAP Theme 4.**
+40. ~~**Consider `ID[B, V]` for protobuf** — `proto.Marshal` support via custom message~~ **Won't implement — not added.**
+41. ~~**Add `ID[B, V]` support for `msgpack`** — common binary format~~ **Won't implement — not added.**
+42. ~~**Explore `ID[B, V]` with `cmp` package** — `cmp.Equal` and `cmp.Diff` support~~ **Won't implement — not done.**
+43. ~~**Add `ID[B, V]` to `gob` codec registry** — for `encoding/gob` v2 if it materializes~~ **Won't implement — not applicable.**
+44. ~~**Consider `ID[B, V]` implementing `crypto/hash.Hash`** — for content-addressable IDs?~~ **Won't implement — not added.**
+45. ~~**Add `ID[B, V]` support for `database/sql` `NullX` types** — `NullInt64`, `NullString` interop~~ **Won't implement — routed to ROADMAP Theme 4.**
+46. ~~**Explore `ID[B, V]` with generics methods on `[]ID`** — batch operations~~ **Won't implement — not added.**
+47. ~~**Add `ID[B, V]` implementing `sort.Interface`** — or helper functions for sorting~~ **Won't implement — not added.**
+48. ~~**Consider `ID[B, V]` with `context.Context`** — trace context propagation?~~ **Won't implement — not added.**
+49. ~~**Add `ID[B, V]` support for `encoding/csv`** — via Text marshal~~ **Won't implement — not added.**
+50. ~~**Write a blog post about the dual-mode architecture** — the pattern is novel and reusable~~ **Won't implement — not written.**
 
 ---
 

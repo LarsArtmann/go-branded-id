@@ -184,7 +184,7 @@ The core feature requested mid-session ("Let's support both!"):
 21. ~~Audit all 84 pre-existing lint issues (50 `varnamelen`, 16 `err113`, 8 `makezero`, etc.).~~ done (82→0 in the 16-44 audit + sentinel refactor)
 22. ~~Add `goexperiment.jsonv2` to `.golangci.yml` build-tags is already there — verify it's sufficient for v2 linting.~~ done (CI matrix covers both modes)
 23. ~~Consider whether `id_text.go` and `id_binary.go` should also be dual-mode (they don't import json, so probably not).~~ **Won't implement — not needed — those files import no json package.**
-24. ~~Document the build-tag pattern in a CONTRIBUTING section for future contributors.~~ done (documented in CONTRIBUTING.md and AGENTS.md)
+24. ~~Document the build-tag pattern in a CONTRIBUTING section for future contributors.~~ done (AGENTS.md owns the dual-mode gotcha; CONTRIBUTING.md mentions both modes at line 40 but has no dedicated section)
 25. ~~Add a "Dual JSON Support" section to the website guides.~~ done (website guides cover dual-mode support)
 26. ~~Consider adding `encoding/json/v2` to the README feature list as a selling point.~~ **Won't implement — not added — README stays consumer-focused; dual-mode documented in FEATURES/MIGRATION/website.**
 27. ~~Verify the `cmd/namer` tool handles `id.ID[Brand]` (single type arg) correctly in real code.~~ **Won't implement — not verified against real code.**

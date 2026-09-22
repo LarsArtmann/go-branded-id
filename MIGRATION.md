@@ -209,13 +209,37 @@ go build ./...
 The BuildFlow `go-auto-upgrade` step used to rewrite `"encoding/json"` to
 `"encoding/json/v2"` in v1-tagged files (`id_json_v1.go`,
 `json_helpers_v1_test.go`), breaking the default build with `build constraints
-exclude all Go files in encoding/json/v2`. It is now permanently skipped via
-`.buildflow.yml` (`skip_steps`). If it ever recurs, restore the imports and
-verify the split:
+exclude all Go files in encoding/json/v2`. The step was skipped via
+`.buildflow.yml` from 2026-08-02; since 2026-09-22 it is re-enabled — its
+upstream v0.6.2 detects build-tagged file pairs and leaves them alone. If it
+ever recurs, restore the imports and verify the split:
 
 ```bash
 go test -run TestDualJSONContract ./...
 ```
+
+## v0.5.0+: Sentinel Errors
+
+Since v0.5.0 every ID operation wraps a package-level sentinel error, and
+v0.6.0 completed the set. **Nothing is required to upgrade** — the sentinels
+are additive — but you can now branch on error categories instead of parsing
+strings:
+
+```go
+if err := sqlID.Scan(value); err != nil {
+    switch {
+    case errors.Is(err, id.ErrCannotScan):
+        // incompatible SQL source type
+    case errors.Is(err, id.ErrUnmarshal):
+        // delegate unmarshaler failed
+    }
+}
+```
+
+The full sentinel table with when-each-fires descriptions lives in the
+[README](README.md#error-handling) and the website Error Handling guide.
+Note: v0.5.0 briefly shortened the `ErrNotOrdered` message; v0.6.0 restored
+the original text. `errors.Is` matching was never affected.
 
 ## Bumping Downstream Repositories
 
