@@ -105,11 +105,9 @@ The `goexperiment.jsonv2` build tag is set automatically by the Go toolchain whe
 
 **Historical note:** Previously the library hard-required `GOEXPERIMENT=jsonv2`, which caused the v0.3.1 release to fail (CI didn't set it). The dual-mode approach eliminates this class of problem entirely.
 
-**CRITICAL: the `go-auto-upgrade` buildflow step corrupts v1 files.** BuildFlow's `go-auto-upgrade` step ("Code modernization: encoding/json v1→v2") silently rewrites `"encoding/json"` to `"encoding/json/v2"` in `id_json_v1.go` and `json_helpers_v1_test.go`. This breaks the v1 build entirely — `go build ./...` without `GOEXPERIMENT` fails with `build constraints exclude all Go files in encoding/json/v2`.
+**Root cause and current state (updated 2026-09-22):** the corruption was caused by BuildFlow's `go-auto-upgrade` step (NOT goimports, which is build-tag-aware and innocent). The step was skipped via `.buildflow.yml` from 2026-08-02; on 2026-09-22 it was **re-enabled** after retesting against gau v0.6.2, whose dual-mode guard now detects `goexperiment.jsonv2` file pairs and skips them, and whose module go-version gate blocks remaining v1→v2 swaps at `go 1.26`. A run is a green no-op emitting info-level notes. This project deliberately supports BOTH v1 and v2 via build tags.
 
-**Permanent fix (in place):** `.buildflow.yml` has `skip_steps: [go-auto-upgrade]`. This project deliberately supports BOTH v1 and v2 via build tags, so the v1→v2 modernizer must never run here. Plain `goimports` does NOT corrupt these files (verified) — only the auto-upgrade step does.
-
-**If the v1 build ever breaks again** with that error, the imports in `id_json_v1.go` / `json_helpers_v1_test.go` have been rewritten back to `"encoding/json/v2"` — change them back to `"encoding/json"` and confirm `go build ./...` (no GOEXPERIMENT) passes.
+**If the v1 build ever breaks again** with `build constraints exclude all Go files in encoding/json/v2`, the imports in `id_json_v1.go` / `json_helpers_v1_test.go` have been rewritten to `"encoding/json/v2"` — change them back to `"encoding/json"` and confirm `go build ./...` (no GOEXPERIMENT) passes. The pre-push hook greps these imports before running tests, so a push with corrupted imports fails fast with a clear message.
 
 ### String() vs Get() — Know the Difference
 
@@ -155,12 +153,14 @@ consumer-facing minimum for a library, not something to auto-bump.
 
 **The recurring writer is BuildFlow's `go-mod-update` step** ("Updates Go
 toolchain and dependencies"), NOT `go-auto-upgrade` (that one rewrites JSON
-imports). It bumped `go 1.26` → `1.27.1` twice (documented pre-v0.6.0, and
-again on 2026-09-17 via daemon commit `1acc808`, caught by CI within minutes).
-Both steps are now in `skip_steps` in `.buildflow.yml`. The bump lands as a
-dirty file that the auto-commit daemon later sweeps into an unrelated commit —
-check `git log -p -- go.mod` when CI fails with `go.mod requires go >= ...`.
-CI is the reliable tripwire (it sets `GOTOOLCHAIN=local`).
+imports, and was itself fixed upstream in gau v0.6.2). It bumped `go 1.26` →
+`1.27.1` twice (documented pre-v0.6.0, and again on 2026-09-17 via daemon
+commit `1acc808`, caught by CI within minutes). `go-mod-update` is in
+`skip_steps` in `.buildflow.yml` (2026-09-22: `go-auto-upgrade` was un-skipped
+after its upstream fix, so only `go-mod-update` remains skipped). The bump
+lands as a dirty file that the auto-commit daemon later sweeps into an
+unrelated commit — check `git log -p -- go.mod` when CI fails with `go.mod
+requires go >= ...`. CI is the reliable tripwire (it sets `GOTOOLCHAIN=local`).
 
 ### Nix Sandbox Build Cache (GOCACHE)
 
@@ -180,7 +180,7 @@ The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspa
 
 ### Dual-Mode Pre-Push Hook
 
-A pre-push git hook (`scripts/pre-push-dual-test.sh`) runs `go test` in both v1 and v2 JSON modes. It's installed at `.git/hooks/pre-push`. Plain `go test` only exercises v1; the hook catches code that passes v1 but breaks v2 (build tag issues, import corruption).
+A pre-push git hook (`scripts/pre-push-dual-test.sh`) greps the v1 JSON files for `encoding/json/v2` imports, then runs `go test` in both v1 and v2 JSON modes, reporting both results. It's installed at `.git/hooks/pre-push` (reinstall after editing the script). Plain `go test` only exercises v1; the hook catches code that passes v1 but breaks v2 (build tag issues, import corruption) — and the grep guard catches import corruption that would prevent the v1 package from compiling at all, which no in-package test can observe.
 
 ## Ecosystem Context
 
@@ -188,7 +188,7 @@ This library was extracted from `go-composable-business-types/id`. It has 14 dow
 
 When making breaking changes, consider the migration impact across:
 
-- InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI, smart-configs, StopTube, universal-workflow, Zlota44, timesheets, complaints-mcp, cqrs-htmx, emeet-pixyd
+- InboxClean, CreditReformBilanzampel, ActaFlow, SEC, storbi, ChastityAPI, smart-configs, StopTube, universal-workflow, Zlota44, timesheets, complaints-mcp, cqrs-htmx, emeet-pixyd (plus go-output, cmdguard, and the go-finding CLI, which pin the library in the linter-stack tooling graph)
 
 ### Brands That Deliberately Skip `Name()`
 
@@ -208,7 +208,7 @@ Not all brand types should implement `Name()`. The `cmd/namer` tool may flag the
 - Tags must be signed (SSH) and annotated (`git tag -a`).
 - **To release**: update CHANGELOG, commit, tag, push the tag: `git push origin vX.Y.Z`.
 - `git-town.toml` configures `master` as the main branch.
-- BuildFlow pre-commit hook runs 34 checks (Go mode) including golangci-lint, gofumpt, goimports, statix, gitleaks, doc-files-age-check (max 3w freshness), and nix-flake-check.
+- BuildFlow pre-commit hook runs the configured Go-mode checks (golangci-lint, gofumpt, goimports, statix, gitleaks, doc-files-age-check (max 3w freshness), nix-flake-check); the exact count varies with `.buildflow.yml` — run `buildflow --dry-run` for the current list.
 - `doc-files-age-check` requires README.md and TODO_LIST.md to be updated within 3 weeks of code changes — SARIF format reveals the specific stale file (`buildflow --step doc-files-age-check --format sarif`).
 
 ## Website
