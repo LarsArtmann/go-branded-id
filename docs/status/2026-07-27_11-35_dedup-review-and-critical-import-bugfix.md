@@ -63,14 +63,14 @@ Added a prominent "CRITICAL: goimports corrupts v1 files" paragraph in the Dual 
 
 ## c) NOT STARTED ✗
 
-1. **v1/v2 equivalence test** — No test verifies that marshaling/unmarshaling produces byte-identical output in both modes. The two build-tagged files could silently diverge.
-2. **Meta-test for import correctness** — No test verifies that `id_json_v1.go` actually imports `encoding/json` (not v2). This would have caught the corruption automatically.
-3. **Lint cleanup** — 79 lint issues exist (50 varnamelen, 16 err113, 8 makezero, etc.). All pre-existing, none introduced this session. Not addressed.
-4. **Website grammar fix** — `changelog.mdx` still has "dual-supports" (should be "dual-support"). Not touched.
-5. **Previous status report update** — `docs/status/2026-07-27_11-27_dual-json-support-and-namer-tests.md` claims everything works but doesn't mention the import corruption that was present at that time.
-6. **CI hardening** — CI workflows run both modes but don't lint in v2 mode specifically.
-7. **Downstream repo bumps** — 14 repos need version bumps. Waiting on version number decision.
-8. **Release** — No tag created. Waiting on version number decision.
+1. ~~**v1/v2 equivalence test** — No test verifies that marshaling/unmarshaling produces byte-identical output in both modes. The two build-tagged files could silently diverge.~~ done (TestJSONByteEquivalence added in the 16-44 session)
+2. ~~**Meta-test for import correctness** — No test verifies that `id_json_v1.go` actually imports `encoding/json` (not v2). This would have caught the corruption automatically.~~ done (TestDualJSONContract_Imports (16-44) plus the pre-push grep guard (2026-09-22))
+3. ~~**Lint cleanup** — 79 lint issues exist (50 varnamelen, 16 err113, 8 makezero, etc.). All pre-existing, none introduced this session. Not addressed.~~ done (82→0 issues (16-44 + sentinel refactor))
+4. ~~**Website grammar fix** — `changelog.mdx` still has "dual-supports" (should be "dual-support"). Not touched.~~ done (fixed (16-44))
+5. ~~**Previous status report update** — `docs/status/2026-07-27_11-27_dual-json-support-and-namer-tests.md` claims everything works but doesn't mention the import corruption that was present at that time.~~ done (annotated (13-06 session and this pass))
+6. ~~**CI hardening** — CI workflows run both modes but don't lint in v2 mode specifically.~~ done (CI matrix lints both modes (16-44))
+7. ~~**Downstream repo bumps** — 14 repos need version bumps. Waiting on version number decision.~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+8. ~~**Release** — No tag created. Waiting on version number decision.~~ done (v0.5.0 (5c4f995))
 
 ---
 
@@ -109,20 +109,20 @@ The auto-commit daemon continues to create noise in git history.
 
 ### Process improvements
 
-1. **Always verify both build modes first.** Before ANY work on this repo, run both `go build ./...` and `GOEXPERIMENT=jsonv2 go build ./...`. This is the smoke test.
-2. **Never trust `nix fmt` on build-tagged files.** The goimports component is fundamentally incompatible with the dual-import pattern. Consider excluding v1 files from goimports or adding a post-format repair step.
-3. **Add automated guards, not just documentation.** A test that imports the v1 file and asserts the import path would have caught this instantly. Documentation rots; tests don't.
-4. **The auto-commit daemon is actively harmful.** It commits broken code with garbage messages. It should either be disabled during active sessions or configured to run tests before committing.
+1. ~~**Always verify both build modes first.** Before ANY work on this repo, run both `go build ./...` and `GOEXPERIMENT=jsonv2 go build ./...`. This is the smoke test.~~ done (the pre-push hook verifies both modes plus the import guard (2026-09-22))
+2. ~~**Never trust `nix fmt` on build-tagged files.** The goimports component is fundamentally incompatible with the dual-import pattern. Consider excluding v1 files from goimports or adding a post-format repair step.~~ **Won't implement — superseded — the root cause was go-auto-upgrade, fixed upstream (gau v0.6.2); unskipped 2026-09-22.**
+3. ~~**Add automated guards, not just documentation.** A test that imports the v1 file and asserts the import path would have caught this instantly. Documentation rots; tests don't.~~ done (contract tests + pre-push guard in place)
+4. ~~**The auto-commit daemon is actively harmful.** It commits broken code with garbage messages. It should either be disabled during active sessions or configured to run tests before committing.~~ **Won't implement — accepted; documented in AGENTS.md.**
 
 ### Code improvements
 
-5. **The v1/v2 file pair is a maintenance liability.** Two files that must stay identical but can't be merged. Consider code generation (one source file, two outputs) or a different approach entirely.
-6. **The 79 lint issues are debt.** Most are varnamelen (parameter names too short) and err113 (errors defined as package-level vars). These are style choices, not bugs, but they make the lint output noisy and real issues harder to spot.
+5. ~~**The v1/v2 file pair is a maintenance liability.** Two files that must stay identical but can't be merged. Consider code generation (one source file, two outputs) or a different approach entirely.~~ done (parity tests guard the pair; codegen explicitly rejected (dedup-acceptance.md))
+6. ~~**The 79 lint issues are debt.** Most are varnamelen (parameter names too short) and err113 (errors defined as package-level vars). These are style choices, not bugs, but they make the lint output noisy and real issues harder to spot.~~ done (0 issues since the 16-44/sentinel passes)
 
 ### Documentation improvements
 
-7. **AGENTS.md is getting long.** The goimports warning is important but adds to an already dense file. Consider a dedicated `docs/gotchas.md` for hazard documentation.
-8. **The previous status report is now misleading.** It claims success but the code was broken. Status reports should be updated when their claims are invalidated.
+7. ~~**AGENTS.md is getting long.** The goimports warning is important but adds to an already dense file. Consider a dedicated `docs/gotchas.md` for hazard documentation.~~ **Won't implement — kept in AGENTS.md; gotcha sections are organized by topic.**
+8. ~~**The previous status report is now misleading.** It claims success but the code was broken. Status reports should be updated when their claims are invalidated.~~ done (annotated)
 
 ---
 
@@ -130,65 +130,65 @@ The auto-commit daemon continues to create noise in git history.
 
 ### P0 — Critical (blocks release)
 
-1. **Add meta-test for v1 import correctness** — Test that verifies `id_json_v1.go` source contains `encoding/json` not `encoding/json/v2`.
-2. **Add v1/v2 equivalence test** — Marshal/unmarshal in both modes, assert byte-identical output.
-3. **Decide version number** — v0.5.0? v1.0.0? Needed for release and downstream bumps.
-4. **Create signed annotated tag** once version is decided.
-5. **Verify CI passes** on both modes before tagging (check GitHub Actions runs).
+1. ~~**Add meta-test for v1 import correctness** — Test that verifies `id_json_v1.go` source contains `encoding/json` not `encoding/json/v2`.~~ done (TestDualJSONContract_Imports (16-44))
+2. ~~**Add v1/v2 equivalence test** — Marshal/unmarshal in both modes, assert byte-identical output.~~ done (TestJSONByteEquivalence (16-44))
+3. ~~**Decide version number** — v0.5.0? v1.0.0? Needed for release and downstream bumps.~~ done (v0.5.0)
+4. ~~**Create signed annotated tag** once version is decided.~~ done (v0.5.0 SSH-signed annotated tag)
+5. ~~**Verify CI passes** on both modes before tagging (check GitHub Actions runs).~~ done (release workflow gates both modes)
 
 ### P1 — High value
 
-6. **Bump 14 downstream ecosystem repos** to new version.
-7. **Add `golangci-lint` with `GOEXPERIMENT=jsonv2`** to CI to lint v2 code paths.
-8. **Fix website `changelog.mdx` grammar** — "dual-supports" → "dual-support".
-9. **Update previous status report** (2026-07-27_11-27) to note the import bug was found and fixed post-report.
-10. **Update AGENTS.md "Stale Files" section** — CONTRIBUTING.md is no longer stale.
-11. **Disable or fix the auto-commit daemon** — it commits broken code and creates garbage commit messages.
-12. **Consider code generation** for v1/v2 file pair to eliminate manual sync risk.
-13. **Add pre-commit guard** that runs `go build ./...` (v1 mode) and fails if it doesn't compile.
+6. ~~**Bump 14 downstream ecosystem repos** to new version.~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+7. ~~**Add `golangci-lint` with `GOEXPERIMENT=jsonv2`** to CI to lint v2 code paths.~~ done (CI matrix (16-44))
+8. ~~**Fix website `changelog.mdx` grammar** — "dual-supports" → "dual-support".~~ done (fixed (16-44))
+9. ~~**Update previous status report** (2026-07-27_11-27) to note the import bug was found and fixed post-report.~~ done (annotated)
+10. ~~**Update AGENTS.md "Stale Files" section** — CONTRIBUTING.md is no longer stale.~~ done (section removed (16-44))
+11. ~~**Disable or fix the auto-commit daemon** — it commits broken code and creates garbage commit messages.~~ **Won't implement — accepted; documented in AGENTS.md.**
+12. ~~**Consider code generation** for v1/v2 file pair to eliminate manual sync risk.~~ done (rejected with rationale (dedup-acceptance.md))
+13. ~~**Add pre-commit guard** that runs `go build ./...` (v1 mode) and fails if it doesn't compile.~~ done (pre-push dual-mode hook + import guard)
 
 ### P2 — Quality improvements
 
-14. **Run `art-dupl` at threshold 5** to find smaller duplications.
-15. **Address varnamelen lint issues** (50 instances) — rename short parameters.
-16. **Address err113 lint issues** (16 instances) — consider if errors should be sentinel values.
-17. **Address makezero lint issues** (8 instances) — use `make` with initial capacity.
-18. **Fix `testableexamples` lint issue** (1 instance).
-19. **Fix `tparallel` lint issues** (2 instances).
-20. **Fix `goconst` lint issues** (2 instances).
-21. **Add benchmark comparing v1 vs v2 JSON performance.**
-22. **Review `cmd/namer` for additional test coverage** (currently 80.1%, target 90%+).
-23. **Verify website builds** — run `nix run .#build` from `website/`.
-24. **Consider adding `goimports` exclusion** for v1 files in formatter config (if possible).
-25. **Add `.editorconfig` or formatter config** that excludes build-tagged files from import rewriting.
-26. **Review all `//nolint` directives** — ensure each has a current, accurate justification.
-27. **Clean up git history** — the 16 unpushed commits include garbage messages from auto-commit daemon; consider squashing before push.
+14. ~~**Run `art-dupl` at threshold 5** to find smaller duplications.~~ **Won't implement — not run.**
+15. ~~**Address varnamelen lint issues** (50 instances) — rename short parameters.~~ done (config-level resolution (16-44))
+16. ~~**Address err113 lint issues** (16 instances) — consider if errors should be sentinel values.~~ done (sentinel refactor (v0.5.0))
+17. ~~**Address makezero lint issues** (8 instances) — use `make` with initial capacity.~~ done (config-level resolution (16-44))
+18. ~~**Fix `testableexamples` lint issue** (1 instance).~~ done (0 issues)
+19. ~~**Fix `tparallel` lint issues** (2 instances).~~ done (fixed (16-44))
+20. ~~**Fix `goconst` lint issues** (2 instances).~~ done (constants extracted)
+21. ~~**Add benchmark comparing v1 vs v2 JSON performance.**~~ done (BenchmarkJSONDual* (16-44))
+22. ~~**Review `cmd/namer` for additional test coverage** (currently 80.1%, target 90%+).~~ done (93.2% coverage)
+23. ~~**Verify website builds** — run `nix run .#build` from `website/`.~~ done (verified (16-44, v0.6.0))
+24. ~~**Consider adding `goimports` exclusion** for v1 files in formatter config (if possible).~~ **Won't implement — superseded — root cause was go-auto-upgrade; fixed upstream and unskipped 2026-09-22.**
+25. ~~**Add `.editorconfig` or formatter config** that excludes build-tagged files from import rewriting.~~ **Won't implement — superseded — same root cause.**
+26. ~~**Review all `//nolint` directives** — ensure each has a current, accurate justification.~~ done (16 unused directives dropped 2026-09-17)
+27. ~~**Clean up git history** — the 16 unpushed commits include garbage messages from auto-commit daemon; consider squashing before push.~~ **Won't implement — history stands.**
 
 ### P3 — Nice to have
 
-28. **Add CONTRIBUTING.md rewrite** — the file was partially fixed but may still have stale references.
-29. **Review `flake.nix`** for the dual-mode test app — ensure it's clean and well-documented.
-30. **Add architecture decision record (ADR)** for the dual JSON v1/v2 build-tag pattern.
-31. **Add ADR for the phantom-types branding pattern.**
-32. **Consider adding `omitempty`-style option** for JSON serialization (currently zero → null always).
-33. **Review `id_sql.go` Scan method** for additional SQL driver type coverage.
-34. **Add fuzz tests** for Text and SQL round-trips (currently only JSON and Binary).
-35. **Document the binary serialization endianness** in the public API docs (currently only in AGENTS.md).
-36. **Consider adding `fmt.Scanner` / `fmt.ScanState` support** for interactive input.
-37. **Review `Compare()` for uint types** — currently a runtime check, could be compile-time with type constraints.
-38. **Add `crypto.Hash` support** for IDs that are hash-derived.
-39. **Consider `ID[B, V].Ptr()` documentation** — clarify when to use pointer vs value IDs.
-40. **Review `Reset()` method** — is it idiomatic? Should it be `Clear()` or `SetZero()`?
-41. **Add integration test** with a real database driver (sqlite) for SQL round-trip.
-42. **Add integration test** with a real HTTP JSON API for JSON round-trip.
-43. **Consider adding `context.Context` support** for any cancellation-aware operations.
-44. **Review error message format** — all errors start with `"id: "` prefix; document this convention.
-45. **Add `errors.Is` / `errors.As` support** for typed error handling (`ErrNotOrdered`, etc.).
-46. **Consider adding `ID[B, V].Validate()` shorthand** that calls `ValidateID`.
-47. **Review `BrandNamer` interface** — should it be `BrandNamer[B any]` with a type parameter?
-48. **Add example with UUID value type** in docs.
-49. **Add example with ULID value type** in docs.
-50. **Review module path** — `github.com/larsartmann/go-branded-id` vs potential rename.
+28. ~~**Add CONTRIBUTING.md rewrite** — the file was partially fixed but may still have stale references.~~ done (rebuilt in v0.3.2)
+29. ~~**Review `flake.nix`** for the dual-mode test app — ensure it's clean and well-documented.~~ done (checks.test runs both modes)
+30. ~~**Add architecture decision record (ADR)** for the dual JSON v1/v2 build-tag pattern.~~ done (dedup-acceptance.md plus the AGENTS.md dual-mode section)
+31. ~~**Add ADR for the phantom-types branding pattern.**~~ **Won't implement — not written; README/website cover the pattern.**
+32. ~~**Consider adding `omitempty`-style option** for JSON serialization (currently zero → null always).~~ **Won't implement — not added.**
+33. ~~**Review `id_sql.go` Scan method** for additional SQL driver type coverage.~~ done (id_sql_test.go covers the driver types)
+34. ~~**Add fuzz tests** for Text and SQL round-trips (currently only JSON and Binary).~~ done (FuzzTextRoundTrip* and FuzzSQLScanRoundTrip* (23-01 session))
+35. ~~**Document the binary serialization endianness** in the public API docs (currently only in AGENTS.md).~~ done (AGENTS.md Binary Endianness section)
+36. ~~**Consider adding `fmt.Scanner` / `fmt.ScanState` support** for interactive input.~~ **Won't implement — not added.**
+37. ~~**Review `Compare()` for uint types** — currently a runtime check, could be compile-time with type constraints.~~ done (runtime check kept; constraint idea lives in ROADMAP Theme 2)
+38. ~~**Add `crypto.Hash` support** for IDs that are hash-derived.~~ **Won't implement — not added.**
+39. ~~**Consider `ID[B, V].Ptr()` documentation** — clarify when to use pointer vs value IDs.~~ done (FEATURES Ptr/FromPtr rows plus README)
+40. ~~**Review `Reset()` method** — is it idiomatic? Should it be `Clear()` or `SetZero()`?~~ **Won't implement — kept Reset().**
+41. ~~**Add integration test** with a real database driver (sqlite) for SQL round-trip.~~ **Won't implement — not added.**
+42. ~~**Add integration test** with a real HTTP JSON API for JSON round-trip.~~ **Won't implement — not added.**
+43. ~~**Consider adding `context.Context` support** for any cancellation-aware operations.~~ **Won't implement — not applicable to this API.**
+44. ~~**Review error message format** — all errors start with `"id: "` prefix; document this convention.~~ **Won't implement — the id prefix is visible in every sentinel; not separately documented.**
+45. ~~**Add `errors.Is` / `errors.As` support** for typed error handling (`ErrNotOrdered`, etc.).~~ done (sentinels with errors.Is tests (23-01))
+46. ~~**Consider adding `ID[B, V].Validate()` shorthand** that calls `ValidateID`.~~ **Won't implement — not added.**
+47. ~~**Review `BrandNamer` interface** — should it be `BrandNamer[B any]` with a type parameter?~~ **Won't implement — kept non-generic.**
+48. ~~**Add example with UUID value type** in docs.~~ **Won't implement — not added.**
+49. ~~**Add example with ULID value type** in docs.~~ **Won't implement — not added.**
+50. ~~**Review module path** — `github.com/larsartmann/go-branded-id` vs potential rename.~~ done (path unchanged and stable)
 
 ---
 

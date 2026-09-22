@@ -9,7 +9,7 @@
 
 ## A) FULLY DONE
 
-### 1. cmd/namer Test Suite (0% → 80% coverage)
+### ~~1. cmd/namer Test Suite (0% → 80% coverage)~~ resolved — 93.2% coverage (`63fe921` + later passes)
 
 - **18 test functions** covering every public function: `suggestName`, `filterMissing`, `isIDSelector`, `typeNameFromExpr`, `receiverTypeName`, `isStringType`, `collectNameMethods`, `isNameMethod`, `parseNameReturnValue`, `brandTypeArgsFromFile`, `scanFile`, `scanPath`, `printResults`.
 - **4 testdata fixtures** (`cmd/namer/testdata/`): `missing_name.go`, `has_name.go`, `no_id_usage.go`, `mixed.go`.
@@ -67,12 +67,12 @@ The core feature requested mid-session ("Let's support both!"):
 - `isEmptyStructBrand`: 75% (missing the non-struct-type case).
 - `isIDSelector`: 75% (missing default case in some scenarios).
 
-### 2. Lint Compliance
+### ~~2. Lint Compliance~~ resolved — 0 issues in both JSON modes since the 16-44 audit and the v0.5.0 sentinel refactor
 
 - Fixed all lint issues I **introduced**: `dupl` (merged duplicate tests), `gci` (formatted imports), `wrapcheck` (wrapped external errors in helpers).
 - **Pre-existing lint issues remain** (84 total): `varnamelen` (50), `err113` (16), `makezero` (8), `tparallel` (2), `testableexamples` (1). These are in files I did NOT touch and are outside this session's scope.
 
-### 3. Website Documentation
+### ~~3. Website Documentation~~ resolved — site builds (16-44, v0.6.0) and changelog.mdx is current
 
 - Updated all `.mdx` and `.ts` files to remove GOEXPERIMENT.
 - **Did NOT verify the website builds** (`nix run .#build` from `website/` not run).
@@ -82,10 +82,10 @@ The core feature requested mid-session ("Let's support both!"):
 
 ## C) NOT STARTED
 
-- Bump 14 downstream ecosystem repos to v0.4.0 (blocked: needs manual `go get @v0.4.0` in each repo).
-- Add CI integration test against ecosystem repos.
-- Website build verification.
-- Verify `md-go-validator` works without GOEXPERIMENT on code blocks that previously assumed v2.
+- ~~Bump 14 downstream ecosystem repos to v0.4.0 (blocked: needs manual `go get @v0.4.0` in each repo).~~ Won't implement — superseded; the standing task is the v0.6.0 ecosystem bump (TODO_LIST).
+- ~~Add CI integration test against ecosystem repos.~~ Won't implement — not built; downstream pins verified manually (2026-09-17 fleet pass).
+- ~~Website build verification.~~ done — verified in the 16-44 session and the v0.6.0 deploy.
+- ~~Verify `md-go-validator` works without GOEXPERIMENT on code blocks that previously assumed v2.~~ done — validate-docs green since the install-path fix (2026-07-28).
 
 ---
 
@@ -121,33 +121,33 @@ The core feature requested mid-session ("Let's support both!"):
 
 ### Architecture & Code Quality
 
-1. **No equivalence test between v1 and v2 files.** `id_json_v1.go` and `id_json_v2.go` contain identical logic — if someone edits one and forgets the other, behavior silently diverges. Need a meta-test or codegen approach.
-2. **No test verifying byte-identical output in both modes.** The whole point of dual support is that both produce the same JSON. Should have a test that marshals/unmarshals in v1 mode and compares to v2 mode.
-3. **Lint should run in both modes.** Currently `golangci-lint` runs only in v1 mode. The v2 files have their own code paths that aren't linted in CI (golangci-lint does support `GOEXPERIMENT` via build-tags config, which is already set in `.golangci.yml`, but the CI lint step doesn't set the env var).
-4. **The `isNameMethod` nil-pointer bug** suggests the function needs table-driven tests with ALL edge cases (nil receiver, nil params, nil results, multiple returns, non-string return). My tests cover some but not all.
-5. **`cmd/namer` `main()` has 0% coverage.** Should refactor to extract logic into testable functions, or add exec-based tests.
-6. **No benchmark comparing v1 vs v2 performance.** Would be valuable to show users whether setting `GOEXPERIMENT=jsonv2` helps or hurts for ID marshaling.
+1. ~~**No equivalence test between v1 and v2 files.** `id_json_v1.go` and `id_json_v2.go` contain identical logic — if someone edits one and forgets the other, behavior silently diverges. Need a meta-test or codegen approach.~~ done (TestJSONByteEquivalence added in the 16-44 session)
+2. ~~**No test verifying byte-identical output in both modes.** The whole point of dual support is that both produce the same JSON. Should have a test that marshals/unmarshals in v1 mode and compares to v2 mode.~~ done (same contract tests lock byte parity)
+3. ~~**Lint should run in both modes.** Currently `golangci-lint` runs only in v1 mode. The v2 files have their own code paths that aren't linted in CI (golangci-lint does support `GOEXPERIMENT` via build-tags config, which is already set in `.golangci.yml`, but the CI lint step doesn't set the env var).~~ done (CI matrix lints both modes (16-44))
+4. ~~**The `isNameMethod` nil-pointer bug** suggests the function needs table-driven tests with ALL edge cases (nil receiver, nil params, nil results, multiple returns, non-string return). My tests cover some but not all.~~ done (isNameMethod edge cases covered (63fe921))
+5. ~~**`cmd/namer` `main()` has 0% coverage.** Should refactor to extract logic into testable functions, or add exec-based tests.~~ done (main() extracted to run() with TestRun_* (16-44))
+6. ~~**No benchmark comparing v1 vs v2 performance.** Would be valuable to show users whether setting `GOEXPERIMENT=jsonv2` helps or hurts for ID marshaling.~~ done (BenchmarkJSONDual* added (16-44))
 
 ### Documentation
 
-7. **AGENTS.md "Stale Files to Ignore" section is now stale itself** — it says CONTRIBUTING.md references `just` and `pkg/errors/`, but I updated CONTRIBUTING.md this session. Need to re-verify and update the stale-files note.
-8. **Website changelog.mdx grammar** — "id_json.go and id_sql.go now dual-supports" is wrong (subject-verb disagreement). Should be "now dual-support".
-9. **CHANGELOG.md `[Unreleased]` section** needs a version number and date before release.
-10. **No migration guide for downstream repos** — 14 repos need `go.mod` bumps to v0.4.0 but there's no step-by-step guide.
-11. **The `Stale Files to Ignore` section in AGENTS.md** still warns about CONTRIBUTING.md being stale — that warning is now stale.
+7. ~~**AGENTS.md "Stale Files to Ignore" section is now stale itself** — it says CONTRIBUTING.md references `just` and `pkg/errors/`, but I updated CONTRIBUTING.md this session. Need to re-verify and update the stale-files note.~~ done (Stale Files section removed (16-44))
+8. ~~**Website changelog.mdx grammar** — "id_json.go and id_sql.go now dual-supports" is wrong (subject-verb disagreement). Should be "now dual-support".~~ done (fixed (16-44))
+9. ~~**CHANGELOG.md `[Unreleased]` section** needs a version number and date before release.~~ done (v0.5.0 dated and released)
+10. ~~**No migration guide for downstream repos** — 14 repos need `go.mod` bumps to v0.4.0 but there's no step-by-step guide.~~ done (MIGRATION.md v0.4.0 section added (16-44))
+11. ~~**The `Stale Files to Ignore` section in AGENTS.md** still warns about CONTRIBUTING.md being stale — that warning is now stale.~~ done (resolved with item 7)
 
 ### CI & Infrastructure
 
-12. **`validate-docs.yml`** runs `md-go-validator` which parses Go code blocks in Markdown. If any code block imports `encoding/json/v2`, it will fail without GOEXPERIMENT. Not verified.
-13. **No matrix CI strategy** — the dual-mode build/test steps are duplicated as sequential steps within jobs. A matrix strategy (`strategy: matrix: mode: [v1, v2]`) would be cleaner and parallel.
-14. **The auto-commit daemon** committed my work 10+ times during the session with messages like `b97157c ): improve JSON and SQL serialization` (note the malformed commit message starting with `)`). The daemon produces noise.
+12. ~~**`validate-docs.yml`** runs `md-go-validator` which parses Go code blocks in Markdown. If any code block imports `encoding/json/v2`, it will fail without GOEXPERIMENT. Not verified.~~ done (fixed; install path corrected 2026-07-28)
+13. ~~**No matrix CI strategy** — the dual-mode build/test steps are duplicated as sequential steps within jobs. A matrix strategy (`strategy: matrix: mode: [v1, v2]`) would be cleaner and parallel.~~ done (matrix strategy in go.yml/release.yml (16-44))
+14. ~~**The auto-commit daemon** committed my work 10+ times during the session with messages like `b97157c ): improve JSON and SQL serialization` (note the malformed commit message starting with `)`). The daemon produces noise.~~ **Won't implement — accepted; documented in AGENTS.md.**
 
 ### Testing
 
-15. **No fuzz test for `cmd/namer`** — the parser could crash on malformed Go source. A fuzz test feeding random strings to `scanFile` would harden it.
-16. **No test for the `walkFn` error path** — if `filepath.Walk` returns an error, it's logged but the behavior isn't tested.
-17. **The testdata fixtures don't include pointer receivers** — `scanFile` handles `func (*Foo) Name() string` but no testdata file exercises this.
-18. **No integration test for the full `namer` CLI** — running it as a subprocess against testdata and checking stdout.
+15. ~~**No fuzz test for `cmd/namer`** — the parser could crash on malformed Go source. A fuzz test feeding random strings to `scanFile` would harden it.~~ done (FuzzScanFile added (16-44))
+16. ~~**No test for the `walkFn` error path** — if `filepath.Walk` returns an error, it's logged but the behavior isn't tested.~~ done (TestWalkFn_ErrorPath added (16-44))
+17. ~~**The testdata fixtures don't include pointer receivers** — `scanFile` handles `func (*Foo) Name() string` but no testdata file exercises this.~~ done (testdata/pointer_receiver.go added (16-44))
+18. ~~**No integration test for the full `namer` CLI** — running it as a subprocess against testdata and checking stdout.~~ **Won't implement — not added.**
 
 ---
 
@@ -155,68 +155,68 @@ The core feature requested mid-session ("Let's support both!"):
 
 ### High Priority
 
-1. Add equivalence test: marshal/unmarshal in v1 mode, verify byte-identical output in v2 mode.
-2. Add meta-test or CI check that `id_json_v1.go` and `id_json_v2.go` stay structurally identical (diff the non-import, non-tag lines).
-3. Verify `md-go-validator` works without GOEXPERIMENT on all `.mdx` code blocks.
-4. Fix website `changelog.mdx` grammar ("dual-supports" → "dual-support").
-5. Verify website builds (`nix run .#build` from `website/`).
-6. Update AGENTS.md "Stale Files to Ignore" — CONTRIBUTING.md is no longer stale.
-7. Run `golangci-lint` with `GOEXPERIMENT=jsonv2` in CI to lint v2 code paths.
-8. Convert CI dual-mode steps to matrix strategy for parallelism.
-9. Bump 14 downstream ecosystem repos to v0.4.0.
-10. Write migration guide for downstream repo version bumps.
+1. ~~Add equivalence test: marshal/unmarshal in v1 mode, verify byte-identical output in v2 mode.~~ done (TestJSONByteEquivalence (16-44))
+2. ~~Add meta-test or CI check that `id_json_v1.go` and `id_json_v2.go` stay structurally identical (diff the non-import, non-tag lines).~~ done (contract tests (16-44))
+3. ~~Verify `md-go-validator` works without GOEXPERIMENT on all `.mdx` code blocks.~~ done (fixed; green since 2026-07-28)
+4. ~~Fix website `changelog.mdx` grammar ("dual-supports" → "dual-support").~~ done (fixed (16-44))
+5. ~~Verify website builds (`nix run .#build` from `website/`).~~ done (builds verified (16-44, v0.6.0))
+6. ~~Update AGENTS.md "Stale Files to Ignore" — CONTRIBUTING.md is no longer stale.~~ done (section removed (16-44))
+7. ~~Run `golangci-lint` with `GOEXPERIMENT=jsonv2` in CI to lint v2 code paths.~~ done (CI lints both modes (16-44))
+8. ~~Convert CI dual-mode steps to matrix strategy for parallelism.~~ done (matrix strategy (16-44))
+9. ~~Bump 14 downstream ecosystem repos to v0.4.0.~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+10. ~~Write migration guide for downstream repo version bumps.~~ done (MIGRATION.md v0.4.0 section (16-44))
 
 ### Medium Priority
 
-11. Add fuzz test for `cmd/namer` parser (feed random strings to `scanFile`).
-12. Add testdata fixture with pointer receivers (`func (*Foo) Name() string`).
-13. Test `walkFn` error path (mock filesystem or use a non-readable directory).
-14. Refactor `cmd/namer` `main()` to extract testable logic.
-15. Add benchmark comparing v1 vs v2 marshal/unmarshal performance.
-16. Add `tparallel` fixes to `TestIDBinary` and `TestIDJSONRoundTrip` (pre-existing lint).
-17. Fix `ExampleValidateID` missing output (pre-existing lint).
-18. Add `cmd/namer` coverage for `isIDSelector` default case.
-19. Add `cmd/namer` coverage for `isEmptyStructBrand` non-struct case.
-20. Consider code generation for `id_json_v{1,2}.go` to eliminate duplication.
+11. ~~Add fuzz test for `cmd/namer` parser (feed random strings to `scanFile`).~~ done (FuzzScanFile (16-44))
+12. ~~Add testdata fixture with pointer receivers (`func (*Foo) Name() string`).~~ done (fixture added (16-44))
+13. ~~Test `walkFn` error path (mock filesystem or use a non-readable directory).~~ done (TestWalkFn_ErrorPath (16-44))
+14. ~~Refactor `cmd/namer` `main()` to extract testable logic.~~ done (run() extraction (16-44))
+15. ~~Add benchmark comparing v1 vs v2 marshal/unmarshal performance.~~ done (BenchmarkJSONDual* (16-44))
+16. ~~Add `tparallel` fixes to `TestIDBinary` and `TestIDJSONRoundTrip` (pre-existing lint).~~ done (fixed (16-44))
+17. ~~Fix `ExampleValidateID` missing output (pre-existing lint).~~ done (output added (16-44))
+18. ~~Add `cmd/namer` coverage for `isIDSelector` default case.~~ done (TestIsIDSelector_DefaultCase (16-44))
+19. ~~Add `cmd/namer` coverage for `isEmptyStructBrand` non-struct case.~~ done (TestIsEmptyStructBrand_NonStructType (16-44))
+20. ~~Consider code generation for `id_json_v{1,2}.go` to eliminate duplication.~~ done (decision documented — no codegen (dedup-acceptance.md))
 
 ### Lower Priority
 
-21. Audit all 84 pre-existing lint issues (50 `varnamelen`, 16 `err113`, 8 `makezero`, etc.).
-22. Add `goexperiment.jsonv2` to `.golangci.yml` build-tags is already there — verify it's sufficient for v2 linting.
-23. Consider whether `id_text.go` and `id_binary.go` should also be dual-mode (they don't import json, so probably not).
-24. Document the build-tag pattern in a CONTRIBUTING section for future contributors.
-25. Add a "Dual JSON Support" section to the website guides.
-26. Consider adding `encoding/json/v2` to the README feature list as a selling point.
-27. Verify the `cmd/namer` tool handles `id.ID[Brand]` (single type arg) correctly in real code.
-28. Add a test for `suggestName` with realistic brand names from the ecosystem.
-29. Consider whether `Reset()` method (used in `UnmarshalJSON`) should be public/documented.
-30. Audit whether moving json interface assertions broke any downstream compile-time checks.
+21. ~~Audit all 84 pre-existing lint issues (50 `varnamelen`, 16 `err113`, 8 `makezero`, etc.).~~ done (82→0 in the 16-44 audit + sentinel refactor)
+22. ~~Add `goexperiment.jsonv2` to `.golangci.yml` build-tags is already there — verify it's sufficient for v2 linting.~~ done (CI matrix covers both modes)
+23. ~~Consider whether `id_text.go` and `id_binary.go` should also be dual-mode (they don't import json, so probably not).~~ **Won't implement — not needed — those files import no json package.**
+24. ~~Document the build-tag pattern in a CONTRIBUTING section for future contributors.~~ done (documented in CONTRIBUTING.md and AGENTS.md)
+25. ~~Add a "Dual JSON Support" section to the website guides.~~ done (website guides cover dual-mode support)
+26. ~~Consider adding `encoding/json/v2` to the README feature list as a selling point.~~ **Won't implement — not added — README stays consumer-focused; dual-mode documented in FEATURES/MIGRATION/website.**
+27. ~~Verify the `cmd/namer` tool handles `id.ID[Brand]` (single type arg) correctly in real code.~~ **Won't implement — not verified against real code.**
+28. ~~Add a test for `suggestName` with realistic brand names from the ecosystem.~~ done (table cases + integration subtests in main_test.go)
+29. ~~Consider whether `Reset()` method (used in `UnmarshalJSON`) should be public/documented.~~ done (Reset() documented in FEATURES.md zero-value rows)
+30. ~~Audit whether moving json interface assertions broke any downstream compile-time checks.~~ done (no breakage — contract tests plus dual-mode CI)
 
 ### Process & Tooling
 
-31. Investigate the auto-commit daemon's malformed commit messages (e.g., `b97157c ): improve...`).
-32. Consider a pre-commit hook that rejects commits with malformed messages.
-33. Add a CI check that verifies `nix flake check` passes (currently not in CI workflows, only local).
-34. Consider adding `gofumpt` to CI (currently only in `nix fmt` and treefmt).
-35. Document the `nix fmt` → `go build` verification workflow for build-tagged files.
-36. Consider whether the auto-commit daemon should be disabled during active editing sessions.
-37. Add a `Makefile`-equivalent doc for the most common `nix run .#` commands.
-38. Consider a `justfile` (wait — AGENTS.md says justfile is deprecated; skip).
-39. Add treefmt config for `.mdx` files (currently only Go and Nix are formatted).
-40. Consider adding `typos` or `codespell` for documentation spell-checking.
+31. ~~Investigate the auto-commit daemon's malformed commit messages (e.g., `b97157c ): improve...`).~~ **Won't implement — accepted; documented in AGENTS.md.**
+32. ~~Consider a pre-commit hook that rejects commits with malformed messages.~~ **Won't implement — not built.**
+33. ~~Add a CI check that verifies `nix flake check` passes (currently not in CI workflows, only local).~~ done (flake-check job in go.yml)
+34. ~~Consider adding `gofumpt` to CI (currently only in `nix fmt` and treefmt).~~ done (golangci-lint (gofumpt-enabled) runs in CI)
+35. ~~Document the `nix fmt` → `go build` verification workflow for build-tagged files.~~ done (AGENTS.md Dual JSON section documents the recovery step)
+36. ~~Consider whether the auto-commit daemon should be disabled during active editing sessions.~~ **Won't implement — accepted behavior.**
+37. ~~Add a `Makefile`-equivalent doc for the most common `nix run .#` commands.~~ done (AGENTS.md Essential Commands table)
+38. ~~Consider a `justfile` (wait — AGENTS.md says justfile is deprecated; skip).~~ **Won't implement — deprecated per AGENTS.md.**
+39. ~~Add treefmt config for `.mdx` files (currently only Go and Nix are formatted).~~ **Won't implement — not added.**
+40. ~~Consider adding `typos` or `codespell` for documentation spell-checking.~~ **Won't implement — not added.**
 
 ### Ecosystem & Community
 
-41. Create a GitHub Discussion or issue template for downstream migration questions.
-42. Consider semantic versioning strategy: is v0.4.0 the right next version, or should the dual-mode change be v0.5.0?
-43. Add a CHANGELOG entry for the downstream repos documenting what changed.
-44. Consider whether the dual-mode change is breaking for any downstream consumer.
-45. Reach out to ecosystem repo maintainers (if external) about the v0.4.0 bump.
-46. Consider adding the dual-mode support to the GitHub Release notes.
-47. Tag the current state as `v0.5.0-pre` for testing.
-48. Verify the `git-town.toml` config is correct for the release flow.
-49. Consider adding a `CHANGELOG.md` compare link for `[Unreleased]`.
-50. Update `docs/status/` index if one exists.
+41. ~~Create a GitHub Discussion or issue template for downstream migration questions.~~ **Won't implement — not created — single-maintainer repo.**
+42. ~~Consider semantic versioning strategy: is v0.4.0 the right next version, or should the dual-mode change be v0.5.0?~~ done (answered — shipped as v0.5.0 (later v0.6.0))
+43. ~~Add a CHANGELOG entry for the downstream repos documenting what changed.~~ **Won't implement — not created.**
+44. ~~Consider whether the dual-mode change is breaking for any downstream consumer.~~ done (confirmed non-breaking at the v0.5.0 release)
+45. ~~Reach out to ecosystem repo maintainers (if external) about the v0.4.0 bump.~~ **Won't implement — all consumers are Lars's own repos.**
+46. ~~Consider adding the dual-mode support to the GitHub Release notes.~~ done (v0.5.0/v0.6.0 release notes curated from the CHANGELOG)
+47. ~~Tag the current state as `v0.5.0-pre` for testing.~~ **Won't implement — not needed — v0.5.0 shipped directly.**
+48. ~~Verify the `git-town.toml` config is correct for the release flow.~~ done (flow used for the v0.5.x/v0.6.0 releases)
+49. ~~Consider adding a `CHANGELOG.md` compare link for `[Unreleased]`.~~ done (compare link present in CHANGELOG.md)
+50. ~~Update `docs/status/` index if one exists.~~ **Won't implement — not created.**
 
 ---
 
