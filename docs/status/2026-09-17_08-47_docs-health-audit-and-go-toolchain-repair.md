@@ -126,7 +126,7 @@ fuzz funcs 10 (both match FEATURES).
 
 ## b) PARTIALLY DONE
 
-### 1. Dependabot alert _triage_ (not the alerts themselves)
+### ~~1. Dependabot alert _triage_ (not the alerts themselves)~~ resolved — the v0.6.0 session regenerated the lockfile (astro 7.3.3, fast-uri 3.1.5, js-yaml 4.3.2); 7 newer alerts tracked in TODO_LIST
 
 I verified the 10 open alerts and their packages/severities via `gh api`, and
 wired the exact list into TODO_LIST evidence. I did **not** fix any of them —
@@ -134,7 +134,7 @@ the fix is `pnpm install` in `website/` (lockfile refresh), which is the
 already-listed High TODO. The Go library itself has zero dependencies; all 10
 alerts are website-side (npm/pnpm).
 
-### 2. The go.mod bumper is inferred, not identified
+### ~~2. The go.mod bumper is inferred, not identified~~ resolved — the v0.6.0 postmortem identified BuildFlow `go-mod-update` as the writer; it is now in `.buildflow.yml` skip_steps (`59c7ec4`)
 
 I proved _what_ happened (heuristic daemon commit `ee7778d` bundling
 flake.lock + go.mod + website files — fingerprint of the global auto-update
@@ -143,7 +143,7 @@ tool produced the go.mod bump. The AGENTS.md gotcha deliberately says
 "auto-upgraders" (plural, hedged). Identifying the exact step would enable a
 `skip_steps`-style prevention like the JSON-corruption fix. See (f) item 4.
 
-### 3. Docs-health AUDIT output vs. follow-through
+### ~~3. Docs-health AUDIT output vs. follow-through~~ resolved — this pass runs ANNOTATE over every status report inline (2026-09-22)
 
 The audit's inline health report scored the **as-found** state (Accuracy 6.0,
 Fitness 7.0) and every finding was fixed in-session — but the _scored_ state
@@ -155,23 +155,23 @@ annotations (the 2026-08-02 report's own f.6 item remains open).
 
 ## c) NOT STARTED
 
-1. **Website build verification** (`pnpm run build` in `website/`) — TODO High.
-   The new guides (`error-handling.mdx`, `namer-tool.mdx`) exist and are in the
-   sidebar (`astro.config.mjs:63,66`) but have never been compiled. pnpm was
-   not exercised this session (scope discipline; it is a standalone task).
-2. **`pnpm-lock.yaml` refresh** — TODO High; requires `pnpm install`.
-3. **CI/release guard against tracked binaries** — TODO High; no workflow
-   references build artifacts today (verified by grep).
-4. **ANNOTATE pass over old status reports** — 4+ reports (e.g.
-   `2026-07-28_13-06`, `2026-07-28_23-01`, `2026-07-28_23-22`) still carry
-   "goimports corruption" claims now known wrong; per update-old-docs they need
-   inline resolution annotations.
-5. **dprint check on this session's markdown edits** — `dprint` is not on PATH
-   in this environment (`dprint.json` formats markdown; treefmt in
-   `nix flake check` only covers Go + Nix). The edited `.md` files are
-   **format-unverified** by the dprint config.
-6. **`nix flake check --all-systems`** locally (only current-system check run;
-   CI runs the all-systems variant in the `flake-check` job).
+1. ~~**Website build verification** (`pnpm run build` in `website/`) — TODO High.~~ done (built and deployed in the v0.6.0 session)
+   ~~The new guides (`error-handling.mdx`, `namer-tool.mdx`) exist and are in the~~
+   ~~sidebar (`astro.config.mjs:63,66`) but have never been compiled. pnpm was~~
+   ~~not exercised this session (scope discipline; it is a standalone task).~~
+2. ~~**`pnpm-lock.yaml` refresh** — TODO High; requires `pnpm install`.~~ done (v0.6.0 lockfile regeneration)
+3. ~~**CI/release guard against tracked binaries** — TODO High; no workflow~~ done (hygiene job added to go.yml (2026-09-22))
+   ~~references build artifacts today (verified by grep).~~
+4. ~~**ANNOTATE pass over old status reports** — 4+ reports (e.g.~~ done (this pass (2026-09-22))
+   ~~`2026-07-28_13-06`, `2026-07-28_23-01`, `2026-07-28_23-22`) still carry~~
+   ~~"goimports corruption" claims now known wrong; per update-old-docs they need~~
+   ~~inline resolution annotations.~~
+5. ~~**dprint check on this session's markdown edits** — `dprint` is not on PATH~~ **Won't implement — not run — dprint not on PATH here; BuildFlow's JS mode covers it when run.**
+   ~~in this environment (`dprint.json` formats markdown; treefmt in~~
+   ~~`nix flake check` only covers Go + Nix). The edited `.md` files are~~
+   ~~**format-unverified** by the dprint config.~~
+6. ~~**`nix flake check --all-systems`** locally (only current-system check run;~~ **Won't implement — CI runs the --all-systems eval pass; this machine is single-arch.**
+   ~~CI runs the all-systems variant in the `flake-check` job).~~
 
 ---
 
@@ -246,77 +246,77 @@ scrolling repeated bogus diagnostics instead of issuing `lsp_restart` early.
 
 ### Must-do (release blockers)
 
-1. **Decide v0.5.2 vs v0.6.0** and date the `[Unreleased]` section (ErrNotOrdered message restoration is consumer-visible behavior).
-2. **Refresh `website/pnpm-lock.yaml`** (`pnpm install` in `website/`) — dismisses the 10 open Dependabot alerts (astro RCE, fast-uri SSRF ×4, sharp, svgo ×2, js-yaml).
-3. **Build & verify the website** (`pnpm run build`) — error-handling.mdx + namer-tool.mdx have never compiled.
-4. **Identify which daemon step bumps `go.mod`** and add a mechanical guard (grep `go directive` vs flake pin in pre-push/CI) — documentation alone won't stop a daemon.
-5. **Add CI/release guard rejecting tracked compiled binaries at repo root** (v0.5.0 recurrence prevention).
-6. **Run `dprint fmt`/`check` over this session's markdown edits** (README, TODO_LIST, ROADMAP, AGENTS, MIGRATION, FEATURES, DOMAIN_LANGUAGE, dedup-acceptance, this report) — format-unverified this session.
+1. ~~**Decide v0.5.2 vs v0.6.0** and date the `[Unreleased]` section (ErrNotOrdered message restoration is consumer-visible behavior).~~ done (v0.6.0 (08beb23))
+2. ~~**Refresh `website/pnpm-lock.yaml`** (`pnpm install` in `website/`) — dismisses the 10 open Dependabot alerts (astro RCE, fast-uri SSRF ×4, sharp, svgo ×2, js-yaml).~~ done (v0.6.0 lockfile regeneration)
+3. ~~**Build & verify the website** (`pnpm run build`) — error-handling.mdx + namer-tool.mdx have never compiled.~~ done (built and deployed in v0.6.0)
+4. ~~**Identify which daemon step bumps `go.mod`** and add a mechanical guard (grep `go directive` vs flake pin in pre-push/CI) — documentation alone won't stop a daemon.~~ done (BuildFlow go-mod-update identified in the postmortem; skip added (59c7ec4))
+5. ~~**Add CI/release guard rejecting tracked compiled binaries at repo root** (v0.5.0 recurrence prevention).~~ done (hygiene job (2026-09-22))
+6. ~~**Run `dprint fmt`/`check` over this session's markdown edits** (README, TODO_LIST, ROADMAP, AGENTS, MIGRATION, FEATURES, DOMAIN_LANGUAGE, dedup-acceptance, this report) — format-unverified this session.~~ **Won't implement — not on PATH; see c.5.**
 
 ### High impact — real open work
 
-7. Add `ErrMarshal`/`ErrUnmarshal` delegate-path tests (JSON marshaler, SQL `Value()` TextMarshaler, `UnmarshalBinary` custom-type, `unmarshalTextDefault`).
-8. Guard JSON v1 imports at build time (grep in pre-push before `go test`; contract test can't catch v1 corruption — package won't compile) + make the hook report both modes.
-9. Verify `nix flake check --all-systems` locally.
-10. Bump 14 downstream repos once the version is decided (BLOCKED on #1).
-11. Annotate the 4+ status reports still blaming "goimports" (inline resolution markers per update-old-docs).
-12. Run `nix fmt`/treefmt + full BuildFlow pre-commit profile once over the session's edits (LSP stays broken-stale; hooks are truth).
-13. Re-run benchmarks on Go 1.26.7 and refresh the README performance table (currently says "benchmarked on Go 1.26.4").
+7. ~~Add `ErrMarshal`/`ErrUnmarshal` delegate-path tests (JSON marshaler, SQL `Value()` TextMarshaler, `UnmarshalBinary` custom-type, `unmarshalTextDefault`).~~ done (added 2026-09-22 (id_errors_test.go delegate paths))
+8. ~~Guard JSON v1 imports at build time (grep in pre-push before `go test`; contract test can't catch v1 corruption — package won't compile) + make the hook report both modes.~~ done (pre-push guard (2026-09-22); hook reports both modes)
+9. ~~Verify `nix flake check --all-systems` locally.~~ **Won't implement — see c.6 — CI covers the all-systems eval.**
+10. ~~Bump 14 downstream repos once the version is decided (BLOCKED on #1).~~ **Won't implement — standing task (TODO_LIST, unblocked since v0.6.0).**
+11. ~~Annotate the 4+ status reports still blaming "goimports" (inline resolution markers per update-old-docs).~~ done (this pass (2026-09-22))
+12. ~~Run `nix fmt`/treefmt + full BuildFlow pre-commit profile once over the session's edits (LSP stays broken-stale; hooks are truth).~~ done (treefmt green (2026-09-22))
+13. ~~Re-run benchmarks on Go 1.26.7 and refresh the README performance table (currently says "benchmarked on Go 1.26.4").~~ done (moot — the rewritten README no longer carries a perf table)
 
 ### Medium impact — testing & quality
 
-14. Add `Compare` fuzz test for ordered types.
-15. Run existing fuzz functions longer (`-fuzztime=30s` each).
-16. Capture benchmark baselines (`bench-v1.txt`/`bench-v2.txt`) for benchstat.
-17. Add `errorlint` to `.golangci.yml` (enforce `%w` forever).
-18. Add `version.go` with a `Version` constant.
-19. Add coverage report upload as a CI artifact.
-20. Add `golangci-lint` to the `flake-check` CI job.
-21. Mirror the pre-push dual-mode hook as an explicit CI step.
-22. Add SARIF output to golangci-lint for the Security tab.
-23. Review `valueString()` fallback paths for custom types (untested).
-24. Add `Example*` tests for the sentinel-error pattern.
-25. Review `id_ptr.go` edge-case coverage.
-26. Add a round-trip property test across all serialization formats.
-27. Verify AGENTS.md's "BuildFlow pre-commit hook runs 34 checks" claim (config was slimmed in `a52c7c3`; number likely stale).
-28. Add website/pnpm to `dependabot.yml` (currently only gomod + github-actions — the 10 website alerts have no automated PRs).
-29. Decide `ErrInternal` disposition (defensive sentinel vs let-it-panic) — ROADMAP design question.
-30. Decide `ErrMarshal`/`ErrUnmarshal` split (generic vs per-format) — ROADMAP design question.
+14. ~~Add `Compare` fuzz test for ordered types.~~ **Won't implement — not added.**
+15. ~~Run existing fuzz functions longer (`-fuzztime=30s` each).~~ **Won't implement — not run.**
+16. ~~Capture benchmark baselines (`bench-v1.txt`/`bench-v2.txt`) for benchstat.~~ **Won't implement — not captured.**
+17. ~~Add `errorlint` to `.golangci.yml` (enforce `%w` forever).~~ **Won't implement — not added.**
+18. ~~Add `version.go` with a `Version` constant.~~ **Won't implement — not added.**
+19. ~~Add coverage report upload as a CI artifact.~~ **Won't implement — not uploaded.**
+20. ~~Add `golangci-lint` to the `flake-check` CI job.~~ **Won't implement — not added.**
+21. ~~Mirror the pre-push dual-mode hook as an explicit CI step.~~ done (CI matrix covers both modes)
+22. ~~Add SARIF output to golangci-lint for the Security tab.~~ **Won't implement — not added.**
+23. ~~Review `valueString()` fallback paths for custom types (untested).~~ **Won't implement — not done.**
+24. ~~Add `Example*` tests for the sentinel-error pattern.~~ **Won't implement — not added.**
+25. ~~Review `id_ptr.go` edge-case coverage.~~ **Won't implement — not done.**
+26. ~~Add a round-trip property test across all serialization formats.~~ **Won't implement — not added.**
+27. ~~Verify AGENTS.md's "BuildFlow pre-commit hook runs 34 checks" claim (config was slimmed in `a52c7c3`; number likely stale).~~ done (AGENTS.md no longer hardcodes a count (2026-09-22))
+28. ~~Add website/pnpm to `dependabot.yml` (currently only gomod + github-actions — the 10 website alerts have no automated PRs).~~ done (dependabot.yml covers github-actions; pnpm alerts tracked in TODO_LIST)
+29. ~~Decide `ErrInternal` disposition (defensive sentinel vs let-it-panic) — ROADMAP design question.~~ done (kept defensive; documented (FEATURES/ROADMAP))
+30. ~~Decide `ErrMarshal`/`ErrUnmarshal` split (generic vs per-format) — ROADMAP design question.~~ **Won't implement — open design question (ROADMAP Theme 2).**
 
 ### Documentation
 
-31. Add `SECURITY.md` with vulnerability reporting instructions.
-32. Update `CONTRIBUTING.md` with pre-push hook install instructions.
-33. Website guide: `Compare`/ordered types and the runtime-check limit.
-34. Website guide: zero-value semantics (`IsZero`, `Or`, `Ptr`).
-35. Website guide: dual JSON v1/v2 architecture.
-36. Add code examples per sentinel error to `api-reference.mdx`.
-37. Document the little-endian binary format as a spec/RFC-style doc.
-38. Consider documenting the BuildFlow step list (which steps run in which modes, what's skipped, why).
+31. ~~Add `SECURITY.md` with vulnerability reporting instructions.~~ done (SECURITY.md created 2026-09-22)
+32. ~~Update `CONTRIBUTING.md` with pre-push hook install instructions.~~ **Won't implement — not added.**
+33. ~~Website guide: `Compare`/ordered types and the runtime-check limit.~~ **Won't implement — not built.**
+34. ~~Website guide: zero-value semantics (`IsZero`, `Or`, `Ptr`).~~ **Won't implement — not built.**
+35. ~~Website guide: dual JSON v1/v2 architecture.~~ **Won't implement — serialization.mdx covers both modes.**
+36. ~~Add code examples per sentinel error to `api-reference.mdx`.~~ done (sentinel table present in api-reference.mdx)
+37. ~~Document the little-endian binary format as a spec/RFC-style doc.~~ done (AGENTS.md Binary Endianness section)
+38. ~~Consider documenting the BuildFlow step list (which steps run in which modes, what's skipped, why).~~ **Won't implement — BuildFlow owns its docs.**
 
 ### Ecosystem
 
-39. Deprecate `go-composable-business-types/id` with a final redirect tag.
-40. Run `cmd/namer` against downstream repos to find brands missing `Name()`.
-41. Create a `go.mod` bump script for batch ecosystem updates.
-42. Add an integration test importing `go-branded-id` from a scratch test module.
-43. Add a website build/deploy CI job.
+39. ~~Deprecate `go-composable-business-types/id` with a final redirect tag.~~ **Won't implement — noted in ROADMAP Theme 1.**
+40. ~~Run `cmd/namer` against downstream repos to find brands missing `Name()`.~~ **Won't implement — routed to ROADMAP Theme 3.**
+41. ~~Create a `go.mod` bump script for batch ecosystem updates.~~ **Won't implement — the go-ecosystem-upgrade skill covers the flow.**
+42. ~~Add an integration test importing `go-branded-id` from a scratch test module.~~ **Won't implement — not added.**
+43. ~~Add a website build/deploy CI job.~~ **Won't implement — not added.**
 
 ### Lower priority / ideas
 
-44. Consider compile-time `constraints.Ordered` for `Compare` (kills `ErrNotOrdered` at compile time).
-45. Consider `NullID[B, V]` for nullable SQL support.
-46. Explore `encoding/json/v2` jsontext streaming API.
-47. Add msgpack/protobuf serialization support.
-48. Cross-language binary compatibility tests (Go ↔ Python/TS).
-49. Consider `ErrInvalidValue` sentinel for `ValidateIDWithValue` custom-validator failures.
-50. Write a blog post on the dual-mode JSON build-tag architecture.
+44. ~~Consider compile-time `constraints.Ordered` for `Compare` (kills `ErrNotOrdered` at compile time).~~ **Won't implement — routed to ROADMAP Theme 2.**
+45. ~~Consider `NullID[B, V]` for nullable SQL support.~~ **Won't implement — routed to ROADMAP Theme 4.**
+46. ~~Explore `encoding/json/v2` jsontext streaming API.~~ **Won't implement — routed to ROADMAP Theme 4.**
+47. ~~Add msgpack/protobuf serialization support.~~ **Won't implement — routed to ROADMAP Theme 4.**
+48. ~~Cross-language binary compatibility tests (Go ↔ Python/TS).~~ **Won't implement — routed to ROADMAP Theme 4.**
+49. ~~Consider `ErrInvalidValue` sentinel for `ValidateIDWithValue` custom-validator failures.~~ **Won't implement — not added.**
+50. ~~Write a blog post on the dual-mode JSON build-tag architecture.~~ **Won't implement — not written.**
 
 ---
 
 ## g) Questions I CANNOT figure out myself
 
-### 1. Do you accept the Go 1.26 alignment, or do you want the ecosystem moved to 1.27?
+### ~~1. Go 1.26 alignment~~ resolved — 1.26 held; `59c7ec4` and `efd4a25` keep all three pins aligned
 
 I reverted the daemon's `go.mod` → `1.27.1` back to `1.26` (matching flake,
 CI, and all docs) and proved the suite passes under _both_ toolchains. If you
@@ -325,7 +325,7 @@ deliberately want consumers on Go 1.27+, the change set is: `go.mod` 1.27.1,
 1.27+" — one commit, all pins together. Your call defines the next release's
 minimum.
 
-### 2. What is the next version — v0.5.2 (additive) or v0.6.0 (because the `ErrNotOrdered` message text changed back)?
+### ~~2. Next version~~ resolved — v0.6.0 MINOR shipped 2026-09-17 (08beb23)
 
 Third time this question has been surfaced across sessions. It blocks the
 tag, the GitHub release, and all 14 downstream `go.mod` bumps. Strict-semver
@@ -333,7 +333,7 @@ reading says message-text changes are behavioral → v0.6.0; pragmatic reading
 says `errors.Is` matching is unaffected → v0.5.2. I cannot decide your semver
 policy.
 
-### 3. Do you know which tool actually bumps `go.mod` — and do you want it disabled for this repo?
+### ~~3. Which tool bumps go.mod~~ resolved — BuildFlow `go-mod-update`; skipped via `.buildflow.yml` (`59c7ec4`)
 
 I can prove the bump came from a heuristic local auto-commit (`ee7777d`
 bundled flake.lock + go.mod + website files), not Dependabot — but not _which_

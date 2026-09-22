@@ -74,7 +74,7 @@ Dual-mode tests passed.
 
 ## b) PARTIALLY DONE
 
-### 1. AGENTS.md root-cause correction — incomplete
+### ~~1. AGENTS.md root-cause correction — incomplete~~ resolved — the contract-test comments were rewritten 2026-09-17 (see the 08-47 report)
 
 - **Done:** Updated the main "CRITICAL: goimports corrupts v1 files"
   paragraph to correctly blame `go-auto-upgrade`.
@@ -83,7 +83,7 @@ Dual-mode tests passed.
   63). These should say "go-auto-upgrade corruption hazard." I noticed this
   but did not fix it.
 
-### 2. Root cause documentation in status reports — not propagated
+### ~~2. Root cause documentation in status reports — not propagated~~ resolved — this docs-health pass annotates every affected report inline (2026-09-22)
 
 - Previous status reports (`2026-07-28_13-06`, `2026-07-28_23-01`,
   `2026-07-28_23-22`, and others) all describe this as the "goimports
@@ -95,18 +95,18 @@ Dual-mode tests passed.
 
 ## c) NOT STARTED
 
-### 1. Dependabot vulnerabilities (noted during push)
+### ~~1. Dependabot vulnerabilities (noted during push)~~ resolved — astro/fast-uri fixed via the v0.6.0 lockfile regeneration; 7 newer alerts tracked in TODO_LIST
 
 GitHub reported during push: "2 vulnerabilities on default branch (1 high, 1
 moderate)." I mentioned this in my final response but did not investigate.
 Likely transitive dependencies. Needs `dependabot` dashboard review.
 
-### 2. Contract test architectural fix (see section e)
+### ~~2. Contract test architectural fix (see section e)~~ resolved — the pre-push hook greps the v1 imports BEFORE go test runs (2026-09-22)
 
 The contract test `TestDualJSONContract_Imports` is structurally incapable
 of catching this bug in v1 mode. No work started on fixing that.
 
-### 3. `.buildflow.yml` tuning
+### ~~3. `.buildflow.yml` tuning~~ resolved — reviewed; go-auto-upgrade re-enabled 2026-09-22 after the upstream v0.6.2 retest, comments document every decision
 
 The config I created via `buildflow config init` uses `max_concurrency: 4`
 and default exclude patterns. The previous runtime default was
@@ -144,7 +144,7 @@ the daemon.
 
 ## e) WHAT WE SHOULD IMPROVE
 
-### 1. The contract test is structurally broken for this bug (CRITICAL)
+### ~~1. The contract test is structurally broken for this bug (CRITICAL)~~ resolved — the pre-push hook now greps the v1 imports before running any test, so compile-breaking corruption fails fast with a clear message (2026-09-22)
 
 `TestDualJSONContract_Imports` in `id_json_contract_test.go` was designed to
 catch EXACTLY this corruption. But it **cannot catch it in v1 mode** because:
@@ -165,7 +165,7 @@ v2 tests ever run.
 first-line check in the pre-push hook that greps the import before running
 `go test`.
 
-### 2. Update misleading "goimports" references throughout codebase
+### ~~2. Update misleading "goimports" references throughout codebase~~ resolved — code comments rewritten 2026-09-17; status reports annotated inline in this pass
 
 | Location                         | Current text                     | Should say                          |
 | -------------------------------- | -------------------------------- | ----------------------------------- |
@@ -174,7 +174,7 @@ first-line check in the pre-push hook that greps the import before running
 | `id_json_contract_test.go:63`    | "goimports corruption hazard"    | "go-auto-upgrade corruption hazard" |
 | 4+ previous status reports       | "goimports corruption"           | Needs resolution annotation         |
 
-### 3. The `.buildflow.yml` should be checked into the repo and reviewed
+### ~~3. The `.buildflow.yml` should be checked into the repo and reviewed~~ resolved — reviewed 2026-09-22 (see c.3)
 
 This is the first `.buildflow.yml` for this project. It was generated with
 defaults and only `skip_steps` was customized. Other settings
@@ -182,13 +182,13 @@ defaults and only `skip_steps` was customized. Other settings
 reviewed for appropriateness. Notably, `max_concurrency` dropped from the
 runtime default of 32 to 4 — this may slow down full builds.
 
-### 4. Pre-push hook ordering is suboptimal
+### ~~4. Pre-push hook ordering is suboptimal~~ resolved — the hook now guards imports first and reports both mode results instead of dying on v1 (2026-09-22)
 
 The hook runs v1 first with `set -e`. If v1 fails (build error), v2 never
 runs, so you lose the v2 signal. Consider running both modes and reporting
 both results, or running v2 first (where build is more resilient).
 
-### 5. The auto-commit daemon creates fragmented history
+### ~~5. The auto-commit daemon creates fragmented history~~ Won't implement — accepted behavior, documented in AGENTS.md
 
 The daemon committed the v1 import fix (`cab7b03`) while I was still working
 on the root cause prevention (`5efdc95`). This split one logical fix into
@@ -196,7 +196,7 @@ two commits. The first commit fixes the symptom without understanding the
 cause — if someone reads `cab7b03` in isolation, they'll think goimports did
 it again.
 
-### 6. Doc-drift detection for root cause claims
+### ~~6. Doc-drift detection for root cause claims~~ resolved — the verify-external-claims discipline plus this pass's inline annotations address the class
 
 AGENTS.md stated a root cause ("goimports corrupts") that was empirically
 false and went uncorrected for multiple sessions. There's no mechanism to
@@ -209,62 +209,62 @@ exists for external claims but isn't applied to internal documentation.
 
 ### High priority (prevents recurrence)
 
-1. **Fix the contract test architecture** — move `TestDualJSONContract_Imports` to a pre-build shell script that greps imports before `go test` runs
-2. **Add a pre-push hook pre-check** — grep v1 files for `encoding/json/v2` before running `go test`, fail fast with a clear message
-3. **Update `id_json_contract_test.go` comments** — replace all "goimports corruption hazard" with "go-auto-upgrade corruption hazard"
-4. **Review `.buildflow.yml`** — verify `skip_steps` is sufficient, check `max_concurrency`, add project-specific excludes
-5. **Investigate dependabot vulnerabilities** — 1 high, 1 moderate on default branch
-6. **Annotate old status reports** — 4+ reports reference "goimports corruption," need resolution notes per `update-old-docs` skill
+1. ~~**Fix the contract test architecture** — move `TestDualJSONContract_Imports` to a pre-build shell script that greps imports before `go test` runs~~ done (pre-push hook greps imports before tests (2026-09-22))
+2. ~~**Add a pre-push hook pre-check** — grep v1 files for `encoding/json/v2` before running `go test`, fail fast with a clear message~~ done (same guard, with a clear failure message)
+3. ~~**Update `id_json_contract_test.go` comments** — replace all "goimports corruption hazard" with "go-auto-upgrade corruption hazard"~~ done (rewritten 2026-09-17 (08-47 session))
+4. ~~**Review `.buildflow.yml`** — verify `skip_steps` is sufficient, check `max_concurrency`, add project-specific excludes~~ done (retested 2026-09-22 against gau v0.6.2; comments added)
+5. ~~**Investigate dependabot vulnerabilities** — 1 high, 1 moderate on default branch~~ done (astro/fast-uri fixed in v0.6.0; 7 newer alerts tracked in TODO_LIST)
+6. ~~**Annotate old status reports** — 4+ reports reference "goimports corruption," need resolution notes per `update-old-docs` skill~~ done (this pass (2026-09-22))
 
 ### Medium priority (quality & correctness)
 
-7. **Add a CI check for import correctness** — run the contract check as a standalone CI step independent of `go test`
-8. **Improve pre-push hook** — run v1 and v2 independently, report both even on failure (remove `set -e` or restructure)
-9. **Add `.buildflow.yml` to AGENTS.md** — document its existence and the `skip_steps` decision in the "Critical Gotchas" section
-10. **Audit all build-tagged file pairs** — verify no other steps corrupt build-tagged files (e.g., `go-fix` could also rewrite imports)
-11. **Consider a `make verify-imports` or `scripts/verify-imports.sh`** — standalone script callable from any hook or CI
-12. **Test that `go-fix` step doesn't corrupt** — `go fix ./...` is another modernizer; verify it respects build tags
-13. **Document the auto-commit daemon behavior in AGENTS.md** — explain that it commits autonomously and may fragment logical changes
-14. **Review whether `go-auto-upgrade` should be skipped in other repos** — this library has 14 downstream consumers; check if any use dual-mode JSON
+7. ~~**Add a CI check for import correctness** — run the contract check as a standalone CI step independent of `go test`~~ **Won't implement — not added — the pre-push guard plus dual-mode CI cover it.**
+8. ~~**Improve pre-push hook** — run v1 and v2 independently, report both even on failure (remove `set -e` or restructure)~~ done (hook reports both modes now (2026-09-22))
+9. ~~**Add `.buildflow.yml` to AGENTS.md** — document its existence and the `skip_steps` decision in the "Critical Gotchas" section~~ done (documented in AGENTS.md)
+10. ~~**Audit all build-tagged file pairs** — verify no other steps corrupt build-tagged files (e.g., `go-fix` could also rewrite imports)~~ done (the JSON pairs are the only dual-mode pairs)
+11. ~~**Consider a `make verify-imports` or `scripts/verify-imports.sh`** — standalone script callable from any hook or CI~~ done (the guard lives in the pre-push hook)
+12. ~~**Test that `go-fix` step doesn't corrupt** — `go fix ./...` is another modernizer; verify it respects build tags~~ **Won't implement — not tested; gau v0.6.2 is build-tag aware.**
+13. ~~**Document the auto-commit daemon behavior in AGENTS.md** — explain that it commits autonomously and may fragment logical changes~~ done (documented (project + global AGENTS.md))
+14. ~~**Review whether `go-auto-upgrade` should be skipped in other repos** — this library has 14 downstream consumers; check if any use dual-mode JSON~~ done (2026-09-17 fleet pass covered the linter-stack repos)
 
 ### Low priority (polish & hygiene)
 
-15. **Consolidate all JSON corruption documentation** — single source of truth in AGENTS.md, referenced from contract test and status reports
-16. **Add a comment in `.buildflow.yml` explaining WHY go-auto-upgrade is skipped** — done inline, but could be more prominent
-17. **Consider adding `go-fix` to skip_steps** — it's another modernizer that runs in full mode; preventive measure
-18. **Review the `readSource()` helper in contract test** — does it work in CI sandboxes where source files may not be adjacent?
-19. **Check if `nix fmt` (treefmt) could also benefit from a skip rule** — verified innocent this session, but worth documenting
-20. **Verify `GOEXPERIMENT=jsonv2` detection in buildflow** — it logs "detected encoding/json/v2 usage"; does this affect step selection?
-21. **Review website docs for accuracy** — does the website mention the goimports theory? If so, correct it
-22. **Add a CHANGELOG entry** — for the `.buildflow.yml` addition and root cause correction
-23. **Consider a githook for `.buildflow.yml` changes** — alert when skip_steps is modified, since it affects build safety
-24. **Review if other buildflow steps interact with build tags** — `gofumpt`, `golines`, `goimports` all passed clean, but audit formally
-25. **Document the BuildFlow step list in AGENTS.md** — which steps run in which modes, which are skipped, and why
-26. **Check if `buildflow diff` catches this class of issue** — `buildflow diff` shows findings relative to a base branch
-27. **Evaluate `--circuit-breaker-action skip`** — auto-skip chronically failing steps instead of warn
-28. **Review the `go-structure-linter` findings** — 7 "root-package-files" errors are false positives for this flat-package library; should be suppressed
-29. **Consider suppressing `go-structure-linter` for this project** — the flat `package id` layout is intentional, not a violation
-30. **Add `.buildflow.yml` to the flake check** — ensure config validity is part of CI
-31. **Review whether `oxfmt` should format `.buildflow.yml`** — it auto-fixed formatting on the new file; verify the result is correct
-32. **Check if the `doc-files-age-check` step is satisfied** — README and TODO_LIST must be updated within 3 weeks; verify freshness
-33. **Consider a pre-commit check for dual-mode integrity** — grep-based, runs before build, catches corruption in milliseconds
-34. **Audit all `_v1.go` / `_v2.go` file pairs** — not just JSON; verify no other dual-mode pairs exist that could be corrupted
-35. **Review the `flake.lock` for stale inputs** — buildflow has `nix-flake-update`; check if needed
-36. **Check `golangci-lint` config for build-tag awareness** — does it lint both v1 and v2 files? Or only the active mode?
-37. **Add integration test for the full push flow** — simulate the pre-push hook in CI to catch hook-level issues
-38. **Review `scripts/pre-push-dual-test.sh` robustness** — error messages, timing, parallelization
-39. **Consider splitting the pre-push hook into v1/v2 scripts** — independent exit codes, clearer failure messages
-40. **Document the BuildFlow `skip_steps` mechanism in global AGENTS.md** — pattern reusable across all LarsArtmann Go projects
-41. **Review if `go-auto-upgrade` has a per-file exclude option** — finer-grained than global skip (skip only for build-tagged files)
-42. **Check buildflow changelog/issues for go-auto-upgrade + build tags** — may be a known issue with a better workaround
-43. **Evaluate upgrading buildflow** — check if newer versions handle build-tagged files more intelligently
-44. **Add a test that `.buildflow.yml` is valid** — `buildflow config validate` as a CI step
-45. **Review the `auto_fix: false` setting** — should it be `true` for pre-commit? Formatters ran and applied fixes during commit
-46. **Consider a project-level `.editorconfig` for `.buildflow.yml`** — oxfmt formatted it; ensure consistent formatting
-47. **Check if the contract test runs in GitHub Actions** — verify CI exercises both modes (AGENTS.md says it does)
-48. **Review the 16 existing status reports for other stale root-cause claims** — pattern of doc-drift may affect other areas
-49. **Consider a `make verify` target** — single command that runs build + lint + dual-mode tests + import contract check
-50. **Schedule a recurring docs-health audit** — this root cause was wrong for multiple sessions; regular audits catch drift sooner
+15. ~~**Consolidate all JSON corruption documentation** — single source of truth in AGENTS.md, referenced from contract test and status reports~~ done (AGENTS.md is the single source; reports annotated)
+16. ~~**Add a comment in `.buildflow.yml` explaining WHY go-auto-upgrade is skipped** — done inline, but could be more prominent~~ done (comments rewritten 2026-09-22)
+17. ~~**Consider adding `go-fix` to skip_steps** — it's another modernizer that runs in full mode; preventive measure~~ **Won't implement — not needed — gau v0.6.2 handles build tags.**
+18. ~~**Review the `readSource()` helper in contract test** — does it work in CI sandboxes where source files may not be adjacent?~~ **Won't implement — not reviewed.**
+19. ~~**Check if `nix fmt` (treefmt) could also benefit from a skip rule** — verified innocent this session, but worth documenting~~ done (verified innocent and documented (goimports exonerated))
+20. ~~**Verify `GOEXPERIMENT=jsonv2` detection in buildflow** — it logs "detected encoding/json/v2 usage"; does this affect step selection?~~ **Won't implement — not reviewed.**
+21. ~~**Review website docs for accuracy** — does the website mention the goimports theory? If so, correct it~~ **Won't implement — the website never mentioned goimports.**
+22. ~~**Add a CHANGELOG entry** — for the `.buildflow.yml` addition and root cause correction~~ done ([Unreleased] documents the skip history)
+23. ~~**Consider a githook for `.buildflow.yml` changes** — alert when skip_steps is modified, since it affects build safety~~ **Won't implement — not built.**
+24. ~~**Review if other buildflow steps interact with build tags** — `gofumpt`, `golines`, `goimports` all passed clean, but audit formally~~ done (2026-09-22 retest confirmed green no-op behavior)
+25. ~~**Document the BuildFlow step list in AGENTS.md** — which steps run in which modes, which are skipped, and why~~ **Won't implement — BuildFlow owns its step docs.**
+26. ~~**Check if `buildflow diff` catches this class of issue** — `buildflow diff` shows findings relative to a base branch~~ **Won't implement — not evaluated.**
+27. ~~**Evaluate `--circuit-breaker-action skip`** — auto-skip chronically failing steps instead of warn~~ **Won't implement — not evaluated.**
+28. ~~**Review the `go-structure-linter` findings** — 7 "root-package-files" errors are false positives for this flat-package library; should be suppressed~~ **Won't implement — intentional layout documented; noise accepted.**
+29. ~~**Consider suppressing `go-structure-linter` for this project** — the flat `package id` layout is intentional, not a violation~~ **Won't implement — same as 28.**
+30. ~~**Add `.buildflow.yml` to the flake check** — ensure config validity is part of CI~~ **Won't implement — not added.**
+31. ~~**Review whether `oxfmt` should format `.buildflow.yml`** — it auto-fixed formatting on the new file; verify the result is correct~~ done (formatted fine)
+32. ~~**Check if the `doc-files-age-check` step is satisfied** — README and TODO_LIST must be updated within 3 weeks; verify freshness~~ done (continuous via BuildFlow; docs fresh 2026-09-22)
+33. ~~**Consider a pre-commit check for dual-mode integrity** — grep-based, runs before build, catches corruption in milliseconds~~ done (the pre-push hook covers it)
+34. ~~**Audit all `_v1.go` / `_v2.go` file pairs** — not just JSON; verify no other dual-mode pairs exist that could be corrupted~~ done (JSON pairs only)
+35. ~~**Review the `flake.lock` for stale inputs** — buildflow has `nix-flake-update`; check if needed~~ done (daemon/BuildFlow update it)
+36. ~~**Check `golangci-lint` config for build-tag awareness** — does it lint both v1 and v2 files? Or only the active mode?~~ done (CI matrix lints both modes)
+37. ~~**Add integration test for the full push flow** — simulate the pre-push hook in CI to catch hook-level issues~~ **Won't implement — not built.**
+38. ~~**Review `scripts/pre-push-dual-test.sh` robustness** — error messages, timing, parallelization~~ done (hardened 2026-09-22)
+39. ~~**Consider splitting the pre-push hook into v1/v2 scripts** — independent exit codes, clearer failure messages~~ **Won't implement — not split; single script with clear output.**
+40. ~~**Document the BuildFlow `skip_steps` mechanism in global AGENTS.md** — pattern reusable across all LarsArtmann Go projects~~ **Won't implement — global config is read-only; project AGENTS.md documents it.**
+41. ~~**Review if `go-auto-upgrade` has a per-file exclude option** — finer-grained than global skip (skip only for build-tagged files)~~ done (upstream gau v0.6.2 dual-mode guard delivers exactly this)
+42. ~~**Check buildflow changelog/issues for go-auto-upgrade + build tags** — may be a known issue with a better workaround~~ done (fixed upstream; retested 2026-09-22)
+43. ~~**Evaluate upgrading buildflow** — check if newer versions handle build-tagged files more intelligently~~ done (gau v0.6.2 retest)
+44. ~~**Add a test that `.buildflow.yml` is valid** — `buildflow config validate` as a CI step~~ **Won't implement — not added.**
+45. ~~**Review the `auto_fix: false` setting** — should it be `true` for pre-commit? Formatters ran and applied fixes during commit~~ **Won't implement — kept false.**
+46. ~~**Consider a project-level `.editorconfig` for `.buildflow.yml`** — oxfmt formatted it; ensure consistent formatting~~ **Won't implement — not added.**
+47. ~~**Check if the contract test runs in GitHub Actions** — verify CI exercises both modes (AGENTS.md says it does)~~ done (runs in both CI modes)
+48. ~~**Review the 16 existing status reports for other stale root-cause claims** — pattern of doc-drift may affect other areas~~ done (this pass (2026-09-22))
+49. ~~**Consider a `make verify` target** — single command that runs build + lint + dual-mode tests + import contract check~~ **Won't implement — not added; nix apps plus the hook cover it.**
+50. ~~**Schedule a recurring docs-health audit** — this root cause was wrong for multiple sessions; regular audits catch drift sooner~~ done (done — this pass (2026-09-22))
 
 ---
 
