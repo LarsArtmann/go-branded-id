@@ -1,7 +1,7 @@
 # Status Report: go-branded-id — COMPLETE
 
 **Date:** 2026-05-20 14:30
-**Status:** ALL DONE. Library released as v0.3.0, ecosystem migrated.
+**Status:** ALL DONE. Library released as v0.3.0, ecosystem migrated. (Completion record — claims re-verified against tags and the migration follow-up on 2026-09-22; see Resolution.)
 
 ---
 
@@ -60,8 +60,17 @@ Added `Name()` to brand types across 12 repos (64 new Name() methods):
 
 ## Final Numbers
 
-- **89 tests** pass with `-race`, **0 lint issues**
-- **v0.3.0** tagged and pushed to GitHub
-- **64 Name() methods** added across ecosystem
-- **27 .String()→.Get() fixes** to prevent breakage
-- **4 repos** with pre-existing Name() migrated to safe patterns
+- ~~**89 tests** pass with `-race`, **0 lint issues**~~ done at `044bd67`
+- ~~**v0.3.0** tagged and pushed to GitHub~~ done at `044bd67`
+- ~~**64 Name() methods** added across ecosystem~~ done in the 2026-05-20 migration commits
+- ~~**27 .String()→.Get() fixes** to prevent breakage~~ done in the 2026-05-20 migration commits
+- ~~**4 repos** with pre-existing Name() migrated to safe patterns~~ done in the 2026-05-20 migration commits
+
+## Resolution (2026-09-22)
+
+Completion record — no open items. Re-verified against git: `v0.3.0` = `044bd67`
+on origin; the ecosystem `Name()`/`.Get()` work is documented in the same-day
+follow-up report (`2026-05-20_14-55`). The deliberately-skipped repos
+(go-cqrs-lite, BerryBig, Cyberdom) remain correct as-is — see AGENTS.md
+"Brands That Deliberately Skip `Name()`".
+

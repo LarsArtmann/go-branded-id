@@ -125,14 +125,14 @@ All 14 ecosystem repos still depend on `go-branded-id v0.1.0`. None have been bu
 
 ## C) NOT STARTED
 
-1. **Bump ecosystem repos to v0.3.0** — `go get github.com/larsartmann/go-branded-id@v0.3.0` in all 14 repos
-2. **Re-run tests in all repos after v0.3.0 bump** — String() behavior will change for repos with Name()
-3. **Fix v0.3.0 tag position** — Force-move to HEAD
-4. **Re-trigger Release CI** — After tag fix
-5. **Verify GitHub Release was created** — Check release notes, assets
-6. **Codemod tool** — Automate adding Name() to brand types across repos
-7. **CreditReformBilanzampel uncommitted changes** — 8 modified + 2 untracked files unrelated to branded-id work
-8. **emeet-pixyd integration tests** — Failing due to PipeWire/state file issues (pre-existing, not our changes)
+1. ~~**Bump ecosystem repos to v0.3.0** — `go get github.com/larsartmann/go-branded-id@v0.3.0` in all 14 repos~~ **Won't implement — superseded — the standing task is the v0.6.0 ecosystem bump (TODO_LIST).**
+2. ~~**Re-run tests in all repos after v0.3.0 bump** — String() behavior will change for repos with Name()~~ **Won't implement — superseded — folds into the v0.6.0 ecosystem bump (TODO_LIST).**
+3. ~~**Fix v0.3.0 tag position** — Force-move to HEAD~~ **Won't implement — the module proxy pinned v0.3.0 at 044bd67; tags are immutable in practice and later releases superseded it.**
+4. ~~**Re-trigger Release CI** — After tag fix~~ done (release pipeline green since v0.3.1 (8b30d92); notes now CHANGELOG-derived (a03780b))
+5. ~~**Verify GitHub Release was created** — Check release notes, assets~~ done (releases verified for v0.5.0/v0.5.1/v0.6.0 in later sessions)
+6. ~~**Codemod tool** — Automate adding Name() to brand types across repos~~ done (cmd/namer shipped v0.5.0 (5c4f995))
+7. ~~**CreditReformBilanzampel uncommitted changes** — 8 modified + 2 untracked files unrelated to branded-id work~~ **Won't implement — pre-existing and unrelated to branded-id; that repo's concern.**
+8. ~~**emeet-pixyd integration tests** — Failing due to PipeWire/state file issues (pre-existing, not our changes)~~ **Won't implement — pre-existing PipeWire/state-file failures — documented as not-ours (TODO_LIST ecosystem detail).**
 
 ---
 

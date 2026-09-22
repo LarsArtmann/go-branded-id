@@ -144,17 +144,17 @@ The following repos could benefit from adding `Name()` to their brand types. Non
 
 ## E) WHAT WE SHOULD IMPROVE 🔧
 
-1. **`GoString()` for unnamed brands** — `id.id.StringBrand(42)` is ugly. Consider just `StringBrand(42)` or detecting when brand name starts with package name and stripping it.
+1. ~~**`GoString()` for unnamed brands** — `id.id.StringBrand(42)` is ugly. Consider just `StringBrand(42)` or detecting when brand name starts with package name and stripping it.~~ **Won't implement — package-qualified fallback kept and documented (AGENTS.md BrandName fallback section).**
 
-2. **`ErrInvalidID` wrapping** — Currently `fmt.Errorf("%w: %s: empty", ErrInvalidID, BrandName[B]())`. The triple-colon format `"id: invalid: User: empty"` is verbose. Could simplify to `"User: invalid: empty"` or `"id: User: empty"`.
+2. ~~**`ErrInvalidID` wrapping** — Currently `fmt.Errorf("%w: %s: empty", ErrInvalidID, BrandName[B]())`. The triple-colon format `"id: invalid: User: empty"` is verbose. Could simplify to `"User: invalid: empty"` or `"id: User: empty"`.~~ **Won't implement — sentinel message format kept stable; changing it would break message-parsing consumers.**
 
-3. **`ValidateID` should accept any comparable V** — Already does, but error message doesn't indicate the value type. Could be useful for debugging.
+3. ~~**`ValidateID` should accept any comparable V** — Already does, but error message doesn't indicate the value type. Could be useful for debugging.~~ **Won't implement — brand name in the message already identifies the type; value type adds noise.**
 
-4. **Consider adding `MustValidateID`** — panic version for init-time validation, consistent with Go patterns.
+4. ~~**Consider adding `MustValidateID`** — panic version for init-time validation, consistent with Go patterns.~~ done (shipped in v0.3.1 (8b30d92); id_brand.go:81)
 
-5. **Package doc comment** — Should mention `BrandNamer` interface and `ValidateID` in the overview.
+5. ~~**Package doc comment** — Should mention `BrandNamer` interface and `ValidateID` in the overview.~~ done (package doc in id.go documents phantom types and brand naming)
 
-6. **Integration test with real consumer** — Run go-cqrs-lite tests against the updated library to verify no breakage.
+6. ~~**Integration test with real consumer** — Run go-cqrs-lite tests against the updated library to verify no breakage.~~ **Won't implement — not feasible in-repo; downstream consumers verified pinned in the 2026-09-17 linter-stack pass.**
 
 ---
 
@@ -162,31 +162,31 @@ The following repos could benefit from adding `Name()` to their brand types. Non
 
 | #  | Priority | Task                                                                   |
 | -- | -------- | ---------------------------------------------------------------------- |
-| 1  | P0       | Tag release: `v0.2.0` or `v1.0.0`                                      |
-| 2  | P0       | Update CHANGELOG.md                                                    |
-| 3  | P0       | Push to remote                                                         |
-| 4  | P1       | Add `Name()` to all brand types in go-cqrs-lite                        |
-| 5  | P1       | Add `Name()` to all brand types in ActaFlow                            |
-| 6  | P1       | Add `Name()` to all brand types in CreditReformBilanzampel             |
-| 7  | P1       | Add `Name()` to all brand types in InboxClean                          |
-| 8  | P1       | Run go-cqrs-lite test suite against updated library                    |
-| 9  | P1       | Fix `GoString()` ugly double-package prefix for unnamed brands         |
-| 10 | P2       | Add benchmarks for `BrandName[B]()` and brand-aware `String()`         |
-| 11 | P2       | Add fuzz tests for `ValidateID`                                        |
-| 12 | P2       | Update MIGRATION.md with `String()` behavior change                    |
-| 13 | P2       | Add `Name()` to brand types in BuildFlow                               |
-| 14 | P2       | Add `Name()` to brand types in GmbH                                    |
-| 15 | P2       | Add `Name()` to brand types in SEC                                     |
-| 16 | P2       | Add `Name()` to brand types in Cyberdom                                |
-| 17 | P3       | Consider `MustValidateID` convenience function                         |
-| 18 | P3       | Update package doc comment to mention BrandNamer                       |
-| 19 | P3       | Add `Name()` to remaining 30+ repos                                    |
-| 20 | P3       | Create a codemod/tool to add `Name()` to all brand types automatically |
-| 21 | P3       | Add Example tests for `ValidateIDWithValue`                            |
-| 22 | P3       | Consider adding `String()` format to domain language doc               |
-| 23 | P4       | Verify CI pipeline covers new files                                    |
-| 24 | P4       | Update go-cqrs-lite to use `ValidateID` instead of custom validation   |
-| 25 | P4       | Write blog post / announcement about the change                        |
+| ~~1~~  | ~~P0~~ done — v0.3.0 (044bd67) | ~~Tag release: `v0.2.0` or `v1.0.0`~~ |
+| ~~2~~  | ~~P0~~ done — v0.3.0 CHANGELOG section | ~~Update CHANGELOG.md~~ |
+| ~~3~~  | ~~P0~~ done — tag on origin; releases automated since (release.yml) | ~~Push to remote~~ |
+| ~~4~~  | ~~P1~~ **Won't implement — marker String() output is used as storage/stream keys; Name() would corrupt data (documented in AGENTS.md).** | ~~Add `Name()` to all brand types in go-cqrs-lite~~ |
+| ~~5~~  | ~~P1~~ done — Correlation brand named in the 2026-05-20 migration (64 Name() methods across 12 repos) | ~~Add `Name()` to all brand types in ActaFlow~~ |
+| ~~6~~  | ~~P1~~ done — indirect dep; source fixes applied in the 2026-05-20 migration | ~~Add `Name()` to all brand types in CreditReformBilanzampel~~ |
+| ~~7~~  | ~~P1~~ done — 4 brands named (Message, Label, Thread, User) | ~~Add `Name()` to all brand types in InboxClean~~ |
+| ~~8~~  | ~~P1~~ done — 27 .String() to .Get() fixes applied across consumers in the 2026-05-20 pass | ~~Run go-cqrs-lite test suite against updated library~~ |
+| ~~9~~  | ~~P1~~ **Won't implement — package-qualified fallback kept; documented in AGENTS.md.** | ~~Fix `GoString()` ugly double-package prefix for unnamed brands~~ |
+| ~~10~~ | ~~P2~~ done — String/BrandName/ValidateID benchmarks in id_bench_test.go (29 benchmark functions) | ~~Add benchmarks for `BrandName[B]()` and brand-aware `String()`~~ |
+| ~~11~~ | ~~P2~~ done — FuzzValidateID in id_bench_test.go | ~~Add fuzz tests for `ValidateID`~~ |
+| ~~12~~ | ~~P2~~ done — String() behavior change documented in MIGRATION.md | ~~Update MIGRATION.md with `String()` behavior change~~ |
+| ~~13~~ | ~~P2~~ **Won't implement — no branded-id brand types surfaced in the migration sweep; not in the consumer set.** | ~~Add `Name()` to brand types in BuildFlow~~ |
+| ~~14~~ | ~~P2~~ **Won't implement — no branded-id brand types surfaced in the migration sweep; not in the consumer set.** | ~~Add `Name()` to brand types in GmbH~~ |
+| ~~15~~ | ~~P2~~ done — 2 brands named (Game, Player) | ~~Add `Name()` to brand types in SEC~~ |
+| ~~16~~ | ~~P2~~ **Won't implement — no brand types found (documented in the 2026-05-20 reports and AGENTS.md).** | ~~Add `Name()` to brand types in Cyberdom~~ |
+| ~~17~~ | ~~P3~~ done — shipped in v0.3.1 (8b30d92); id_brand.go:81 | ~~Consider `MustValidateID` convenience function~~ |
+| ~~18~~ | ~~P3~~ done — package doc in id.go covers BrandNamer and validation | ~~Update package doc comment to mention BrandNamer~~ |
+| ~~19~~ | ~~P3~~ done — 12 repos / 64 Name() methods migrated 2026-05-20; remainder not in the consumer set | ~~Add `Name()` to remaining 30+ repos~~ |
+| ~~20~~ | ~~P3~~ done — cmd/namer shipped v0.5.0 (5c4f995) | ~~Create a codemod/tool to add `Name()` to all brand types automatically~~ |
+| ~~21~~ | ~~P3~~ done — Example functions in id_brand_test.go (ExampleValidateID, ExampleBrandName, ...) | ~~Add Example tests for `ValidateIDWithValue`~~ |
+| ~~22~~ | ~~P3~~ done — DOMAIN_LANGUAGE.md Named Brand entry defines the format | ~~Consider adding `String()` format to domain language doc~~ |
+| ~~23~~ | ~~P4~~ done — go.yml runs the full module in both JSON modes | ~~Verify CI pipeline covers new files~~ |
+| ~~24~~ | ~~P4~~ **Won't implement — markers are internal keys; adopting library validation is an upstream go-cqrs-lite decision.** | ~~Update go-cqrs-lite to use `ValidateID` instead of custom validation~~ |
+| ~~25~~ | ~~P4~~ **Won't implement — never written; no announcement channel.** | ~~Write blog post / announcement about the change~~ |
 
 ---
 
