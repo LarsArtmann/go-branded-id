@@ -26,6 +26,37 @@ func (sentinelFailingBinary) MarshalBinary() ([]byte, error) {
 // Compile-time interface assertion.
 var _ encoding.BinaryMarshaler = sentinelFailingBinary{}
 
+// sentinelFailingJSON implements json.Marshaler but always returns an error.
+type sentinelFailingJSON struct{ X int }
+
+func (sentinelFailingJSON) MarshalJSON() ([]byte, error) {
+	return nil, errors.New("intentional json marshal failure")
+}
+
+// sentinelFailingText implements encoding.TextMarshaler but always returns an
+// error.
+type sentinelFailingText struct{ X int }
+
+func (sentinelFailingText) MarshalText() ([]byte, error) {
+	return nil, errors.New("intentional text marshal failure")
+}
+
+// sentinelFailingBinaryUnmarshal implements encoding.BinaryUnmarshaler but
+// always returns an error.
+type sentinelFailingBinaryUnmarshal struct{ X int }
+
+func (*sentinelFailingBinaryUnmarshal) UnmarshalBinary([]byte) error {
+	return errors.New("intentional binary unmarshal failure")
+}
+
+// sentinelFailingTextUnmarshal implements encoding.TextUnmarshaler but always
+// returns an error.
+type sentinelFailingTextUnmarshal struct{ X int }
+
+func (*sentinelFailingTextUnmarshal) UnmarshalText([]byte) error {
+	return errors.New("intentional text unmarshal failure")
+}
+
 func assertErrorIs(tb testing.TB, err error, sentinel error) {
 	tb.Helper()
 
@@ -179,6 +210,22 @@ func TestSentinelErrMarshal(t *testing.T) {
 		_, err := id.MarshalBinary()
 		assertErrorIs(t, err, ErrMarshal)
 	})
+
+	t.Run("json marshal delegate failure", func(t *testing.T) {
+		t.Parallel()
+
+		id := NewID[sentinelMarshalBrand, sentinelFailingJSON](sentinelFailingJSON{X: 1})
+		_, err := id.MarshalJSON()
+		assertErrorIs(t, err, ErrMarshal)
+	})
+
+	t.Run("SQL value text-marshaler delegate failure", func(t *testing.T) {
+		t.Parallel()
+
+		id := NewID[sentinelMarshalBrand, sentinelFailingText](sentinelFailingText{X: 1})
+		_, err := id.Value()
+		assertErrorIs(t, err, ErrMarshal)
+	})
 }
 
 func TestSentinelErrUnmarshal(t *testing.T) {
@@ -208,6 +255,24 @@ func TestSentinelErrUnmarshal(t *testing.T) {
 		var id ID[Int64Brand, int64]
 
 		err := id.UnmarshalJSON([]byte("not-json"))
+		assertErrorIs(t, err, ErrUnmarshal)
+	})
+
+	t.Run("binary unmarshal delegate failure", func(t *testing.T) {
+		t.Parallel()
+
+		var id ID[sentinelMarshalBrand, sentinelFailingBinaryUnmarshal]
+
+		err := id.UnmarshalBinary([]byte{1, 2, 3})
+		assertErrorIs(t, err, ErrUnmarshal)
+	})
+
+	t.Run("text unmarshal delegate failure", func(t *testing.T) {
+		t.Parallel()
+
+		var id ID[sentinelMarshalBrand, sentinelFailingTextUnmarshal]
+
+		err := id.UnmarshalText([]byte("data"))
 		assertErrorIs(t, err, ErrUnmarshal)
 	})
 }

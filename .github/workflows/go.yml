@@ -6,6 +6,25 @@ on:
   pull_request:
 
 jobs:
+  hygiene:
+    # Fails if a compiled binary or other build artifact is tracked at repo
+    # root — recurrence guard for the v0.5.0 incident where a tracked `namer`
+    # binary inflated release source archives ~10x.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Reject tracked build artifacts
+        run: |
+          offenders=$(git ls-files | grep -v / | xargs -r file --mime-type \
+            | grep -E 'application/(x-executable|x-sharedlib|x-mach-binary|octet-stream)' \
+            | cut -d: -f1 || true)
+          if [ -n "$offenders" ]; then
+            echo "::error::Tracked build artifacts at repo root:"
+            echo "$offenders"
+            exit 1
+          fi
+
   build:
     runs-on: ubuntu-latest
     strategy:
