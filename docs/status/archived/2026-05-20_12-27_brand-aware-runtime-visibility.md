@@ -161,7 +161,7 @@ The following repos could benefit from adding `Name()` to their brand types. Non
 ## F) TOP 25 THINGS TO DO NEXT
 
 | #  | Priority | Task                                                                   |
-| -- | -------- | ---------------------------------------------------------------------- |
+| --- | ------------ | --------------------------------------------------------------------------------------------------------- |
 | ~~1~~  | ~~P0~~ done — v0.3.0 (044bd67) | ~~Tag release: `v0.2.0` or `v1.0.0`~~ |
 | ~~2~~  | ~~P0~~ done — v0.3.0 CHANGELOG section | ~~Update CHANGELOG.md~~ |
 | ~~3~~  | ~~P0~~ done — tag on origin; releases automated since (release.yml) | ~~Push to remote~~ |

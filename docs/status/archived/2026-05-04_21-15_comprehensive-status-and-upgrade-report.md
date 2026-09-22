@@ -125,7 +125,7 @@
 ## f) Top #25 Things We Should Get Done Next
 
 | #  | Priority | Task                                                                  | Est. Effort |
-| -- | -------- | --------------------------------------------------------------------- | ----------- |
+| --- | ------------ | ------------------------------------------------------------------------------------------------------- | ---------------- |
 | ~~1~~  | ~~P0~~ done — shipped inside v0.3.0 (044bd67) | ~~Tag `v0.2.0` and push to remote~~ | ~~1 min~~ |
 | ~~2~~  | ~~P0~~ done — in the 2026-05-20 ecosystem migration | ~~Remove `replace` directive from `go-composable-business-types/go.mod`~~ | ~~2 min~~ |
 | ~~3~~  | ~~P0~~ done — in the 2026-05-20 ecosystem migration | ~~Update consumer to `v0.2.0` (remove local replace)~~ | ~~2 min~~ |

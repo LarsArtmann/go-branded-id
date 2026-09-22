@@ -30,7 +30,7 @@
 ## a) FULLY DONE
 
 | #  | Item                                                                                                                                                                                                                 | Evidence                                                                                                                    |
-| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1  | Four-repo stack survey: READMEs, AGENTS.md, core sources (rule.go, output_adapter.go, ids.go), PRO/CONTRA go-output integration doc                                                                                  | Read this session; no code claims                                                                                           |
 | 2  | Cross-repo dependency graph verified from go.mod: go-branded-id v0.5.1 → go-output v0.38.0 → {go-finding CLI, cmdguard}; go-finding → go-linter-sdk; go-error-family underlies go-finding                            | go.mod greps, all 5 module files                                                                                            |
 | 3  | go-linter-sdk flake regression repaired: `self,` restored to `outputs` destructure (3rd application of a twice-clobbered fix; clobbered by daemon commit `802ff0a`)                                                  | go-linter-sdk `1a7d7c8` (flake.nix +1); `nix run .#test` → PASS                                                             |
@@ -49,7 +49,7 @@
 ## b) PARTIALLY DONE
 
 | # | Item                                        | What works                                             | What remains                                                                                                                                                                  | Effort |
-| - | ------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| --- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | ~~1~~ | ~~go-finding flake `test` app still root-only~~ **Won't implement — routed to go-finding (owning repo).** | ~~Gap is documented truthfully in AGENTS.md~~ | ~~Flake app itself not fixed to iterate all 5 modules (go-output-style loop)~~ | ~~S–M~~ |
 | ~~2~~ | ~~cmdguard cleanup-hook context design~~ **Won't implement — routed to cmdguard.** | ~~Lint silences the finding; behavior verified unchanged~~ | ~~No design review of whether hooks _should_ capture the Execute-time ctx explicitly instead of nolint~~ | ~~S~~ |
 | ~~3~~ | ~~cmdguard fix documentation~~ **Won't implement — routed to cmdguard.** | ~~nolint comment in code with reason~~ | ~~AGENTS.md entry (cobra RunE deferred-context footgun) not written~~ | ~~S~~ |
@@ -62,7 +62,7 @@
 ## c) NOT STARTED
 
 | #  | Item                                                                                                                                    | Why not started                                                                          | Priority     |
-| -- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------ |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------ |
 | ~~1~~  | ~~Rebuild cmd/namer as a real linter (go-linter-sdk rules emitting `finding.Finding`, cmdguard CLI shell, go-output rendering)~~ **Won't implement — routed to ROADMAP Theme 3 — placement and suppression decisions pending.** | ~~Session's implied goal; waiting on repo-placement + suppression-design decisions (see g)~~ | ~~HIGH~~ |
 | ~~2~~  | ~~go-linter-sdk first-production-consumer milestone (v0.4.0)~~ **Won't implement — routed to go-linter-sdk (blocked by c.1).** | ~~Blocked by 1~~ | ~~HIGH~~ |
 | ~~3~~  | ~~`nix flake check` pass over all four repos~~ **Won't implement — routed to the owning repos.** | ~~Not run this session (tests only)~~ | ~~MEDIUM~~ |
@@ -108,7 +108,7 @@
 Impact: Critical/High/Medium/Low · Effort: S <30min, M 30min–2h, L >2h
 
 | #  | Task                                                                                                                                       | Impact   | Effort | Category      |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ------ | ------------- |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------- | ------------------- |
 | ~~1~~  | ~~Decide cmd/namer endgame placement (in-repo rebuild vs standalone linter repo; golangci plugin or not) — blocks the whole chain~~ **Won't implement — open decision; ROADMAP Theme 3.** | ~~Critical~~ | ~~S~~ | ~~Decision~~ |
 | ~~2~~  | ~~Rebuild cmd/namer on go-linter-sdk: one RuleFunc per rule emitting finding.Finding, Registry, ExitCodeByConfidence~~ **Won't implement — ROADMAP Theme 3.** | ~~Critical~~ | ~~L~~ | ~~Feature~~ |
 | ~~3~~  | ~~Add in-source suppression support for deliberate non-brands (go-cqrs-lite markers): `//branded-id:ignore(<rule>) <reason>` design~~ **Won't implement — ROADMAP Theme 3.** | ~~High~~ | ~~M~~ | ~~Feature~~ |
