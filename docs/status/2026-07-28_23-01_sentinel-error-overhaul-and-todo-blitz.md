@@ -100,11 +100,11 @@
 
 ## B) PARTIALLY DONE
 
-### Dependabot Remediation
+### ~~Dependabot Remediation~~ resolved — lockfile regenerated in v0.6.0; 7 newer alerts tracked in TODO_LIST
 
 The `package.json` overrides are correct, but the `package-lock.json` was not regenerated because `pnpm` is not in the PATH in this environment. The GitHub Dependabot alerts will NOT auto-resolve until someone runs `pnpm install` in `website/`. This is a **real gap** — the fix is declared but not materialized.
 
-### Ecosystem go.mod Bumps (BLOCKED)
+### ~~Ecosystem go.mod Bumps (BLOCKED)~~ superseded — the standing task is the v0.6.0 bump (TODO_LIST)
 
 The only remaining BLOCKED item. 14 downstream repos need `go.mod` bumped from `v0.3.0` to `v0.5.0`. Source-level fixes (Name() methods, .Get() calls) are applied. Requires per-repo access.
 
@@ -118,39 +118,39 @@ Nothing from the TODO_LIST was left unstarted. All 15 actionable items were exec
 
 ## D) TOTALLY FUCKED UP / THINGS I MISSED
 
-### D1. Never ran `golangci-lint`
+### ~~D1. Never ran `golangci-lint`~~ resolved — the 12 introduced issues were found and fixed in the 23-22 session; 0 issues in both modes since
 
 I ran `go test`, `go build`, and `go vet` in both modes, but **never ran `golangci-lint`** — the project's actual linter with 90+ enabled rules. The CI workflow runs it, but I have no local confirmation that the strict config passes. The new test file (`id_errors_test.go`) introduces package-level types (`sentinelUnsupportedBrand`, `sentinelFailingBinary`) that might trigger `gochecknoglobals` (though that linter is disabled for `_test.go` files, these are in the test file so it should be fine — but I didn't verify).
 
-### D2. Never ran `nix fmt`
+### ~~D2. Never ran `nix fmt`~~ resolved — formatting passes ran in later sessions; treefmt-check green
 
 The project uses `nix fmt` (gofumpt + goimports + golines + nixfmt). My new files were never formatted through this pipeline. `gofumpt` is stricter than `gofmt` — indentation, spacing, and ordering differences are possible. The BuildFlow pre-commit hook will catch these, but I should have run it proactively.
 
-### D3. Never ran `nix flake check`
+### ~~D3. Never ran `nix flake check`~~ resolved — green locally (2026-09-22) and a CI job runs it on every push
 
 I added a `flake-check` CI job but never ran `nix flake check` locally to verify the flake is still valid. The `DeterminateSystems/nix-installer-action` SHA I used (`21a544727d0c`) was verified against the GitHub API, but I have no confirmation that `nix flake check --all-systems` actually passes in CI.
 
-### D4. Website lockfile not regenerated (pnpm unavailable)
+### ~~D4. Website lockfile not regenerated (pnpm unavailable)~~ resolved — pnpm-lock.yaml regenerated in the v0.6.0 session (overrides moved to pnpm-workspace.yaml)
 
 `pnpm` was not available in this environment. I edited `package.json` directly (correct overrides) but couldn't run `pnpm install` to regenerate `package-lock.json`. The Dependabot alerts will persist until this is done. I noted this in the final summary but should have been more emphatic — **the vulnerability fix is incomplete**.
 
-### D5. Never built the website
+### ~~D5. Never built the website~~ resolved — built in the 16-44 session and the v0.6.0 deploy (14 pages)
 
 I created new `.mdx` files and updated `astro.config.mjs`, but never ran `pnpm run build` or `astro check` to verify the website compiles. A broken frontmatter field, invalid import, or sidebar mismatch would only surface at deploy time.
 
-### D6. The `TestSentinelErrInternal_Defensive` test is weak
+### ~~D6. The `TestSentinelErrInternal_Defensive` test is weak~~ Won't implement — the ErrInternal path is unreachable by design; FEATURES.md documents the defensive intent
 
 `ErrInternal` guards unreachable type assertions. My test just checks the sentinel is non-nil and has the right message string. It doesn't exercise any code path that returns `ErrInternal`. This is honest (the code path is truly unreachable), but the test name implies coverage it doesn't provide.
 
-### D7. The `FuzzValidateID` fuzz test was not examined
+### ~~D7. The `FuzzValidateID` fuzz test was not examined~~ Won't implement — reviewed; no ErrMarshal/ErrUnmarshal interaction, left as-is
 
 I added fuzz tests for SQL/Text but didn't check whether `FuzzValidateID` (already in `id_bench_test.go:546`) needed updating to cover the new `ErrMarshal`/`ErrUnmarshal` sentinels. It may be fine as-is, but I didn't verify.
 
-### D8. `goimports` corruption risk not re-checked after all edits
+### ~~D8. `goimports` corruption risk not re-checked after all edits~~ resolved — the pre-push hook greps the v1 imports before every push (2026-09-22)
 
 The AGENTS.md warns that `goimports` corrupts `id_json_v1.go` imports. I verified the imports are clean NOW, but the auto-git daemon may run formatters that could corrupt them. I should have noted this as a risk for the auto-commit pipeline.
 
-### D9. No coverage delta analysis
+### ~~D9. No coverage delta analysis~~ Won't implement — totals tracked in FEATURES.md suffice for a library this size
 
 I reported 85.6% coverage (up from 81.6%) but didn't analyze WHICH code paths the new tests cover vs. which remain uncovered. The `ErrInternal` paths are structurally untestable, but there may be other gaps I didn't look for.
 
@@ -196,71 +196,71 @@ The auto-git daemon has already committed the CHANGELOG changes. When these are 
 
 ### Immediate (must do before release)
 
-1. **Run `pnpm install` in `website/`** to regenerate `package-lock.json` and actually resolve the Dependabot alerts.
-2. **Run `golangci-lint run ./...`** in both v1 and v2 modes and fix all findings.
-3. **Run `nix fmt`** to format all new files through gofumpt/goimports/golines.
-4. **Run `nix flake check`** locally to verify the flake is valid.
-5. **Build the website** (`pnpm run build` in `website/`) to verify new `.mdx` files compile.
-6. **Verify Dependabot alerts auto-dismiss** after lockfile regeneration (check GitHub UI).
+1. ~~**Run `pnpm install` in `website/`** to regenerate `package-lock.json` and actually resolve the Dependabot alerts.~~ done (v0.6.0 regenerated the lockfile)
+2. ~~**Run `golangci-lint run ./...`** in both v1 and v2 modes and fix all findings.~~ done (0 issues in both modes since 23-22)
+3. ~~**Run `nix fmt`** to format all new files through gofumpt/goimports/golines.~~ done (treefmt green)
+4. ~~**Run `nix flake check`** locally to verify the flake is valid.~~ done (green 2026-09-22 plus a CI job)
+5. ~~**Build the website** (`pnpm run build` in `website/`) to verify new `.mdx` files compile.~~ done (built in v0.6.0 (14 pages))
+6. ~~**Verify Dependabot alerts auto-dismiss** after lockfile regeneration (check GitHub UI).~~ done (alerts for the fixed packages dismissed; 7 newer advisories tracked in TODO_LIST)
 
 ### Short-term (next session)
 
-7. **Add `ErrMarshal` test for SQL TextMarshaler path** — create a type implementing `encoding.TextMarshaler` that returns an error, verify `Value()` wraps `ErrMarshal`.
-8. **Add `ErrMarshal` test for JSON marshaler path** — create a type implementing `json.Marshaler` that returns an error.
-9. **Add `ErrUnmarshal` test for BinaryUnmarshaler delegate** — create a type implementing `BinaryUnmarshaler` that returns an error.
-10. **Add `ErrUnmarshal` test for TextUnmarshaler delegate** — create a type implementing `TextUnmarshaler` that returns an error.
-11. **Decide on `ErrInternal`** — remove it (let panics happen) or add a code comment explaining why it's intentionally untestable.
-12. **Run fuzz tests for longer** — `go test -fuzz=FuzzSQLScanRoundTrip -fuzztime=30s` for each new fuzz function to find edge cases.
-13. **Add `Compare` fuzz test for ordered types** — verify all int/uint/string comparisons are correct under arbitrary inputs.
-14. **Bump 14 downstream repos** to v0.5.0 in `go.mod` (requires per-repo access — the only BLOCKED item).
-15. **Add a `Makefile`-equivalent** in `flake.nix` for installing the pre-push hook (`nix run .#install-hooks`).
+7. ~~**Add `ErrMarshal` test for SQL TextMarshaler path** — create a type implementing `encoding.TextMarshaler` that returns an error, verify `Value()` wraps `ErrMarshal`.~~ done (delegate test added 2026-09-22)
+8. ~~**Add `ErrMarshal` test for JSON marshaler path** — create a type implementing `json.Marshaler` that returns an error.~~ done (delegate test added 2026-09-22)
+9. ~~**Add `ErrUnmarshal` test for BinaryUnmarshaler delegate** — create a type implementing `BinaryUnmarshaler` that returns an error.~~ done (delegate test added 2026-09-22)
+10. ~~**Add `ErrUnmarshal` test for TextUnmarshaler delegate** — create a type implementing `TextUnmarshaler` that returns an error.~~ done (delegate test added 2026-09-22)
+11. ~~**Decide on `ErrInternal`** — remove it (let panics happen) or add a code comment explaining why it's intentionally untestable.~~ done (kept as defensive; documented in FEATURES.md)
+12. ~~**Run fuzz tests for longer** — `go test -fuzz=FuzzSQLScanRoundTrip -fuzztime=30s` for each new fuzz function to find edge cases.~~ **Won't implement — not run.**
+13. ~~**Add `Compare` fuzz test for ordered types** — verify all int/uint/string comparisons are correct under arbitrary inputs.~~ **Won't implement — not added.**
+14. ~~**Bump 14 downstream repos** to v0.5.0 in `go.mod` (requires per-repo access — the only BLOCKED item).~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+15. ~~**Add a `Makefile`-equivalent** in `flake.nix` for installing the pre-push hook (`nix run .#install-hooks`).~~ **Won't implement — not added.**
 
 ### Code Quality
 
-16. **Consider `constraints.Ordered`** for `Compare` to make `ErrNotOrdered` a compile-time error instead of runtime.
-17. **Review `valueString()` fallback paths** — the `TextMarshaler` and `fmt.Sprintf` fallbacks are untested for custom types.
-18. **Add `Example*` test functions** for the sentinel error pattern (documented testing).
-19. **Add `ExampleValidateID`** showing the `errors.Is(err, id.ErrInvalidID)` pattern.
-20. **Consider an `ErrInvalidValue` sentinel** for `ValidateIDWithValue` when the custom validator fails (currently wraps `ErrInvalidID` which is semantically wrong — the ID IS non-zero, the value is invalid).
-21. **Review whether `ErrMarshal`/`ErrUnmarshal` should be split** by format (`ErrJSONMarshal`, `ErrBinaryMarshal`, etc.) — depends on consumer feedback.
-22. **Add a `.editorconfig` check** to CI (the file exists but isn't validated).
-23. **Add `goconst` review** — check if error message strings should be constants.
-24. **Review `id_ptr.go`** — only 2 functions, minimal test coverage; consider edge cases.
-25. **Add a round-trip property test** for all serialization formats (JSON → Text → Binary → back).
+16. ~~**Consider `constraints.Ordered`** for `Compare` to make `ErrNotOrdered` a compile-time error instead of runtime.~~ **Won't implement — routed to ROADMAP Theme 2.**
+17. ~~**Review `valueString()` fallback paths** — the `TextMarshaler` and `fmt.Sprintf` fallbacks are untested for custom types.~~ **Won't implement — not done.**
+18. ~~**Add `Example*` test functions** for the sentinel error pattern (documented testing).~~ **Won't implement — not added.**
+19. ~~**Add `ExampleValidateID`** showing the `errors.Is(err, id.ErrInvalidID)` pattern.~~ **Won't implement — not added.**
+20. ~~**Consider an `ErrInvalidValue` sentinel** for `ValidateIDWithValue` when the custom validator fails (currently wraps `ErrInvalidID` which is semantically wrong — the ID IS non-zero, the value is invalid).~~ **Won't implement — not added.**
+21. ~~**Review whether `ErrMarshal`/`ErrUnmarshal` should be split** by format (`ErrJSONMarshal`, `ErrBinaryMarshal`, etc.) — depends on consumer feedback.~~ **Won't implement — open design question in ROADMAP Theme 2.**
+22. ~~**Add a `.editorconfig` check** to CI (the file exists but isn't validated).~~ **Won't implement — not added.**
+23. ~~**Add `goconst` review** — check if error message strings should be constants.~~ done (0 goconst issues)
+24. ~~**Review `id_ptr.go`** — only 2 functions, minimal test coverage; consider edge cases.~~ **Won't implement — not done.**
+25. ~~**Add a round-trip property test** for all serialization formats (JSON → Text → Binary → back).~~ **Won't implement — not added.**
 
 ### Documentation
 
-26. **Add `docs/DOMAIN_LANGUAGE.md` entries** for sentinel errors, marshaling, unmarshaling.
-27. **Update `MIGRATION.md`** with the sentinel error pattern for downstream consumers.
-28. **Add a website guide on `Compare` and ordered types** — explain the runtime check limitation.
-29. **Add a website guide on zero-value semantics** — when to use `IsZero()`, `Or()`, `Ptr()`.
-30. **Document the `GOCACHE` workaround** in the website contributing guide.
-31. **Add a website guide on dual JSON v1/v2 support** — what consumers need to know.
-32. **Add code examples to `api-reference.mdx`** for each sentinel error.
-33. **Update `CONTRIBUTING.md`** with the pre-push hook install instructions.
-34. **Add a `SECURITY.md`** with vulnerability reporting instructions.
-35. **Add an `ACTIONS.md` or expand `CONTRIBUTING.md`** with the GitHub Actions pinning policy.
+26. ~~**Add `docs/DOMAIN_LANGUAGE.md` entries** for sentinel errors, marshaling, unmarshaling.~~ done (Sentinel Error row added 2026-09-17)
+27. ~~**Update `MIGRATION.md`** with the sentinel error pattern for downstream consumers.~~ done (MIGRATION.md v0.5.0+ section added 2026-09-22)
+28. ~~**Add a website guide on `Compare` and ordered types** — explain the runtime check limitation.~~ **Won't implement — not built.**
+29. ~~**Add a website guide on zero-value semantics** — when to use `IsZero()`, `Or()`, `Ptr()`.~~ **Won't implement — not built.**
+30. ~~**Document the `GOCACHE` workaround** in the website contributing guide.~~ **Won't implement — not added.**
+31. ~~**Add a website guide on dual JSON v1/v2 support** — what consumers need to know.~~ **Won't implement — not built — serialization.mdx covers both modes.**
+32. ~~**Add code examples to `api-reference.mdx`** for each sentinel error.~~ done (sentinel table added to api-reference.mdx (23-01))
+33. ~~**Update `CONTRIBUTING.md`** with the pre-push hook install instructions.~~ **Won't implement — not added.**
+34. ~~**Add a `SECURITY.md`** with vulnerability reporting instructions.~~ done (SECURITY.md created 2026-09-22)
+35. ~~**Add an `ACTIONS.md` or expand `CONTRIBUTING.md`** with the GitHub Actions pinning policy.~~ **Won't implement — not written; actions are pinned to SHAs though.**
 
 ### CI / DevOps
 
-36. **Add `golangci-lint` to the `flake-check` job** (currently only `nix flake check` runs, not lint).
-37. **Add a website build/deploy job** to CI (the website has no CI coverage).
-38. **Add a Dependabot config** (`dependabot.yml`) for GitHub Actions and pnpm.
-39. **Add `codecov` or similar** coverage tracking to CI.
-40. **Add a `release-please` or `semantic-release` bot** for automated changelog generation.
-41. **Add SARIF output to `golangci-lint`** for GitHub Security tab integration.
-42. **Add a `stale` bot** for issue/PR management.
-43. **Mirror the pre-push hook as a CI check** (run both modes in CI, which already happens, but make it explicit).
-44. **Add a `flake update` job** — automated `nix flake update` PRs.
+36. ~~**Add `golangci-lint` to the `flake-check` job** (currently only `nix flake check` runs, not lint).~~ **Won't implement — not added.**
+37. ~~**Add a website build/deploy job** to CI (the website has no CI coverage).~~ **Won't implement — not added.**
+38. ~~**Add a Dependabot config** (`dependabot.yml`) for GitHub Actions and pnpm.~~ done (dependabot.yml covers github-actions (pnpm not configured))
+39. ~~**Add `codecov` or similar** coverage tracking to CI.~~ **Won't implement — not added.**
+40. ~~**Add a `release-please` or `semantic-release` bot** for automated changelog generation.~~ **Won't implement — not added.**
+41. ~~**Add SARIF output to `golangci-lint`** for GitHub Security tab integration.~~ **Won't implement — not added.**
+42. ~~**Add a `stale` bot** for issue/PR management.~~ **Won't implement — not added.**
+43. ~~**Mirror the pre-push hook as a CI check** (run both modes in CI, which already happens, but make it explicit).~~ done (CI matrix runs both modes (go.yml))
+44. ~~**Add a `flake update` job** — automated `nix flake update` PRs.~~ **Won't implement — not added.**
 
 ### Ecosystem
 
-45. **Create a `go.mod` bump script** that updates all 14 downstream repos programmatically.
-46. **Add an integration test** that imports `go-branded-id` from a test module and verifies all public APIs.
-47. **Create a `CHANGELOG` entry per downstream repo** documenting the sentinel error changes.
-48. **Audit the 14 downstream repos** for `errors.Is` adoption opportunities.
-49. **Tag `v0.6.0`** (breaking: `ErrNotOrdered` message restored, new `ErrMarshal`/`ErrUnmarshal` sentinels).
-50. **Write a migration guide** for v0.5 → v0.6 (sentinel error adoption).
+45. ~~**Create a `go.mod` bump script** that updates all 14 downstream repos programmatically.~~ **Won't implement — not created; the go-ecosystem-upgrade skill covers the flow.**
+46. ~~**Add an integration test** that imports `go-branded-id` from a test module and verifies all public APIs.~~ **Won't implement — not added.**
+47. ~~**Create a `CHANGELOG` entry per downstream repo** documenting the sentinel error changes.~~ **Won't implement — not created.**
+48. ~~**Audit the 14 downstream repos** for `errors.Is` adoption opportunities.~~ **Won't implement — not done.**
+49. ~~**Tag `v0.6.0`** (breaking: `ErrNotOrdered` message restored, new `ErrMarshal`/`ErrUnmarshal` sentinels).~~ done (shipped — v0.6.0 (08beb23))
+50. ~~**Write a migration guide** for v0.5 → v0.6 (sentinel error adoption).~~ done (MIGRATION.md sentinel section added 2026-09-22)
 
 ---
 

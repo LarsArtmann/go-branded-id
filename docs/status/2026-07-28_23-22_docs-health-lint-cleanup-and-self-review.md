@@ -125,22 +125,22 @@ that reflect a tool I did not run are left with their original values.
 
 ## c) NOT STARTED
 
-1. **`nix flake check` was never run.** The skill mandates the canonical quality
-   gate; AGENTS.md documents `nix flake check` as the project's gate. `nix` is on
-   `PATH` (`/run/current-system/sw/bin/nix`). I ran only the Go-level checks. See
-   (d).1.
-2. **`docs/DOMAIN_LANGUAGE.md` was never inspected.** It exists, it is a living
-   doc in the docs-health model, and the 23-01 report (item F.26) flagged it as
-   needing sentinel-error / marshal / unmarshal term entries. I skipped it
-   entirely while claiming a "full docs-health AUDIT." See (d).2.
-3. **No CHANGELOG entry for the lint cleanup.** The 12 fixed issues are test-file
-   quality fixes, arguably not user-facing. I chose to omit; a stricter reading
-   of Keep-a-Changelog would log them under `[Unreleased] / Fixed` or `Internal`.
-4. **The `[Unreleased]` section has no version/date.** The 23-01 report left
-   v0.5.2-vs-v0.6.0 as an open question (Q2). I carried it forward; no decision
-   was made or proposed forcefully.
-5. **Website never built.** Files exist; `pnpm run build` not run (pnpm unavailable
-   in environment). Carried as a TODO.
+1. ~~**`nix flake check` was never run.** The skill mandates the canonical quality~~ done (green 2026-09-22 and a CI job (go.yml) runs it on every push)
+   ~~gate; AGENTS.md documents `nix flake check` as the project's gate. `nix` is on~~
+   ~~`PATH` (`/run/current-system/sw/bin/nix`). I ran only the Go-level checks. See~~
+   ~~(d).1.~~
+2. ~~**`docs/DOMAIN_LANGUAGE.md` was never inspected.** It exists, it is a living~~ done (Sentinel Error + Serialization rows added 2026-09-17)
+   ~~doc in the docs-health model, and the 23-01 report (item F.26) flagged it as~~
+   ~~needing sentinel-error / marshal / unmarshal term entries. I skipped it~~
+   ~~entirely while claiming a "full docs-health AUDIT." See (d).2.~~
+3. ~~**No CHANGELOG entry for the lint cleanup.** The 12 fixed issues are test-file~~ **Won't implement — internal test-file fixes, not user-facing.**
+   ~~quality fixes, arguably not user-facing. I chose to omit; a stricter reading~~
+   ~~of Keep-a-Changelog would log them under `[Unreleased] / Fixed` or `Internal`.~~
+4. ~~**The `[Unreleased]` section has no version/date.** The 23-01 report left~~ done (v0.6.0 released 2026-09-17 (08beb23))
+   ~~v0.5.2-vs-v0.6.0 as an open question (Q2). I carried it forward; no decision~~
+   ~~was made or proposed forcefully.~~
+5. ~~**Website never built.** Files exist; `pnpm run build` not run (pnpm unavailable~~ done (built and deployed in the v0.6.0 session)
+   ~~in environment). Carried as a TODO.~~
 
 ---
 
@@ -201,24 +201,24 @@ a focused separate step first, or (b) left it for a dedicated cleanup commit.
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Run `nix flake check`. Always. First.** It is the documented gate and the
-   skill mandates it. The Go-level checks are a subset, not a substitute. If the
-   GOCACHE sandbox issue recurs, fix the cache, don't skip the gate.
-2. **AUDIT means every living doc.** Keep a literal checklist from the
-   documentation-model table and tick each row. DOMAIN_LANGUAGE.md is not
-   optional. Neither is README (I touched it only via FEATURES-level reasoning).
-3. **Verify before asserting, not after.** Every claim I put in a living doc
-   should be grepped from code _before_ I write it, not audited under pressure.
-4. **Separate concerns across commits.** Lint cleanup is its own change. Docs
-   rebuild is its own change. Beating the auto-git daemon means committing
-   atomically with a precise message, not letting it lump everything.
-5. **Surface the version-number decision loudly.** `[Unreleased]` with no version
-   is the single biggest open product decision. It should be question #1, not a
-   footnote. Every downstream bump and the next tag depend on it.
-6. **The goimports-corruption hazard still has no _prevention_.** The contract
-   test catches it in CI; locally every `nix fmt` re-corrupts. Five+ recurrences
-   across these reports. A treefmt exclusion for the v1 files, or a pre-commit
-   guard, would actually stop it. Nobody has done that. I did not do that.
+1. ~~**Run `nix flake check`. Always. First.** It is the documented gate and the~~ done (flake check is now a CI job and runs in every docs pass)
+   ~~skill mandates it. The Go-level checks are a subset, not a substitute. If the~~
+   ~~GOCACHE sandbox issue recurs, fix the cache, don't skip the gate.~~
+2. ~~**AUDIT means every living doc.** Keep a literal checklist from the~~ done (DOMAIN_LANGUAGE.md updated 2026-09-17)
+   ~~documentation-model table and tick each row. DOMAIN_LANGUAGE.md is not~~
+   ~~optional. Neither is README (I touched it only via FEATURES-level reasoning).~~
+3. ~~**Verify before asserting, not after.** Every claim I put in a living doc~~ done (standing practice — this pass greps before writing)
+   ~~should be grepped from code _before_ I write it, not audited under pressure.~~
+4. ~~**Separate concerns across commits.** Lint cleanup is its own change. Docs~~ **Won't implement — daemon behavior accepted; documented in AGENTS.md.**
+   ~~rebuild is its own change. Beating the auto-git daemon means committing~~
+   ~~atomically with a precise message, not letting it lump everything.~~
+5. ~~**Surface the version-number decision loudly.** `[Unreleased]` with no version~~ done (resolved — v0.6.0 shipped)
+   ~~is the single biggest open product decision. It should be question #1, not a~~
+   ~~footnote. Every downstream bump and the next tag depend on it.~~
+6. ~~**The goimports-corruption hazard still has no _prevention_.** The contract~~ done (superseded — root cause was go-auto-upgrade; skip 2026-08-02, upstream fix, re-enabled 2026-09-22; pre-push grep guard added)
+   ~~test catches it in CI; locally every `nix fmt` re-corrupts. Five+ recurrences~~
+   ~~across these reports. A treefmt exclusion for the v1 files, or a pre-commit~~
+   ~~guard, would actually stop it. Nobody has done that. I did not do that.~~
 
 ---
 
@@ -226,86 +226,86 @@ a focused separate step first, or (b) left it for a dedicated cleanup commit.
 
 ### Must-do (unblocks the gate I skipped)
 
-1. **Run `nix flake check`** and resolve any failures. This is the missing step
-   from this session.
-2. **Audit `docs/DOMAIN_LANGUAGE.md`** for freshness — add sentinel-error,
-   marshal, unmarshal, phantom-type, zero-value, brand terms if missing.
-3. **Decide the next version number** (v0.5.2 additive vs v0.6.0 for the
-   `ErrNotOrdered` message change) and date the `[Unreleased]` section.
+1. ~~**Run `nix flake check`** and resolve any failures. This is the missing step~~ done (green + CI job)
+   ~~from this session.~~
+2. ~~**Audit `docs/DOMAIN_LANGUAGE.md`** for freshness — add sentinel-error,~~ done (rows added 2026-09-17)
+   ~~marshal, unmarshal, phantom-type, zero-value, brand terms if missing.~~
+3. ~~**Decide the next version number** (v0.5.2 additive vs v0.6.0 for the~~ done (v0.6.0 (08beb23))
+   ~~`ErrNotOrdered` message change) and date the `[Unreleased]` section.~~
 
 ### High impact — real open work
 
-4. **Regenerate `website/package-lock.json`** (`pnpm install` in `website/`) — the
-   `astro`/`fast-uri` overrides are set but the lockfile still holds vulnerable
-   versions; Dependabot alerts will not dismiss until this runs.
-5. **Build & verify the website** (`pnpm run build`) — `error-handling.mdx` and
-   `namer-tool.mdx` were added but never compiled; sidebar/frontmatter unverified.
-6. **Add a CI/release guard rejecting a tracked compiled binary at repo root** —
-   prevents recurrence of the v0.5.0 `namer`-binary incident (currently
-   `.gitignore` + human discipline only).
-7. **Add `ErrMarshal`/`ErrUnmarshal` delegate-path tests** — only
-   `MarshalBinary` proves `ErrMarshal`. Untested: JSON marshaler, SQL `Value()`
-   TextMarshaler, BinaryUnmarshaler delegate, TextUnmarshaler delegate.
-8. **Verify `nix flake check --all-systems` locally** (the CI job was added but
-   never run locally — 23-01 report D3).
+4. ~~**Regenerate `website/package-lock.json`** (`pnpm install` in `website/`) — the~~ done (v0.6.0 lockfile regeneration)
+   ~~`astro`/`fast-uri` overrides are set but the lockfile still holds vulnerable~~
+   ~~versions; Dependabot alerts will not dismiss until this runs.~~
+5. ~~**Build & verify the website** (`pnpm run build`) — `error-handling.mdx` and~~ done (built and deployed in v0.6.0)
+   ~~`namer-tool.mdx` were added but never compiled; sidebar/frontmatter unverified.~~
+6. ~~**Add a CI/release guard rejecting a tracked compiled binary at repo root** —~~ done (hygiene job added to go.yml (2026-09-22))
+   ~~prevents recurrence of the v0.5.0 `namer`-binary incident (currently~~
+   ~~`.gitignore` + human discipline only).~~
+7. ~~**Add `ErrMarshal`/`ErrUnmarshal` delegate-path tests** — only~~ done (added 2026-09-22 (id_errors_test.go delegate paths))
+   ~~`MarshalBinary` proves `ErrMarshal`. Untested: JSON marshaler, SQL `Value()`~~
+   ~~TextMarshaler, BinaryUnmarshaler delegate, TextUnmarshaler delegate.~~
+8. ~~**Verify `nix flake check --all-systems` locally** (the CI job was added but~~ done (CI runs the --all-systems eval; local single-arch build passes)
+   ~~never run locally — 23-01 report D3).~~
 
 ### Medium impact — testing & quality
 
-9. Add `Compare` fuzz test for ordered types (int/uint/string).
-10. Run the existing fuzz functions for longer (`-fuzztime=30s` each).
-11. Capture benchmark baseline files (`bench-v1.txt`, `bench-v2.txt`) for benchstat.
-12. Decide on `ErrInternal` (remove + let panics fire, or keep as defensive).
-13. Decide on `ErrMarshal`/`ErrUnmarshal` split (generic vs per-format).
-14. Add `errorlint` to `.golangci.yml` to enforce `%w` wrapping going forward.
-15. Add a treefmt exclusion or pre-commit guard to _prevent_ goimports v1-file
-    corruption (5+ recurrences; detection is not prevention).
-16. Add `version.go` exposing `Version` as a package constant.
-17. Add coverage report upload as a CI artifact.
+9. ~~Add `Compare` fuzz test for ordered types (int/uint/string).~~ **Won't implement — not added.**
+10. ~~Run the existing fuzz functions for longer (`-fuzztime=30s` each).~~ **Won't implement — not run.**
+11. ~~Capture benchmark baseline files (`bench-v1.txt`, `bench-v2.txt`) for benchstat.~~ **Won't implement — not captured.**
+12. ~~Decide on `ErrInternal` (remove + let panics fire, or keep as defensive).~~ done (kept defensive; documented in FEATURES.md)
+13. ~~Decide on `ErrMarshal`/`ErrUnmarshal` split (generic vs per-format).~~ **Won't implement — open design question (ROADMAP Theme 2).**
+14. ~~Add `errorlint` to `.golangci.yml` to enforce `%w` wrapping going forward.~~ **Won't implement — not added.**
+15. ~~Add a treefmt exclusion or pre-commit guard to _prevent_ goimports v1-file~~ done (superseded — root cause go-auto-upgrade fixed; pre-push guard added)
+    ~~corruption (5+ recurrences; detection is not prevention).~~
+16. ~~Add `version.go` exposing `Version` as a package constant.~~ **Won't implement — not added.**
+17. ~~Add coverage report upload as a CI artifact.~~ **Won't implement — not uploaded.**
 
 ### Documentation
 
-18. Update `MIGRATION.md` for the v0.5.x sentinel-error changes.
-19. Add a website guide on `Compare` / ordered types and the runtime-check limit.
-20. Add a website guide on zero-value semantics (`IsZero`, `Or`, `Ptr`).
-21. Add a website guide on dual JSON v1/v2 support.
-22. Add code examples to `api-reference.mdx` for each sentinel error.
-23. Update `CONTRIBUTING.md` with the pre-push hook install instructions.
-24. Add a `SECURITY.md` with vulnerability reporting instructions.
-25. Document the little-endian binary format in a spec/RFC-style doc.
+18. ~~Update `MIGRATION.md` for the v0.5.x sentinel-error changes.~~ done (v0.5.0+ section added 2026-09-22)
+19. ~~Add a website guide on `Compare` / ordered types and the runtime-check limit.~~ **Won't implement — not built.**
+20. ~~Add a website guide on zero-value semantics (`IsZero`, `Or`, `Ptr`).~~ **Won't implement — not built.**
+21. ~~Add a website guide on dual JSON v1/v2 support.~~ **Won't implement — not built; serialization.mdx covers both modes.**
+22. ~~Add code examples to `api-reference.mdx` for each sentinel error.~~ done (sentinel table present in api-reference.mdx)
+23. ~~Update `CONTRIBUTING.md` with the pre-push hook install instructions.~~ **Won't implement — not added.**
+24. ~~Add a `SECURITY.md` with vulnerability reporting instructions.~~ done (SECURITY.md created 2026-09-22)
+25. ~~Document the little-endian binary format in a spec/RFC-style doc.~~ done (AGENTS.md Binary Endianness section)
 
 ### Ecosystem
 
-26. Bump 14 downstream repos to the next version in `go.mod` (BLOCKED — per-repo).
-27. Run `cmd/namer` against downstream repos to find brands missing `Name()`.
-28. Create a `go.mod` bump script for batch ecosystem updates.
-29. Add an integration test importing `go-branded-id` from a test module.
-30. Deprecate `go-composable-business-types/id` with a redirect tag.
+26. ~~Bump 14 downstream repos to the next version in `go.mod` (BLOCKED — per-repo).~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+27. ~~Run `cmd/namer` against downstream repos to find brands missing `Name()`.~~ **Won't implement — routed to ROADMAP Theme 3.**
+28. ~~Create a `go.mod` bump script for batch ecosystem updates.~~ **Won't implement — the go-ecosystem-upgrade skill covers the flow.**
+29. ~~Add an integration test importing `go-branded-id` from a test module.~~ **Won't implement — not added.**
+30. ~~Deprecate `go-composable-business-types/id` with a redirect tag.~~ **Won't implement — not done; noted in ROADMAP Theme 1.**
 
 ### CI / DevOps
 
-31. Add `golangci-lint` to the `flake-check` CI job (currently only `nix flake check`).
-32. Add a website build/deploy job to CI.
-33. Add a `dependabot.yml` for GitHub Actions and pnpm.
-34. Add SARIF output to `golangci-lint` for the GitHub Security tab.
-35. Mirror the pre-push dual-mode hook as an explicit CI check.
-36. Add automated `nix flake update` PRs.
+31. ~~Add `golangci-lint` to the `flake-check` CI job (currently only `nix flake check`).~~ **Won't implement — not added.**
+32. ~~Add a website build/deploy job to CI.~~ **Won't implement — not added.**
+33. ~~Add a `dependabot.yml` for GitHub Actions and pnpm.~~ done (dependabot.yml covers github-actions (pnpm not configured))
+34. ~~Add SARIF output to `golangci-lint` for the GitHub Security tab.~~ **Won't implement — not added.**
+35. ~~Mirror the pre-push dual-mode hook as an explicit CI check.~~ done (CI matrix runs both modes)
+36. ~~Add automated `nix flake update` PRs.~~ **Won't implement — not added.**
 
 ### Code quality / lower priority
 
-37. Consider compile-time `constraints.Ordered` for `Compare` (kills `ErrNotOrdered` at compile time).
-38. Review `valueString()` fallback paths for custom types (untested).
-39. Add `Example*` tests for the sentinel error pattern.
-40. Consider `ErrInvalidValue` sentinel for `ValidateIDWithValue` custom-validator failures.
-41. Review `id_ptr.go` edge-case coverage.
-42. Add a round-trip property test across all serialization formats.
-43. Consider `NullID[B, V]` for nullable SQL support.
-44. Explore `encoding/json/v2` jsontext streaming API.
-45. Add `msgpack` / protobuf serialization support.
-46. Add cross-language binary compatibility tests.
-47. Consider `ID[B, V]` implementing `sort.Interface` / batch helpers.
-48. Add `context.Context` support review.
-49. Review `BrandNamer` for a generic `BrandNamer[B any]` form.
-50. Write a blog post on the dual-mode JSON build-tag architecture.
+37. ~~Consider compile-time `constraints.Ordered` for `Compare` (kills `ErrNotOrdered` at compile time).~~ **Won't implement — routed to ROADMAP Theme 2.**
+38. ~~Review `valueString()` fallback paths for custom types (untested).~~ **Won't implement — not done.**
+39. ~~Add `Example*` tests for the sentinel error pattern.~~ **Won't implement — not added.**
+40. ~~Consider `ErrInvalidValue` sentinel for `ValidateIDWithValue` custom-validator failures.~~ **Won't implement — not added.**
+41. ~~Review `id_ptr.go` edge-case coverage.~~ **Won't implement — not done.**
+42. ~~Add a round-trip property test across all serialization formats.~~ **Won't implement — not added.**
+43. ~~Consider `NullID[B, V]` for nullable SQL support.~~ **Won't implement — routed to ROADMAP Theme 4.**
+44. ~~Explore `encoding/json/v2` jsontext streaming API.~~ **Won't implement — routed to ROADMAP Theme 4.**
+45. ~~Add `msgpack` / protobuf serialization support.~~ **Won't implement — routed to ROADMAP Theme 4.**
+46. ~~Add cross-language binary compatibility tests.~~ **Won't implement — routed to ROADMAP Theme 4.**
+47. ~~Consider `ID[B, V]` implementing `sort.Interface` / batch helpers.~~ **Won't implement — not added.**
+48. ~~Add `context.Context` support review.~~ **Won't implement — not applicable.**
+49. ~~Review `BrandNamer` for a generic `BrandNamer[B any]` form.~~ **Won't implement — kept non-generic.**
+50. ~~Write a blog post on the dual-mode JSON build-tag architecture.~~ **Won't implement — not written.**
 
 ---
 

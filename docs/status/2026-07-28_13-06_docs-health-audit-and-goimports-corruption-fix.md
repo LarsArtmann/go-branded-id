@@ -132,7 +132,7 @@ remains open. This was a judgment call; the skill permits appendix-only when the
 opening claims are not stale (which they weren't — the reports honestly said
 "things to get done next").
 
-### 3. VERIFY skipped `nix flake check`
+### ~~3. VERIFY skipped `nix flake check`~~ resolved — green as of 2026-09-22 and a CI job (go.yml) runs it on every push
 
 I ran `go build`, `go test`, `go vet`, and `golangci-lint` in both modes, but
 did not run `nix flake check` (the sandbox build). The Go build cache was
@@ -144,38 +144,38 @@ working cache. The quality gate covers what CI runs (`go.yml` uses
 
 ## c) NOT STARTED
 
-1. **Did not fix the tracked `namer` binary** — `git ls-files namer` confirms it's
+~~1. **Did not fix the tracked `namer` binary** — `git ls-files namer` confirms it's
    tracked at repo root. BuildFlow flags it. I put it in TODO_LIST as a 5-minute
    task instead of just doing `git rm --cached namer` + adding to `.gitignore`.
-   This is a fix-on-sight violation.
+   This is a fix-on-sight violation.~~ done — removed in `c29a034` (v0.5.1); see Resolution below.
 
-2. **Did not fix the Validate Docs CI failure** — `validate-docs.yml` fails
+~~2. **Did not fix the Validate Docs CI failure** — `validate-docs.yml` fails
    because `md-go-validator@latest` module v1.2.0 exists but the root package
    doesn't. Likely needs install path corrected (e.g.,
    `github.com/larsartmann/md-go-validator/cmd/md-go-validator`). Put in TODO_LIST
-   instead of investigating.
+   instead of investigating.~~ done — install path fixed in the 23-01 session.
 
-3. **Did not update AGENTS.md** — it's a living doc in the docs-health model. I
+~~3. **Did not update AGENTS.md** — it's a living doc in the docs-health model. I
    discovered the goimports corruption recurred AGAIN, encountered a GOCACHE
    corruption issue, and confirmed the `namer` binary is tracked. None of these
    made it into AGENTS.md. The `outputs` pattern gotcha (from the 10-39 report)
-   is also still missing.
+   is also still missing.~~ done — every item is documented in AGENTS.md now (go-auto-upgrade root cause, `outputs` gotcha, GOCACHE hazard).
 
-4. **Did not update MIGRATION.md** — v0.5.0 sentinel errors are not documented
-   for downstream consumers. `grep -c 'sentinel\|v0.5.0' MIGRATION.md` → 0.
+~~4. **Did not update MIGRATION.md** — v0.5.0 sentinel errors are not documented
+   for downstream consumers. `grep -c 'sentinel\|v0.5.0' MIGRATION.md` → 0.~~ done — MIGRATION.md gained a v0.5.0+ Sentinel Errors section (2026-09-22).
 
-5. **Did not update website `changelog.mdx`** — only goes up to 0.3.2. Missing
+~~5. **Did not update website `changelog.mdx`** — only goes up to 0.3.2. Missing
    0.3.3, 0.4.0, and 0.5.0 entries. The dual-mode support, namer tool, and
-   sentinel errors are invisible on the public site.
+   sentinel errors are invisible on the public site.~~ done — entries added through v0.6.0 in the release session.
 
-6. **Did not add sentinel error docs to README** — consumers don't know they can
-   use `errors.Is(err, id.ErrUnsupportedType)`.
+~~6. **Did not add sentinel error docs to README** — consumers don't know they can
+   use `errors.Is(err, id.ErrUnsupportedType)`.~~ done — README Error Handling section added in the 23-01 session.
 
-7. **Did not add `errors.Is` tests** — 5 of 7 sentinel errors have zero test
-   coverage demonstrating `errors.Is` matching.
+~~7. **Did not add `errors.Is` tests** — 5 of 7 sentinel errors have zero test
+   coverage demonstrating `errors.Is` matching.~~ done — 9/9 tested (23-01, id_errors_test.go); delegate paths added 2026-09-22.
 
-8. **Did not investigate Dependabot vulnerabilities** — 2 alerts (1 high, 1
-   moderate) reported on v0.5.0 push. Not investigated.
+~~8. **Did not investigate Dependabot vulnerabilities** — 2 alerts (1 high, 1
+   moderate) reported on v0.5.0 push. Not investigated.~~ done — astro/fast-uri fixed via the v0.6.0 lockfile regeneration; 7 newer alerts tracked in TODO_LIST.
 
 ---
 
@@ -232,36 +232,36 @@ my own global AGENTS.md: _"Update at the moment of discovery, not end of session
 
 ### Process
 
-1. **Fix on sight.** When I find a 5-minute fix during a docs audit, DO IT. Don't
-   put it in TODO_LIST. The TODO_LIST is for work that needs scheduling, not for
-   work I'm choosing not to do right now.
+1. ~~**Fix on sight.** When I find a 5-minute fix during a docs audit, DO IT. Don't~~ done (applied — this pass does the small fixes immediately)
+   ~~put it in TODO_LIST. The TODO_LIST is for work that needs scheduling, not for~~
+   ~~work I'm choosing not to do right now.~~
 
-2. **AGENTS.md is a living doc.** Update it during the session, not "later."
-   The goimports recurrence count is now 5+ — that's a pattern that deserves
-   stronger documentation, maybe a pre-commit guard.
+2. ~~**AGENTS.md is a living doc.** Update it during the session, not "later."~~ done (AGENTS.md updated in every docs pass since)
+   ~~The goimports recurrence count is now 5+ — that's a pattern that deserves~~
+   ~~stronger documentation, maybe a pre-commit guard.~~
 
-3. **Don't use `rm` on Go cache directories.** `go clean -cache` exists for a
-   reason. If disk space is the issue, increase the tmpfs size or point GOCACHE
-   elsewhere, but don't force-delete cache internals.
+3. ~~**Don't use `rm` on Go cache directories.** `go clean -cache` exists for a~~ done (recorded as standing practice)
+   ~~reason. If disk space is the issue, increase the tmpfs size or point GOCACHE~~
+   ~~elsewhere, but don't force-delete cache internals.~~
 
-4. **The goimports corruption needs a PREVENTION mechanism, not just detection.**
-   The contract test catches it in CI. But locally, every `nix fmt` or
-   `goimports` pass re-corrupts. Consider: excluding v1 files from goimports in
-   treefmt config, adding a pre-commit hook that checks v1 imports, or filing a
-   goimports bug report for build-tag-unaware import resolution.
+4. ~~**The goimports corruption needs a PREVENTION mechanism, not just detection.**~~ done (superseded — root cause was go-auto-upgrade; skip guard 2026-08-02, upstream fix unskipped 2026-09-22; pre-push grep guard added)
+   ~~The contract test catches it in CI. But locally, every `nix fmt` or~~
+   ~~`goimports` pass re-corrupts. Consider: excluding v1 files from goimports in~~
+   ~~treefmt config, adding a pre-commit hook that checks v1 imports, or filing a~~
+   ~~goimports bug report for build-tag-unaware import resolution.~~
 
 ### Documentation
 
-5. **Website changelog is 3 versions behind.** `changelog.mdx` stops at 0.3.2.
-   The public face of the project is stale. This should be part of the release
-   process, not an afterthought.
+5. ~~**Website changelog is 3 versions behind.** `changelog.mdx` stops at 0.3.2.~~ done (part of the AGENTS.md release checklist now)
+   ~~The public face of the project is stale. This should be part of the release~~
+   ~~process, not an afterthought.~~
 
-6. **MIGRATION.md doesn't cover v0.5.0 sentinel errors.** Downstream consumers
-   upgrading to v0.5.0 need to know about the new sentinel error taxonomy and
-   the `ErrNotOrdered` message change.
+6. ~~**MIGRATION.md doesn't cover v0.5.0 sentinel errors.** Downstream consumers~~ done (MIGRATION.md v0.5.0+ section added 2026-09-22)
+   ~~upgrading to v0.5.0 need to know about the new sentinel error taxonomy and~~
+   ~~the `ErrNotOrdered` message change.~~
 
-7. **README doesn't mention sentinel errors at all.** The error handling pattern
-   (`errors.Is(err, id.ErrUnsupportedType)`) is a selling point that's invisible.
+7. ~~**README doesn't mention sentinel errors at all.** The error handling pattern~~ done (README Error Handling section (23-01))
+   ~~(`errors.Is(err, id.ErrUnsupportedType)`) is a selling point that's invisible.~~
 
 ---
 
@@ -269,74 +269,74 @@ my own global AGENTS.md: _"Update at the moment of discovery, not end of session
 
 ### High Impact — do first
 
-1. **Add `errors.Is` tests for 5 new sentinel errors** — `ErrUnsupportedType`,
-   `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver`. Each
-   needs a test proving the sentinel matches through wrapping chains.
-2. **Fix Validate Docs CI failure** — `md-go-validator` install path in
-   `validate-docs.yml`.
-3. **Remove tracked `namer` binary** — `git rm --cached namer`, add to `.gitignore`.
-4. **Investigate Dependabot vulnerabilities** — 2 alerts (1 high, 1 moderate).
-5. **Restore `ErrNotOrdered` full message** — add back "(int, uint, or string)".
-6. **Add goimports prevention** — treefmt exclusion, pre-commit hook, or goimports
-   config to stop v1 file corruption at the source.
-7. **Update website `changelog.mdx`** — add 0.3.3, 0.4.0, 0.5.0 entries.
-8. **Update AGENTS.md** — goimports recurrence #5, `outputs` pattern gotcha,
-   `namer` binary tracking, GOCACHE `rm` hazard.
+1. ~~**Add `errors.Is` tests for 5 new sentinel errors** — `ErrUnsupportedType`,~~ done (9/9 sentinels tested (23-01))
+   ~~`ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver`. Each~~
+   ~~needs a test proving the sentinel matches through wrapping chains.~~
+2. ~~**Fix Validate Docs CI failure** — `md-go-validator` install path in~~ done (install path fixed (23-01))
+   ~~`validate-docs.yml`.~~
+3. ~~**Remove tracked `namer` binary** — `git rm --cached namer`, add to `.gitignore`.~~ done (c29a034 (v0.5.1))
+4. ~~**Investigate Dependabot vulnerabilities** — 2 alerts (1 high, 1 moderate).~~ done (astro/fast-uri fixed in v0.6.0; 7 newer alerts tracked in TODO_LIST)
+5. ~~**Restore `ErrNotOrdered` full message** — add back "(int, uint, or string)".~~ done (restored (23-01))
+6. ~~**Add goimports prevention** — treefmt exclusion, pre-commit hook, or goimports~~ done (root cause was go-auto-upgrade; fixed upstream (gau v0.6.2), unskipped 2026-09-22; pre-push grep guard added)
+   ~~config to stop v1 file corruption at the source.~~
+7. ~~**Update website `changelog.mdx`** — add 0.3.3, 0.4.0, 0.5.0 entries.~~ done (entries added through v0.6.0)
+8. ~~**Update AGENTS.md** — goimports recurrence #5, `outputs` pattern gotcha,~~ done (all documented in AGENTS.md)
+   ~~`namer` binary tracking, GOCACHE `rm` hazard.~~
 
 ### Medium Impact
 
-9. **Document sentinel errors in README** — "Error Handling" section with
-   `errors.Is` usage.
-10. **Add `cmd/namer` and sentinel errors to website docs.**
-11. **Update MIGRATION.md** for v0.5.0 sentinel error changes.
-12. **Pin GitHub Actions to SHA hashes** — 17 `github-actions-pinned` BuildFlow errors.
-13. **Add `nix flake check` to CI workflows.**
-14. **Bump 14 downstream ecosystem repos to v0.5.0** (externally blocked — needs
-    per-repo access).
-15. **Review remaining `fmt.Errorf` calls without sentinel wrapping** — 7 calls
-    wrap external errors without a library sentinel.
-16. **Add pre-commit hook for dual-mode `go test`** — prevents single-mode blind spots.
-17. **Run `cmd/namer` against downstream repos** — find brands missing `Name()`.
-18. **Add website `changelog.mdx` to the release checklist** — so it doesn't go
-    stale again.
+9. ~~**Document sentinel errors in README** — "Error Handling" section with~~ done (README Error Handling section (23-01))
+   ~~`errors.Is` usage.~~
+10. ~~**Add `cmd/namer` and sentinel errors to website docs.**~~ done (guides added (23-01))
+11. ~~**Update MIGRATION.md** for v0.5.0 sentinel error changes.~~ done (MIGRATION.md v0.5.0+ section (2026-09-22))
+12. ~~**Pin GitHub Actions to SHA hashes** — 17 `github-actions-pinned` BuildFlow errors.~~ done (pinned to SHAs (23-01))
+13. ~~**Add `nix flake check` to CI workflows.**~~ done (flake-check job (go.yml))
+14. ~~**Bump 14 downstream ecosystem repos to v0.5.0** (externally blocked — needs~~ **Won't implement — superseded — standing task is the v0.6.0 bump (TODO_LIST).**
+    ~~per-repo access).~~
+15. ~~**Review remaining `fmt.Errorf` calls without sentinel wrapping** — 7 calls~~ done (0 unwrapped paths (23-01))
+    ~~wrap external errors without a library sentinel.~~
+16. ~~**Add pre-commit hook for dual-mode `go test`** — prevents single-mode blind spots.~~ done (pre-push dual-mode hook)
+17. ~~**Run `cmd/namer` against downstream repos** — find brands missing `Name()`.~~ **Won't implement — routed to ROADMAP Theme 3.**
+18. ~~**Add website `changelog.mdx` to the release checklist** — so it doesn't go~~ done (AGENTS.md release checklist)
+    ~~stale again.~~
 
 ### Lower Impact — quality and polish
 
-19. **Restore `TestSuggestName_IntegrationWithPrint`** — deleted in commit
-    `0e73d12`, guards against expectation-weakening.
-20. **Add `printResults` test** asserting the suggested name string value.
-21. **Add fuzz tests for SQL `Scan` and Text `UnmarshalText`.**
-22. **Add `outputs` pattern gotcha to AGENTS.md "Critical Gotchas" section.**
-23. **Add `-diff` mode to `cmd/namer`** — show what would change per file.
-24. **Add JSON output mode to `cmd/namer`** — for CI/editor integration.
-25. **Consider compile-time constraint for `Compare`** — `constraints.Ordered`
-    would make `ErrNotOrdered` a compile error.
-26. **Consider `NullID[B, V]` type** — for nullable SQL support.
-27. **Capture benchmark baseline files** — check in `bench-v1.txt` / `bench-v2.txt`.
-28. **Add integration test running the namer binary** — `exec.Command("go", "run", "./cmd/namer", ...)`.
-29. **Document the goimports corruption in CONTRIBUTING.md** — warn contributors.
-30. **Add `errorlint` to `.golangci.yml`** — enforce `%w` wrapping.
-31. **Add coverage report to CI** — upload as artifact.
-32. **Consider `errors.go` → `id_errors.go` rename** — naming consistency.
-33. **Add `version.go`** — expose `Version = "v0.5.0"` as package constant.
-34. **Add `.editorconfig`** that excludes build-tagged files from import rewriting.
-35. **Document the `signedInt`/`unsignedInt` helper types** in `id_text.go`.
-36. **Review `parseIntegerID` generic constraint** — verify cleanest expression.
-37. **Add cross-language binary compatibility test** — marshal in Go, verify in Python/TS.
-38. **Consider `ID[B, V]` support for `encoding/xml`** — currently only Text.
-39. **Add `context.Context` support** review — is it needed for any operation?
-40. **Review `BrandNamer` interface** — should it be generic `BrandNamer[B any]`?
-41. **Add UUID/ULID value type examples** in docs.
-42. **Consider `ID[B, V].Validate()` shorthand** that calls `ValidateID`.
-43. **Review `Reset()` method naming** — `Clear()` or `SetZero()` more idiomatic?
-44. **Add property-based testing with `rapid`** — generate random IDs, verify invariants.
-45. **Document the little-endian binary format** in a spec or RFC-style doc.
-46. **Explore `encoding/json/v2` jsontext API** — streaming marshal performance.
-47. **Consider `ID[B, V]` for protobuf** — `proto.Marshal` support.
-48. **Add `ID[B, V]` support for `msgpack`** — common binary format.
-49. **Explore `sync.Pool` for marshal buffers** — reduce hot-path allocations.
-50. **Write a blog post about the dual-mode JSON architecture** — the pattern is
-    novel and reusable.
+19. ~~**Restore `TestSuggestName_IntegrationWithPrint`** — deleted in commit~~ done (restored (23-01))
+    ~~`0e73d12`, guards against expectation-weakening.~~
+20. ~~**Add `printResults` test** asserting the suggested name string value.~~ done (restored (23-01))
+21. ~~**Add fuzz tests for SQL `Scan` and Text `UnmarshalText`.**~~ done (FuzzSQLScanRoundTrip* and FuzzTextRoundTrip* (23-01))
+22. ~~**Add `outputs` pattern gotcha to AGENTS.md "Critical Gotchas" section.**~~ done (outputs gotcha added)
+23. ~~**Add `-diff` mode to `cmd/namer`** — show what would change per file.~~ **Won't implement — routed to ROADMAP Theme 3.**
+24. ~~**Add JSON output mode to `cmd/namer`** — for CI/editor integration.~~ **Won't implement — routed to ROADMAP Theme 3.**
+25. ~~**Consider compile-time constraint for `Compare`** — `constraints.Ordered`~~ **Won't implement — routed to ROADMAP Theme 2.**
+    ~~would make `ErrNotOrdered` a compile error.~~
+26. ~~**Consider `NullID[B, V]` type** — for nullable SQL support.~~ **Won't implement — routed to ROADMAP Theme 4.**
+27. ~~**Capture benchmark baseline files** — check in `bench-v1.txt` / `bench-v2.txt`.~~ **Won't implement — not captured.**
+28. ~~**Add integration test running the namer binary** — `exec.Command("go", "run", "./cmd/namer", ...)`.~~ **Won't implement — not added.**
+29. ~~**Document the goimports corruption in CONTRIBUTING.md** — warn contributors.~~ done (superseded — root cause corrected in AGENTS.md/MIGRATION.md (2026-09-17))
+30. ~~**Add `errorlint` to `.golangci.yml`** — enforce `%w` wrapping.~~ **Won't implement — not added; the sentinel pattern is enforced by review.**
+31. ~~**Add coverage report to CI** — upload as artifact.~~ **Won't implement — not uploaded.**
+32. ~~**Consider `errors.go` → `id_errors.go` rename** — naming consistency.~~ **Won't implement — kept errors.go.**
+33. ~~**Add `version.go`** — expose `Version = "v0.5.0"` as package constant.~~ **Won't implement — not added.**
+34. ~~**Add `.editorconfig`** that excludes build-tagged files from import rewriting.~~ **Won't implement — superseded — root cause was go-auto-upgrade.**
+35. ~~**Document the `signedInt`/`unsignedInt` helper types** in `id_text.go`.~~ **Won't implement — not added — two-line helper types.**
+36. ~~**Review `parseIntegerID` generic constraint** — verify cleanest expression.~~ **Won't implement — kept as-is.**
+37. ~~**Add cross-language binary compatibility test** — marshal in Go, verify in Python/TS.~~ **Won't implement — routed to ROADMAP Theme 4.**
+38. ~~**Consider `ID[B, V]` support for `encoding/xml`** — currently only Text.~~ **Won't implement — not added — Text covers XML use cases.**
+39. ~~**Add `context.Context` support** review — is it needed for any operation?~~ **Won't implement — not applicable.**
+40. ~~**Review `BrandNamer` interface** — should it be generic `BrandNamer[B any]`?~~ **Won't implement — kept non-generic.**
+41. ~~**Add UUID/ULID value type examples** in docs.~~ **Won't implement — not added.**
+42. ~~**Consider `ID[B, V].Validate()` shorthand** that calls `ValidateID`.~~ **Won't implement — not added.**
+43. ~~**Review `Reset()` method naming** — `Clear()` or `SetZero()` more idiomatic?~~ **Won't implement — kept Reset().**
+44. ~~**Add property-based testing with `rapid`** — generate random IDs, verify invariants.~~ **Won't implement — not added.**
+45. ~~**Document the little-endian binary format** in a spec or RFC-style doc.~~ done (AGENTS.md Binary Endianness section)
+46. ~~**Explore `encoding/json/v2` jsontext API** — streaming marshal performance.~~ **Won't implement — routed to ROADMAP Theme 4.**
+47. ~~**Consider `ID[B, V]` for protobuf** — `proto.Marshal` support.~~ **Won't implement — routed to ROADMAP Theme 4.**
+48. ~~**Add `ID[B, V]` support for `msgpack`** — common binary format.~~ **Won't implement — routed to ROADMAP Theme 4.**
+49. ~~**Explore `sync.Pool` for marshal buffers** — reduce hot-path allocations.~~ **Won't implement — not done.**
+50. ~~**Write a blog post about the dual-mode JSON architecture** — the pattern is~~ **Won't implement — not written.**
+    ~~novel and reusable.~~
 
 ---
 
