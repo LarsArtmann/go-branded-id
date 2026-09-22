@@ -3,9 +3,9 @@
 > Long-term direction and raw ideas not yet refined into actionable tasks.
 > For short-term bounded work, see `TODO_LIST.md`.
 
-## Theme 1: Ecosystem v0.5.1 Adoption
+## Theme 1: Ecosystem v0.6.0 Adoption
 
-The library is stable at v0.5.1 but 14 downstream repos have source fixes applied
+The library is stable at v0.6.0 but 14 downstream repos have source fixes applied
 without the `go.mod` dependency bump. Full ecosystem migration is the path to v1.0.
 
 - Strategy for batch-bumping 14 repos (automated PRs? migration script?)
@@ -20,12 +20,13 @@ Before tagging v1.0, the API surface should be frozen and audited:
 - **Error taxonomy refinement (open design question)**: should `ErrMarshal`/`ErrUnmarshal` be split per-format (`ErrJSONMarshal`, `ErrBinaryMarshal`, `ErrTextMarshal`, `ErrSQLMarshal`)? Current design uses two generic sentinels; per-format would give consumers finer branching at the cost of API surface
 - **`ErrInternal` disposition**: it guards type assertions the outer type switch guarantees will succeed (unreachable by design). Decide: keep as defensive sentinel, or remove and let panics fire as programmer errors
 - Consider compile-time constraint for `Compare` (currently runtime `ErrNotOrdered` via type switch — a `constraints.Ordered` generic could make it a compile error)
-- Push statement coverage toward 90%+ (currently 87.6%; main uncovered paths are `ErrInternal` branches and `valueString()` fallbacks for non-standard types)
+- Push statement coverage toward 90%+ (currently 88.5%; main uncovered paths are `ErrInternal` branches and `valueString()` fallbacks for non-standard types)
 - API review: are there methods that should not exist? Are there missing methods users keep asking for?
 - Stability guarantee: once v1.0 ships, breaking changes require v2.0
 
 ## Theme 3: Ecosystem Tooling
 
+- Rebuild `cmd/namer` on the linter stack (go-linter-sdk rules emitting `finding.Finding`, cmdguard CLI shell, go-output rendering) — placement and suppression design decisions pending
 - Expand `cmd/namer` into a full migration toolkit (scan, fix, verify)
 - Add `-diff` mode to namer showing what would change per file
 - Add JSON output mode to namer for CI/editor integration

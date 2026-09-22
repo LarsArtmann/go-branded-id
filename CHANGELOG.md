@@ -8,11 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Nothing yet.
+- **`ErrMarshal`/`ErrUnmarshal` delegate-path test coverage**: the four remaining untested error delegates now have `errors.Is` subtests in `id_errors_test.go` — JSON marshaler failure, SQL `Value()` text-marshaler failure, `BinaryUnmarshaler` delegate failure, and `TextUnmarshaler` delegate failure (`unmarshalTextDefault`). Library statement coverage rose from 85.6% to 88.5%.
+- **`SECURITY.md`** with private vulnerability-reporting instructions.
+- **CI hygiene job** (`.github/workflows/go.yml`): fails if a compiled binary or build artifact is tracked at repo root — recurrence guard for the v0.5.0 incident where a tracked `namer` binary inflated release source archives ~10x.
+- **Hardened pre-push hook** (`scripts/pre-push-dual-test.sh`): greps the v1 JSON files for `encoding/json/v2` imports before running any test (the in-package contract test is structurally blind to compile-breaking import corruption), and reports both mode results instead of dying on the first failure.
 
 ### Fixed
 
-- **`go.mod` toolchain bump recurrence stopped at the root**: BuildFlow's `go-mod-update` step bumped `go 1.26` → `1.27.1` again after v0.6.0 (the pre-release repair blamed the wrong step). `go-mod-update` is now in `.buildflow.yml` `skip_steps` alongside `go-auto-upgrade`; CI caught the regression within minutes via `GOTOOLCHAIN=local`.
+- **`go.mod` toolchain bump recurrence stopped at the root**: BuildFlow's `go-mod-update` step bumped `go 1.26` → `1.27.1` again after v0.6.0 (the pre-release repair blamed the wrong step). `go-mod-update` is now in `.buildflow.yml` `skip_steps`; CI caught the regression within minutes via `GOTOOLCHAIN=local`. (`go-auto-upgrade` was re-enabled on 2026-09-22 after its upstream v0.6.2 fixed the dual-mode import rewrites — see AGENTS.md.)
 - **Website security overrides actually apply now**: the `overrides` block sat in `package.json` (npm syntax, silently ignored by pnpm 11). Moved to `pnpm-workspace.yaml` — `js-yaml` resolves to patched 4.3.2, `fast-uri` to 3.1.5.
 
 ## [0.6.0] - 2026-09-17

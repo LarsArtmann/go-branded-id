@@ -21,9 +21,9 @@
 
 Computed live from the repo (do not hardcode these numbers):
 
-- Test subtests: `go test ./... -count=1 -v \| grep -cE '^\s*=== RUN'` → 427
-- Statement coverage (library package): `go test ./... -cover` → 87.6%
-- Statement coverage (`cmd/namer`): `go test -cover ./cmd/namer/` → 95.1%
+- Test subtests: `go test ./... -count=1 -v \| grep -cE '^\s*=== RUN'` → 431
+- Statement coverage (library package): `go test ./... -cover` → 88.5%
+- Statement coverage (`cmd/namer`): `go test -cover ./cmd/namer/` → 93.2%
 - Benchmark functions: `grep -c '^func Benchmark' id_bench_test.go` → 29
 - Fuzz functions: `grep -c '^func Fuzz' id_bench_test.go` → 10
 - Lint issues (both modes): `golangci-lint run ./...` → 0
@@ -78,8 +78,8 @@ Computed live from the repo (do not hardcode these numbers):
 | `ErrInsufficientData` | 🟢 `FULLY_FUNCTIONAL` | `errors.go:25`; returned when binary data is too short. Tested via `errors.Is` in `id_errors_test.go`.                              |
 | `ErrInternal`         | 🟢 `FULLY_FUNCTIONAL` | `errors.go:29`; returned for unreachable internal errors. Defensive only — verified in `id_errors_test.go`.                         |
 | `ErrNilReceiver`      | 🟢 `FULLY_FUNCTIONAL` | `errors.go:32`; returned when a method is called on nil pointer. Tested via `errors.Is` in `id_errors_test.go`.                     |
-| `ErrMarshal`          | 🟢 `FULLY_FUNCTIONAL` | `errors.go:37`; wraps marshaler failures (JSON, binary, SQL text). Tested via `errors.Is` in `id_errors_test.go`.                   |
-| `ErrUnmarshal`        | 🟢 `FULLY_FUNCTIONAL` | `errors.go:42`; wraps unmarshaler failures (JSON, text). Tested via `errors.Is` in `id_errors_test.go`.                             |
+| `ErrMarshal`          | 🟢 `FULLY_FUNCTIONAL` | `errors.go:37`; wraps marshaler failures (JSON, binary, SQL text). Tested via `errors.Is` in `id_errors_test.go`, including the JSON, binary, and SQL text-marshaler delegate paths. |
+| `ErrUnmarshal`        | 🟢 `FULLY_FUNCTIONAL` | `errors.go:42`; wraps unmarshaler failures (JSON, text). Tested via `errors.Is` in `id_errors_test.go`, including the binary and text unmarshaler delegate paths. |
 
 ## Formatting & Pointers
 
@@ -93,7 +93,7 @@ Computed live from the repo (do not hardcode these numbers):
 
 | Feature                                      | Status                | Notes                                                                                          |
 | -------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------- |
-| `cmd/namer` codemod (brand `Name()` scanner) | 🟢 `FULLY_FUNCTIONAL` | `cmd/namer/main.go`; AST scanner + optional stub writer; 93% test coverage; dry-run by default |
+| `cmd/namer` codemod (brand `Name()` scanner) | 🟢 `FULLY_FUNCTIONAL` | `cmd/namer/main.go`; AST scanner + optional stub writer; 93.2% test coverage; dry-run by default |
 
 ---
 
