@@ -76,9 +76,9 @@ Nothing. The fix itself is complete and verified.
 
 ## c) NOT STARTED
 
-1. **AGENTS.md update** — the "Critical Gotchas" section should document: _"The `outputs` pattern must include `...` if it doesn't name every input. Nix passes all declared inputs; a strict pattern without `...` breaks the entire flake."_ This is textbook "hard to discover from code alone" context.
-2. **Commit message quality** — see section (d) below. The auto-git daemon committed the fix with a generic message.
-3. **Root-cause of the root-cause** — WHY did `530702f` remove those lines? Was it an agent refactor? A linter suggestion? Understanding this prevents the same class of bug recurring.
+1. ~~**AGENTS.md update** — the "Critical Gotchas" section should document: _"The `outputs` pattern must include `...` if it doesn't name every input. Nix passes all declared inputs; a strict pattern without `...` breaks the entire flake."_ This is textbook "hard to discover from code alone" context.~~ done (done — 'Flake outputs Must Include ...' gotcha added to AGENTS.md (2026-07-28))
+2. ~~**Commit message quality** — see section (d) below. The auto-git daemon committed the fix with a generic message.~~ **Won't implement — history stands as-is; the lesson is recorded here and in later reports.**
+3. ~~**Root-cause of the root-cause** — WHY did `530702f` remove those lines? Was it an agent refactor? A linter suggestion? Understanding this prevents the same class of bug recurring.~~ **Won't implement — origin unprovable after the fact; fix-on-sight + explicit-commit policy adopted instead.**
 
 ---
 
@@ -131,9 +131,9 @@ By not committing, I ceded the commit message to the daemon. **Lesson: for a fix
 
 ### Codebase improvements (noted but not addressed — out of session scope)
 
-1. **`go-structure-linter` warnings (21 errors)** — all "root-package-files" complaints. AGENTS.md says the flat single-package layout is intentional. These warnings are noise; the linter config should be told to accept the intentional layout rather than emitting 21 errors every BuildFlow run.
-2. **`gitleaks` skipped by config** — is this intentional? If so, document why. If not, re-enable.
-3. **`assets/` and `internal/` directory warnings** — same class as above; intentional layout flagged by a generic linter.
+1. ~~**`go-structure-linter` warnings (21 errors)** — all "root-package-files" complaints.~~ Won't implement — intentional flat layout documented in AGENTS.md; tool noise accepted. AGENTS.md says the flat single-package layout is intentional. These warnings are noise; the linter config should be told to accept the intentional layout rather than emitting 21 errors every BuildFlow run.
+2. ~~**`gitleaks` skipped by config** — is this intentional? If so, document why. If not, re-enable.~~ done — the current `.buildflow.yml` declares its skip list explicitly (`go-mod-update` only); no gitleaks skip remains.
+3. ~~**`assets/` and `internal/` directory warnings** — same class as above; intentional layout flagged by a generic linter.~~ Won't implement — intentional layout.
 
 ---
 
@@ -143,65 +143,65 @@ Ranked by impact (Pareto: top ~5 deliver 80% of value).
 
 ### High impact — do first
 
-1. **Amend commit `4b6b4b5`** with an honest message describing the actual one-line fix (if history rewrite is acceptable; otherwise add a clarifying follow-up commit).
-2. **Add `outputs` pattern gotcha to `AGENTS.md`** "Critical Gotchas" section.
-3. **Add `nix flake check --no-build`** as a pre-commit or BuildFlow step to catch flake evaluation errors before they land.
-4. **Investigate `530702f`** — determine if an agent or tool suggested removing `nixpkgs`/`system`. If an agent, add a guardrail so it doesn't recur.
-5. **Audit other repos in the ecosystem** (14 downstream repos per AGENTS.md) — if they use the same flake-parts pattern, they may have the same latent bug.
+1. ~~**Amend commit `4b6b4b5`** with an honest message describing the actual one-line fix (if history rewrite is acceptable; otherwise add a clarifying follow-up commit).~~ **Won't implement — history stands as-is.**
+2. ~~**Add `outputs` pattern gotcha to `AGENTS.md`** "Critical Gotchas" section.~~ done (done — AGENTS.md gotcha added 2026-07-28)
+3. ~~**Add `nix flake check --no-build`** as a pre-commit or BuildFlow step to catch flake evaluation errors before they land.~~ done (flake-check CI job in go.yml)
+4. ~~**Investigate `530702f`** — determine if an agent or tool suggested removing `nixpkgs`/`system`. If an agent, add a guardrail so it doesn't recur.~~ **Won't implement — origin unprovable after the fact.**
+5. ~~**Audit other repos in the ecosystem** (14 downstream repos per AGENTS.md) — if they use the same flake-parts pattern, they may have the same latent bug.~~ done (go-linter-sdk self-regression found and fixed in the 2026-09-17 fleet pass)
 
 ### Medium impact — technical debt
 
-6. **Configure `go-structure-linter`** to suppress the intentional root-package layout (21 errors → 0). Either via config ignore or a `//nolint`-equivalent.
-7. **Document or re-enable `gitleaks`** in BuildFlow config.
-8. **Add a regression note** — somewhere testable (CI or a flake eval smoke test) that the `outputs` function accepts all inputs.
-9. **Review the `530702f` commit holistically** — it changed `.golangci.yml`, added tests, updated AGENTS.md, and broke the flake. Were the other changes reviewed? Are the new tests correct?
-10. **Standardize the `outputs` pattern across all flakes** in the ecosystem — enforce `...` unless all inputs are explicitly named and used.
-11. **Add a `flake eval` smoke test** to CI (`go.yml`) that runs `nix flake show` or `nix flake check --no-build` before the full build.
-12. **Update `AGENTS.md` "Essential Commands"** to mention `nix flake check --no-build` as a quick smoke test.
+6. ~~**Configure `go-structure-linter`** to suppress the intentional root-package layout (21 errors → 0). Either via config ignore or a `//nolint`-equivalent.~~ **Won't implement — intentional layout documented; noise accepted.**
+7. ~~**Document or re-enable `gitleaks`** in BuildFlow config.~~ done (.buildflow.yml declares its skip list explicitly (go-mod-update only))
+8. ~~**Add a regression note** — somewhere testable (CI or a flake eval smoke test) that the `outputs` function accepts all inputs.~~ done (the CI flake-check job is the regression gate)
+9. ~~**Review the `530702f` commit holistically** — it changed `.golangci.yml`, added tests, updated AGENTS.md, and broke the flake. Were the other changes reviewed? Are the new tests correct?~~ **Won't implement — superseded by later full audits.**
+10. ~~**Standardize the `outputs` pattern across all flakes** in the ecosystem — enforce `...` unless all inputs are explicitly named and used.~~ done (linter-stack flakes verified in the 2026-09-17 pass)
+11. ~~**Add a `flake eval` smoke test** to CI (`go.yml`) that runs `nix flake show` or `nix flake check --no-build` before the full build.~~ done (flake-check job runs the --all-systems eval plus current-system build)
+12. ~~**Update `AGENTS.md` "Essential Commands"** to mention `nix flake check --no-build` as a quick smoke test.~~ done (AGENTS.md lists nix flake check)
 
 ### Lower impact — polish
 
-13. **Review whether the `checks.build` derivation** needs the `GOCACHE` workaround documented in AGENTS.md — is it still necessary with current nixpkgs?
-14. **Add `meta.description` to all `apps`** — BuildFlow emits warnings for every app lacking description (7 warnings).
-15. **Consider a `flake-parts` module** for the shared `mkApp` helper — currently duplicated if other repos copy this flake.
-16. **Document the `GOEXPERIMENT=jsonv2` requirement** more prominently in the flake itself (a comment near the devShell).
-17. **Review the `cmd/namer` tool** — was it affected by `530702f`? Does it still build?
-18. **Check if the website's `flake.lock`** is also stale (the root one was updated by the daemon).
-19. **Run `nix flake update`** deliberately (not via daemon) to see if any input bumps cause issues.
-20. **Add a `just`/`make` compatibility shim** if any downstream tooling expects it (CONTRIBUTING.md still references `just` — stale per AGENTS.md).
-21. **Fix or remove `CONTRIBUTING.md`** — it references nonexistent `pkg/errors/`, `go-arch-lint`, and `just`. Either rewrite or delete.
-22. **Review the 4 new test files** added in `530702f` (`id_bench_test.go`, `id_brand_test.go`, `id_json_test.go`, `id_alltypes_test.go`) for correctness and coverage gaps.
-23. **Benchmark the `...` pattern fix** — confirm no evaluation performance regression (negligible, but verify).
-24. **Add a `CHANGELOG.md` entry** for the flake fix if it warrants a patch release.
-25. **Review the v0.3.1 release** — AGENTS.md says it "never fired" due to missing `GOEXPERIMENT`. Is the fix actually deployed? Did the tag get re-pushed?
+13. ~~**Review whether the `checks.build` derivation** needs the `GOCACHE` workaround documented in AGENTS.md — is it still necessary with current nixpkgs?~~ done (still required; documented in AGENTS.md (Nix Sandbox GOCACHE))
+14. ~~**Add `meta.description` to all `apps`** — BuildFlow emits warnings for every app lacking description (7 warnings).~~ **Won't implement — not added.**
+15. ~~**Consider a `flake-parts` module** for the shared `mkApp` helper — currently duplicated if other repos copy this flake.~~ **Won't implement — not extracted.**
+16. ~~**Document the `GOEXPERIMENT=jsonv2` requirement** more prominently in the flake itself (a comment near the devShell).~~ **Won't implement — obsolete — the GOEXPERIMENT requirement was removed in v0.5.0.**
+17. ~~**Review the `cmd/namer` tool** — was it affected by `530702f`? Does it still build?~~ done (builds and tests at 93.2% coverage)
+18. ~~**Check if the website's `flake.lock`** is also stale (the root one was updated by the daemon).~~ done (website flake maintained independently; refreshed with later dep regenerations)
+19. ~~**Run `nix flake update`** deliberately (not via daemon) to see if any input bumps cause issues.~~ done (flake.lock updated by the daemon/BuildFlow since)
+20. ~~**Add a `just`/`make` compatibility shim** if any downstream tooling expects it (CONTRIBUTING.md still references `just` — stale per AGENTS.md).~~ **Won't implement — never needed; CONTRIBUTING.md fixed instead (v0.3.2).**
+21. ~~**Fix or remove `CONTRIBUTING.md`** — it references nonexistent `pkg/errors/`, `go-arch-lint`, and `just`. Either rewrite or delete.~~ done (rebuilt in v0.3.2 (ed5ee4b))
+22. ~~**Review the 4 new test files** added in `530702f` (`id_bench_test.go`, `id_brand_test.go`, `id_json_test.go`, `id_alltypes_test.go`) for correctness and coverage gaps.~~ done (superseded — suite now at 431 subtests with contract tests)
+23. ~~**Benchmark the `...` pattern fix** — confirm no evaluation performance regression (negligible, but verify).~~ **Won't implement — negligible; not measured.**
+24. ~~**Add a `CHANGELOG.md` entry** for the flake fix if it warrants a patch release.~~ **Won't implement — not released; documented in reports and AGENTS.md.**
+25. ~~**Review the v0.3.1 release** — AGENTS.md says it "never fired" due to missing `GOEXPERIMENT`. Is the fix actually deployed? Did the tag get re-pushed?~~ done (v0.3.2 fixed the release pipeline; the proxy serves v0.3.1)
 
 ### Ecosystem / strategic
 
-26. **Notify downstream repos** (InboxClean, CreditReformBilanzampel, ActaFlow, etc.) of the flake pattern gotcha if they copy this flake structure.
-27. **Create a shared flake template** (or flake-parts module) so all LarsArtmann Go repos use a consistent, tested flake pattern.
-28. **Consider a `nix-health` check** for the `outputs` pattern across all repos.
-29. **Review whether `encoding/json/v2` is still experimental** — if it's stabilized in Go 1.26+, the `GOEXPERIMENT` flag may be removable.
-30. **Document the release process end-to-end** — the v0.3.1 saga suggests gaps.
-31. **Set up dependabot / flake-update automation** for flake inputs (if not already).
-32. **Review the `git-town.toml`** config — still accurate?
-33. **Audit the BuildFlow pre-commit hook** (34 checks) — are any stale or redundant?
-34. **Add a `docs/status/` index** or README listing all status reports chronologically.
-35. **Review the `domains/` repo** DNS status — AGENTS.md says CNAME is "pending terraform apply."
-36. **Verify `branded-id.lars.software`** is live (DNS may have propagated since last report).
-37. **Run `nix flake check --all-systems`** to verify cross-platform compatibility (the default skips darwin/aarch64).
-38. **Consider splitting `flake.nix`** into a `flake-parts` module if it grows further.
-39. **Review `treefmt-nix` config** — are all 4 formatters (gofumpt, goimports, golines, nixfmt) still needed and non-conflicting?
-40. **Add `GOEXPERIMENT=jsonv2` to the `checks.build`** — wait, it's already there. Verify all derivations that run `go` have it.
-41. **Document the `cmd/namer` codemod** usage in README or a dedicated doc.
-42. **Review whether `flake-parts` `mkFlake`** could catch this pattern error at definition time (feature request upstream?).
-43. **Add a `direnv` `.envrc`** if not present, using `nix develop` — improves DX.
-44. **Review the `devShells.ci`** — is it used by CI? If not, remove (YAGNI).
-45. **Consolidate `GOEXPERIMENT=jsonv2`** — it's repeated in 8+ places. Could it be set once via `mkShellNoCC` default or an env wrapper?
-46. **Check if `go_1_26`** is the right attribute or if it should be `go` (defaulting to latest) for less churn.
-47. **Review the `lib.fileset.gitTracked`** usage in `checks.build` — does it handle `vendor/` correctly?
-48. **Add a `flake.nix` smoke test to the website** — `website/flake.nix` should also be checked in CI.
-49. **Document the relationship between root `flake.nix` and `website/flake.nix`** — two independent flakes in one repo is unusual; explain why.
-50. **Celebrate** — the build is unblocked and all 37 checks pass. Then tackle items 1-5.
+26. ~~**Notify downstream repos** (InboxClean, CreditReformBilanzampel, ActaFlow, etc.) of the flake pattern gotcha if they copy this flake structure.~~ done (2026-09-17 fleet pass covered the linter-stack repos)
+27. ~~**Create a shared flake template** (or flake-parts module) so all LarsArtmann Go repos use a consistent, tested flake pattern.~~ **Won't implement — not created.**
+28. ~~**Consider a `nix-health` check** for the `outputs` pattern across all repos.~~ **Won't implement — not built.**
+29. ~~**Review whether `encoding/json/v2` is still experimental** — if it's stabilized in Go 1.26+, the `GOEXPERIMENT` flag may be removable.~~ done (dual-mode support shipped v0.5.0; v1 remains the default)
+30. ~~**Document the release process end-to-end** — the v0.3.1 saga suggests gaps.~~ done (AGENTS.md release process section is the checklist)
+31. ~~**Set up dependabot / flake-update automation** for flake inputs (if not already).~~ **Won't implement — not configured.**
+32. ~~**Review the `git-town.toml`** config — still accurate?~~ done (main = master still correct)
+33. ~~**Audit the BuildFlow pre-commit hook** (34 checks) — are any stale or redundant?~~ done (superseded — .buildflow.yml is explicit; AGENTS.md no longer hardcodes a count)
+34. ~~**Add a `docs/status/` index** or README listing all status reports chronologically.~~ **Won't implement — not created.**
+35. ~~**Review the `domains/` repo** DNS status — AGENTS.md says CNAME is "pending terraform apply."~~ done (domain live (AGENTS.md Website section))
+36. ~~**Verify `branded-id.lars.software`** is live (DNS may have propagated since last report).~~ done (live; v0.6.0 deployed and fetched)
+37. ~~**Run `nix flake check --all-systems`** to verify cross-platform compatibility (the default skips darwin/aarch64).~~ done (CI runs it (flake-check job))
+38. ~~**Consider splitting `flake.nix`** into a `flake-parts` module if it grows further.~~ **Won't implement — not needed at current size.**
+39. ~~**Review `treefmt-nix` config** — are all 4 formatters (gofumpt, goimports, golines, nixfmt) still needed and non-conflicting?~~ done (all four formatters current; treefmt-check green)
+40. ~~**Add `GOEXPERIMENT=jsonv2` to the `checks.build`** — wait, it's already there. Verify all derivations that run `go` have it.~~ done (checks.test runs both modes)
+41. ~~**Document the `cmd/namer` codemod** usage in README or a dedicated doc.~~ done (website guides/namer-tool.mdx documents the tool)
+42. ~~**Review whether `flake-parts` `mkFlake`** could catch this pattern error at definition time (feature request upstream?).~~ **Won't implement — not filed.**
+43. ~~**Add a `direnv` `.envrc`** if not present, using `nix develop` — improves DX.~~ **Won't implement — not added.**
+44. ~~**Review the `devShells.ci`** — is it used by CI? If not, remove (YAGNI).~~ done (devShells.ci exists in flake.nix:77)
+45. ~~**Consolidate `GOEXPERIMENT=jsonv2`** — it's repeated in 8+ places. Could it be set once via `mkShellNoCC` default or an env wrapper?~~ **Won't implement — obsolete — requirement removed in v0.5.0.**
+46. ~~**Check if `go_1_26`** is the right attribute or if it should be `go` (defaulting to latest) for less churn.~~ done (go_1_26 pinned deliberately (AGENTS.md version-pins gotcha))
+47. ~~**Review the `lib.fileset.gitTracked`** usage in `checks.build` — does it handle `vendor/` correctly?~~ done (no vendor/ directory; fileset works as-is)
+48. ~~**Add a `flake.nix` smoke test to the website** — `website/flake.nix` should also be checked in CI.~~ **Won't implement — not added.**
+49. ~~**Document the relationship between root `flake.nix` and `website/flake.nix`** — two independent flakes in one repo is unusual; explain why.~~ done (AGENTS.md Website section notes the independent website flake)
+50. ~~**Celebrate** — the build is unblocked and all 37 checks pass. Then tackle items 1-5.~~ done (done — the build stayed unblocked through v0.6.0)
 
 ---
 
@@ -236,6 +236,9 @@ BuildFlow passes (37/38, `gitleaks` skipped by config).
 - goimports corruption hazard — documented in AGENTS.md + contract test added
   (see `2026-07-27_11-35` and `2026-07-27_16-44` reports)
 
-**Still open:** `nix flake check --no-build` not in CI or pre-commit; `gitleaks`
+~~**Still open:** `nix flake check --no-build` not in CI or pre-commit; `gitleaks`
 skip reason undocumented; AGENTS.md lacks the `outputs` pattern gotcha (the
-goimports gotcha was documented instead). All work culminated in **v0.5.0**.
+goimports gotcha was documented instead).~~ All three closed since: the
+`flake-check` CI job exists (go.yml), `.buildflow.yml` declares its skip list
+explicitly, and the `outputs` gotcha is in AGENTS.md. All work culminated in
+**v0.5.0**; the flake-guard story completed around v0.6.0.

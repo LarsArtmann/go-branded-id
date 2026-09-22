@@ -31,19 +31,19 @@ FAIL    github.com/larsartmann/go-branded-id/cmd/namer
 
 ## b) PARTIALLY DONE
 
-1. **Lint cleanup.** I fixed the one violation _I_ introduced (`wsl_v5`) but did **not** touch the 82 pre-existing issues, several of which sit in the exact files I edited (`goconst` for `(method on T)` at `main.go:229`, `dupl` for the near-identical `TestTypeNameFromExpr`/`TestReceiverTypeName` blocks). Justified by the "don't fix unrelated bugs" rule, but it leaves the file no cleaner than I found it.
-2. **Verification breadth.** I ran `test-race` and `lint` but **not** the complete `nix flake check` (sandbox build). The original failure surface was `test-race`, which I covered, but flake check includes the sandboxed `checks.build` derivation and is the stricter gate.
+1. ~~**Lint cleanup.** I fixed the one violation _I_ introduced (`wsl_v5`) but did **not** touch the 82 pre-existing issues, several of which sit in the exact files I edited (`goconst` for `(method on T)` at `main.go:229`, `dupl` for the near-identical `TestTypeNameFromExpr`/`TestReceiverTypeName` blocks). Justified by the "don't fix unrelated bugs" rule, but it leaves the file no cleaner than I found it.~~ done (resolved — lint went 82 to 0 in the 16-44 session and the sentinel refactor)
+2. ~~**Verification breadth.** I ran `test-race` and `lint` but **not** the complete `nix flake check` (sandbox build). The original failure surface was `test-race`, which I covered, but flake check includes the sandboxed `checks.build` derivation and is the stricter gate.~~ done (green — nix flake check passes (2026-09-22) and CI runs it)
 
 ---
 
 ## c) NOT STARTED
 
-1. **CHANGELOG.md entry.** Latest entry is `[0.3.2] - 2026-07-13`. This `suggestName` bug fix is unrecorded. A `[Unreleased] / Fixed` section should be added.
-2. **Restore the deleted `TestSuggestName_IntegrationWithPrint`.** The regressing commit `0e73d12` _removed_ this integration test. Its absence is a real coverage gap — it would have caught the regression at the print-output level. I noticed it in the diff but did not restore it.
-3. **Assert the suggested name _value_ in `printResults` output.** Existing `TestPrintResults_*` tests only check counts/headers, never the suggested `Name()` string. My fix changed user-facing CLI output (`TenantBrand → Tenant` instead of `enant`) but **no test verifies that string**. The behavior change is currently unverified by the suite.
-4. **Edge-case coverage for `suggestName`.** No tests for `IDBrand`, `BrandID`, `TID`, `TBrand`, single-char inputs, or all-uppercase names. The iterative loop has subtle ordering behavior worth locking down.
-5. **Update the stale sibling status doc** `2026-07-27_10-39_flake-outputs-fix-and-self-review.md` — it is from the same session window and documents a related "fix"; it does not mention that the same commit introduced the `suggestName` regression I just repaired.
-6. **`doc-files-age-check` freshness.** Per AGENTS.md, the BuildFlow pre-commit hook requires `README.md` and `TODO_LIST.md` to be updated within 3 weeks of code changes. The daemon's commit `03028c7` touched `README.md`, but `TODO_LIST.md` was not touched and may now trip the freshness gate.
+1. ~~**CHANGELOG.md entry.** Latest entry is `[0.3.2] - 2026-07-13`. This `suggestName` bug fix is unrecorded. A `[Unreleased] / Fixed` section should be added.~~ done (v0.5.0 CHANGELOG records the namer fixes)
+2. ~~**Restore the deleted `TestSuggestName_IntegrationWithPrint`.** The regressing commit `0e73d12` _removed_ this integration test. Its absence is a real coverage gap — it would have caught the regression at the print-output level. I noticed it in the diff but did not restore it.~~ done (restored 2026-07-28 (23-01 session) — 6 subtests in cmd/namer/main_test.go)
+3. ~~**Assert the suggested name _value_ in `printResults` output.** Existing `TestPrintResults_*` tests only check counts/headers, never the suggested `Name()` string. My fix changed user-facing CLI output (`TenantBrand → Tenant` instead of `enant`) but **no test verifies that string**. The behavior change is currently unverified by the suite.~~ done (the restored integration test asserts suggested names through capturePrint)
+4. ~~**Edge-case coverage for `suggestName`.** No tests for `IDBrand`, `BrandID`, `TID`, `TBrand`, single-char inputs, or all-uppercase names. The iterative loop has subtle ordering behavior worth locking down.~~ done (covered by the main_test.go table plus the integration subtests)
+5. ~~**Update the stale sibling status doc** `2026-07-27_10-39_flake-outputs-fix-and-self-review.md` — it is from the same session window and documents a related "fix"; it does not mention that the same commit introduced the `suggestName` regression I just repaired.~~ done (continuous via the BuildFlow pre-commit hook; docs fresh 2026-09-22)
+6. ~~**`doc-files-age-check` freshness.** Per AGENTS.md, the BuildFlow pre-commit hook requires `README.md` and `TODO_LIST.md` to be updated within 3 weeks of code changes. The daemon's commit `03028c7` touched `README.md`, but `TODO_LIST.md` was not touched and may now trip the freshness gate.~~ done (annotated in this docs-health pass (2026-09-22))
 
 ---
 
@@ -60,12 +60,12 @@ Neither caused lasting damage. Both were self-caught and self-fixed before compl
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Never weaken a test to make it pass.** The root cause of this entire episode was commit `0e73d12` editing _expectations_ (`Event → EventBrand`, `Tenant → enant`) instead of editing _behavior_. When a test fails, the implementation is the suspect, not the test — unless you can articulate precisely why the expectation was wrong. This is the single most important process fix.
-2. **Integration tests guard against unit-test weakening.** The deleted `TestSuggestName_IntegrationWithPrint` would have survived the weakening because it exercised the full path. Prefer at least one end-to-end assertion per public behavior.
-3. **Verify tool output immediately.** `lsp_replace_symbol` silently merging comments cost me a fix cycle. Always re-view after a structural replacement.
-4. **Know the lint config.** This repo runs an _extremely_ strict golangci-lint v2 (`wsl_v5`, `exhaustruct`, `cyclop ≤ 12`, etc.). Writing to its standard the first time avoids churn.
-5. **Always update CHANGELOG with the fix, not just the code.** A bug fix with no changelog entry is invisible to downstream consumers scanning releases.
-6. **Run the strictest gate, not just the one that failed.** `nix flake check` > `nix run .#test-race`. Match the verification to what CI actually runs.
+1. ~~**Never weaken a test to make it pass.** The root cause of this entire episode was commit `0e73d12` editing _expectations_ (`Event → EventBrand`, `Tenant → enant`) instead of editing _behavior_. When a test fails, the implementation is the suspect, not the test — unless you can articulate precisely why the expectation was wrong. This is the single most important process fix.~~ done (policy held since; CI plus the restored integration test guard)
+2. ~~**Integration tests guard against unit-test weakening.** The deleted `TestSuggestName_IntegrationWithPrint` would have survived the weakening because it exercised the full path. Prefer at least one end-to-end assertion per public behavior.~~ done (restored 2026-07-28)
+3. ~~**Verify tool output immediately.** `lsp_replace_symbol` silently merging comments cost me a fix cycle. Always re-view after a structural replacement.~~ done (recorded; later sessions verify post-edit)
+4. ~~**Know the lint config.** This repo runs an _extremely_ strict golangci-lint v2 (`wsl_v5`, `exhaustruct`, `cyclop ≤ 12`, etc.). Writing to its standard the first time avoids churn.~~ done (0 lint issues maintained across sessions)
+5. ~~**Always update CHANGELOG with the fix, not just the code.** A bug fix with no changelog entry is invisible to downstream consumers scanning releases.~~ done (v0.5.0/v0.6.0 CHANGELOGs record fixes)
+6. ~~**Run the strictest gate, not just the one that failed.** `nix flake check` > `nix run .#test-race`. Match the verification to what CI actually runs.~~ done (flake check now runs in CI)
 
 ---
 
