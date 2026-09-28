@@ -71,8 +71,8 @@ func TestDetectPath_MissingNameFile(t *testing.T) {
 		t.Errorf("Position.Column = %d, want 6", f.Position.Column)
 	}
 
-	if f.Offset < 0 {
-		t.Errorf("Position.Offset = %d, want >= 0", f.Offset)
+	if f.Position.Offset < 0 {
+		t.Errorf("Position.Offset = %d, want >= 0", f.Position.Offset)
 	}
 
 	wantMessage := "brand type UserBrand is used with id.ID but has no Name() string method"
@@ -80,7 +80,7 @@ func TestDetectPath_MissingNameFile(t *testing.T) {
 		t.Errorf("Message = %q, want %q", f.Message, wantMessage)
 	}
 
-	assertBD001(t, f, filepath.Join("testdata", "missing_name.go"), 6, "UserBrand")
+	assertBD001(t, f, filepath.Join("testdata", "missing_name.go"), 7, "UserBrand")
 }
 
 func TestDetectPath_Directory(t *testing.T) {

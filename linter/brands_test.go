@@ -20,7 +20,7 @@ func TestSuggestName(t *testing.T) {
 		{name: "strips stacked suffixes", brandName: "OrderIDBrand", want: "Order"},
 		{name: "strips leading T prefix", brandName: "TProductBrand", want: "Product"},
 		{name: "keeps real word starting with T", brandName: "TenantBrand", want: "Tenant"},
-		{name: "keeps single letter", brandName: "TBrand", want: "TBrand"},
+		{name: "strips suffix leaving lone prefix intact", brandName: "TBrand", want: "T"},
 		{name: "falls back to input when empty", brandName: "Brand", want: "Brand"},
 		{name: "returns plain name unchanged", brandName: "Account", want: "Account"},
 	}

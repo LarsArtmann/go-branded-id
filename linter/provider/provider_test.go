@@ -65,9 +65,10 @@ func TestProviderDetect(t *testing.T) {
 
 	spec := findProviderSpec(t)
 
-	findings, err := spec.Detect(gofinding.WithWorkingDir(context.Background(), "../testdata"))
+	findings, err := spec.Detect.Detect(
+		gofinding.WithWorkingDir(context.Background(), "../testdata"))
 	if err != nil {
-		t.Fatalf("Spec.Detect() error = %v", err)
+		t.Fatalf("Spec.Detect.Detect() error = %v", err)
 	}
 
 	if len(findings) != 3 {
@@ -86,5 +87,9 @@ func TestProviderDetectorName(t *testing.T) {
 
 	if Provider.Detect == nil {
 		t.Fatal("Provider.Detect is nil")
+	}
+
+	if got := Provider.Detect.Name(); got != linter.ToolName {
+		t.Errorf("Provider.Detect.Name() = %q, want %q", got, linter.ToolName)
 	}
 }
