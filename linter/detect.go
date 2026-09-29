@@ -85,7 +85,9 @@ func skipDir(name string) bool {
 }
 
 // detectFile scans one Go file. Files that fail to parse yield no findings
-// and no error (see DetectPath).
+// and no error (see DetectPath). Brands with a valid in-source suppression
+// directive (see suppress.go) yield no BD001 finding; broken directives
+// yield BD002 findings instead.
 func detectFile(filename string) ([]gofinding.Finding, error) {
 	fset := token.NewFileSet()
 
@@ -94,15 +96,21 @@ func detectFile(filename string) ([]gofinding.Finding, error) {
 		return nil, nil //nolint:nilerr // unparseable files are skipped by design
 	}
 
+	decls := brandDeclsFromFile(f, fset)
+	suppressed, directiveFindings := applySuppressions(
+		decls,
+		suppressionDirectivesFromFile(f, fset),
+	)
+
 	var findings []gofinding.Finding
 
-	for _, decl := range brandDeclsFromFile(f, fset) {
-		if decl.HasName {
+	for _, decl := range decls {
+		if decl.HasName || suppressed[decl.Offset] {
 			continue
 		}
 
 		findings = append(findings, findingForBrand(decl))
 	}
 
-	return findings, nil
+	return append(findings, directiveFindings...), nil
 }

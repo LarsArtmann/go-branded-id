@@ -35,6 +35,11 @@ func run(args []string, stdout, stderr io.Writer) int {
 	flagSet.SetOutput(stderr)
 
 	format := flagSet.String("format", "text", "output format: text or sarif")
+	fix := flagSet.Bool(
+		"fix",
+		false,
+		"apply repairs: insert the suggested Name() stub for every unsuppressed BD001 finding (dry-run by default)",
+	)
 
 	if err := flagSet.Parse(args); err != nil {
 		return 2
@@ -45,6 +50,24 @@ func run(args []string, stdout, stderr io.Writer) int {
 		printUsage(stderr, flagSet)
 
 		return 2
+	}
+
+	if *fix {
+		inserted, fixErr := repairAll(paths)
+		if fixErr != nil {
+			_, _ = fmt.Fprintf(stderr, "error: %v\n", fixErr)
+
+			return 2
+		}
+
+		if inserted > 0 {
+			_, _ = fmt.Fprintf(
+				stderr,
+				"%s: inserted %d Name() stub(s)\n",
+				linter.ToolName,
+				inserted,
+			)
+		}
 	}
 
 	findings, runErr := detectAll(paths)

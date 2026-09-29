@@ -8,12 +8,15 @@
 // glue to drift out of date.
 //
 // Detect delegates to linter.Detect, the same entry point the CLI uses, so
-// CLI and BuildFlow findings can never diverge. The spec is detector-only by
-// design: writing Name() stubs into arbitrary files requires AST-based
-// insertion that does not exist yet, so no Repair capability is claimed.
+// CLI and BuildFlow findings can never diverge. Repair inserts the suggested
+// Name() stub for every unsuppressed BD001 finding; BuildFlow re-runs Detect
+// to measure the delta, and suppressed brands are never modified.
 package provider
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/larsartmann/go-branded-id/linter"
 	gofinding "github.com/larsartmann/go-finding"
 	gofstoolsdk "github.com/larsartmann/go-finding/toolsdk"
@@ -36,7 +39,18 @@ var Provider = gofstoolsdk.Register(
 		ModuleFanOut: true,
 		Inputs:       []string{"**/*.go"},
 		Detect:       gofinding.NamedDetectorFunc(linter.ToolName, linter.Detect),
-		Repair:       nil,
-		HealthCheck:  nil,
+		Repair: gofstoolsdk.RepairerFunc(
+			func(ctx context.Context) (gofstoolsdk.RepairResult, error) {
+				inserted, err := linter.Repair(ctx)
+				if err != nil {
+					return gofstoolsdk.RepairResult{}, fmt.Errorf("brandid-lint repair: %w", err)
+				}
+
+				return gofstoolsdk.RepairResult{
+					Description: fmt.Sprintf("inserted %d Name() stub(s)", inserted),
+				}, nil
+			},
+		),
+		HealthCheck: nil,
 	},
 )
