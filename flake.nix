@@ -50,7 +50,20 @@
 
           mkApp = name: runtimeInputs: text: {
             type = "app";
-            program = "${pkgs.writeShellApplication { inherit name runtimeInputs text; }}/bin/${name}";
+            program = "${
+              pkgs.writeShellApplication {
+                inherit name runtimeInputs text;
+                # Per-module toolchain dirs: root legs MUST run on the root floor
+                # (go1.26). Under go1.27 the goexperiment.jsonv2 tag is
+                # default-true, so a go1.27 "v1" leg compiles the v2 files and
+                # fails the language gate (or fake-passes on a swept go.mod,
+                # testing v2 twice without noticing).
+                runtimeEnv = {
+                  go126Bin = "${goPkg}/bin";
+                  go127Bin = "${linterGoPkg}/bin";
+                };
+              }
+            }/bin/${name}";
           };
         in
         {
@@ -140,58 +153,58 @@
           };
 
           apps = {
-            test = mkApp "test" [ linterGoPkg ] ''
-              echo "=== Testing json v1 ==="
-              go test ./... -count=1 "$@"
-              echo "=== Testing json v2 ==="
-              GOEXPERIMENT=jsonv2 go test ./... -count=1 "$@"
-              echo "=== Testing brandid-lint module ==="
-              (cd linter && go test ./... -count=1 "$@")
+            test = mkApp "test" [ ] ''
+              echo "=== Testing json v1 (go1.26) ==="
+              PATH="$go126Bin:$PATH" go test ./... -count=1 "$@"
+              echo "=== Testing json v2 (go1.26) ==="
+              PATH="$go126Bin:$PATH" GOEXPERIMENT=jsonv2 go test ./... -count=1 "$@"
+              echo "=== Testing brandid-lint module (go1.27) ==="
+              (cd linter && PATH="$go127Bin:$PATH" go test ./... -count=1 "$@")
             '';
 
-            test-race = mkApp "test-race" [ linterGoPkg ] ''
-              echo "=== Race testing json v1 ==="
-              go test ./... -race -count=1 "$@"
-              echo "=== Race testing json v2 ==="
-              GOEXPERIMENT=jsonv2 go test ./... -race -count=1 "$@"
-              echo "=== Race testing brandid-lint module ==="
-              (cd linter && go test ./... -race -count=1 "$@")
+            test-race = mkApp "test-race" [ ] ''
+              echo "=== Race testing json v1 (go1.26) ==="
+              PATH="$go126Bin:$PATH" go test ./... -race -count=1 "$@"
+              echo "=== Race testing json v2 (go1.26) ==="
+              PATH="$go126Bin:$PATH" GOEXPERIMENT=jsonv2 go test ./... -race -count=1 "$@"
+              echo "=== Race testing brandid-lint module (go1.27) ==="
+              (cd linter && PATH="$go127Bin:$PATH" go test ./... -race -count=1 "$@")
             '';
 
-            build = mkApp "build" [ linterGoPkg ] ''
-              echo "=== Building json v1 ==="
-              go build ./...
-              echo "=== Building json v2 ==="
-              GOEXPERIMENT=jsonv2 go build ./...
-              echo "=== Building brandid-lint module ==="
-              (cd linter && go build ./...)
+            build = mkApp "build" [ ] ''
+              echo "=== Building json v1 (go1.26) ==="
+              PATH="$go126Bin:$PATH" go build ./...
+              echo "=== Building json v2 (go1.26) ==="
+              PATH="$go126Bin:$PATH" GOEXPERIMENT=jsonv2 go build ./...
+              echo "=== Building brandid-lint module (go1.27) ==="
+              (cd linter && PATH="$go127Bin:$PATH" go build ./...)
             '';
 
-            vet = mkApp "vet" [ linterGoPkg ] ''
-              go vet ./...
-              (cd linter && go vet ./...)
+            vet = mkApp "vet" [ ] ''
+              PATH="$go126Bin:$PATH" go vet ./...
+              (cd linter && PATH="$go127Bin:$PATH" go vet ./...)
             '';
 
-            lint = mkApp "lint" [ pkgs.golangci-lint linterGoPkg ] ''
-              echo "=== Linting json v1 ==="
-              golangci-lint run ./...
-              echo "=== Linting json v2 ==="
-              golangci-lint run --build-tags goexperiment.jsonv2 ./...
-              echo "=== Linting brandid-lint module ==="
-              (cd linter && golangci-lint run ./...)
+            lint = mkApp "lint" [ pkgs.golangci-lint ] ''
+              echo "=== Linting json v1 (go1.26) ==="
+              PATH="$go126Bin:$PATH" golangci-lint run ./...
+              echo "=== Linting json v2 (go1.26) ==="
+              PATH="$go126Bin:$PATH" golangci-lint run --build-tags goexperiment.jsonv2 ./...
+              echo "=== Linting brandid-lint module (go1.27) ==="
+              (cd linter && PATH="$go127Bin:$PATH" golangci-lint run ./...)
             '';
 
-            coverage = mkApp "coverage" [ linterGoPkg ] ''
-              go test ./... -coverprofile=coverage.out -covermode=atomic "$@"
-              go tool cover -func=coverage.out
+            coverage = mkApp "coverage" [ ] ''
+              PATH="$go126Bin:$PATH" go test ./... -coverprofile=coverage.out -covermode=atomic "$@"
+              PATH="$go126Bin:$PATH" go tool cover -func=coverage.out
               (cd linter \
-                && go test ./... -coverprofile="$TMPDIR/linter-coverage.out" -covermode=atomic "$@" \
-                && go tool cover -func="$TMPDIR/linter-coverage.out")
+                && PATH="$go127Bin:$PATH" go test ./... -coverprofile="$TMPDIR/linter-coverage.out" -covermode=atomic "$@" \
+                && PATH="$go127Bin:$PATH" go tool cover -func="$TMPDIR/linter-coverage.out")
             '';
 
-            clean = mkApp "clean" [ goPkg pkgs.trash-cli ] ''
+            clean = mkApp "clean" [ pkgs.trash-cli ] ''
               trash-put coverage.out 2>/dev/null || true
-              go clean -testcache
+              PATH="$go126Bin:$PATH" go clean -testcache
             '';
           };
         };

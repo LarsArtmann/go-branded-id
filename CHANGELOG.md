@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **`go.mod` daemon sweeps on release day (root fourth instance, linter re-sweep)**: pushed commit `7a970f5` re-swept `linter/go.mod` `1.27.1` → `1.27`, and the unpushed daemon commit `8262d3c` bumped root `go 1.26` → `1.27` again. Both restored before tagging (`1.26` / `1.27.1`); `scripts/check-go-pins.sh` caught the root bump locally before push — the tripwire's first in-anger catch.
 - **Untracked the unused `website/src/styles/global.out.css`**: Tailwind build output (`global.css` is the source; the Vite plugin compiles at build time) whose ~1,900-line regenerations kept landing in daemon commits. Gitignored.
 - **Removed accidental root `package.json`** (empty `npm init` boilerplate) and pointed Dependabot's npm ecosystem at `/website`, where the real manifest lives.
+- **`nix run .#test`/`#test-race`/`#build`/`#lint`/`#coverage` pinned the wrong toolchain for the root legs**: the flake apps ran everything with the dev-shell Go (1.27), under which the `goexperiment.jsonv2` build tag is default-true — the "json v1" leg either failed the `go 1.26` language gate or, on a daemon-swept `go.mod`, silently tested the v2 implementation twice. Every root leg now runs go1.26 and every linter leg go1.27, matching the flake checks and CI.
 
 ## [0.6.0] - 2026-09-17
 
