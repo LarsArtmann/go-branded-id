@@ -99,3 +99,41 @@ func TestProviderDetectorName(t *testing.T) {
 		t.Errorf("Provider.Detect.Name() = %q, want %q", got, linter.ToolName)
 	}
 }
+
+func TestProviderRepair(t *testing.T) {
+	t.Parallel()
+
+	if Provider.Repair == nil {
+		t.Fatal("Provider.Repair is nil, want a Repairer")
+	}
+
+	dir := t.TempDir()
+	src := "package repairme\n\n" +
+		"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
+		"type FixBrand struct{}\n\n" +
+		"func use() { _ = id.ID[FixBrand, string]{} }\n"
+
+	if err := os.WriteFile(filepath.Join(dir, "fix.go"), []byte(src), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+
+	result, err := Provider.Repair.Repair(
+		gofinding.WithWorkingDir(context.Background(), dir))
+	if err != nil {
+		t.Fatalf("Provider.Repair.Repair() error = %v", err)
+	}
+
+	if result.Description == "" {
+		t.Error("RepairResult.Description is empty, want an insertion summary")
+	}
+
+	content, readErr := os.ReadFile(filepath.Join(dir, "fix.go"))
+	if readErr != nil {
+		t.Fatalf("ReadFile() error = %v", readErr)
+	}
+
+	want := "func (FixBrand) Name() string { return \"Fix\" }"
+	if !strings.Contains(string(content), want) {
+		t.Errorf("repaired file misses %q:\n%s", want, content)
+	}
+}

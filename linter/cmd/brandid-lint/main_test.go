@@ -107,3 +107,69 @@ func TestRun_MissingPathExitTwo(t *testing.T) {
 		t.Errorf("run() exit code = %d, want 2", code)
 	}
 }
+
+func TestRun_FixAppliesRepairs(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	src := "package fixme\n\n" +
+		"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
+		"type FixBrand struct{}\n\n" +
+		"func use() { _ = id.ID[FixBrand, string]{} }\n"
+
+	filename := filepath.Join(dir, "fix.go")
+	if err := os.WriteFile(filename, []byte(src), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{"-fix", dir}, &stdout, &stderr)
+
+	if code != 0 {
+		t.Errorf("run() exit code = %d, want 0 (repair clears all findings)", code)
+	}
+
+	if !strings.Contains(stderr.String(), "inserted 1") {
+		t.Errorf("stderr = %q, want an insertion summary", stderr.String())
+	}
+
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		t.Fatalf("ReadFile() error = %v", err)
+	}
+
+	if want := "func (FixBrand) Name() string { return \"Fix\" }"; !strings.Contains(string(content), want) {
+		t.Errorf("repaired file misses %q:\n%s", want, content)
+	}
+}
+
+func TestRun_FixLeavesBrokenDirectivesLoud(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	src := "package fixme\n\n" +
+		"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
+		"//brandid-lint:ignore(BD001)\ntype NoReasonBrand struct{}\n\n" +
+		"func use() { _ = id.ID[NoReasonBrand, string]{} }\n"
+
+	filename := filepath.Join(dir, "noreason.go")
+	if err := os.WriteFile(filename, []byte(src), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{"-fix", dir}, &stdout, &stderr)
+
+	// The missing-reason directive yields BD002 after repair; findings
+	// remain, so the exit code stays 1.
+	if code != 1 {
+		t.Errorf("run() exit code = %d, want 1 (BD002 remains after repair)", code)
+	}
+
+	if !strings.Contains(stdout.String(), "BD002") &&
+		!strings.Contains(stdout.String(), "missing reason") {
+		t.Errorf("stdout = %q, want it to report the broken directive", stdout.String())
+	}
+}

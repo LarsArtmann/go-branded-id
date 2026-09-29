@@ -103,30 +103,30 @@ type nameStubEdit struct {
 	text   string
 }
 
-// spliceInsertions applies pure insertions to content, back to front, so no
-// edit shifts another; for grouped type declarations (identical offsets) the
-// later declaration is written first, keeping stub order aligned with
-// declaration order.
+// spliceInsertions applies pure insertions to content in ascending offset
+// order; for grouped type declarations (identical offsets) the earlier
+// declaration is written first, keeping stub order aligned with declaration
+// order.
 func spliceInsertions(content []byte, edits []nameStubEdit) []byte {
 	slices.SortFunc(edits, func(a, b nameStubEdit) int {
-		if c := cmp.Compare(b.offset, a.offset); c != 0 {
+		if c := cmp.Compare(a.offset, b.offset); c != 0 {
 			return c
 		}
 
-		return cmp.Compare(b.line, a.line)
+		return cmp.Compare(a.line, b.line)
 	})
 
 	out := make([]byte, 0, len(content)+len(edits)*64)
-	cursor := len(content)
+	prev := 0
 
 	for _, edit := range edits {
-		out = append(out, content[edit.offset:cursor]...)
+		out = append(out, content[prev:edit.offset]...)
 		out = append(out, edit.text...)
 
-		cursor = edit.offset
+		prev = edit.offset
 	}
 
-	out = append(out, content[0:cursor]...)
+	out = append(out, content[prev:]...)
 
 	return out
 }
