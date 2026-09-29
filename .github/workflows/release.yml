@@ -93,6 +93,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: [verify, lint, linter-verify]
+    # Exactly one of (verify+lint) / linter-verify runs per tag; a skipped
+    # needed job would otherwise skip this job too (GitHub treats skipped
+    # needs as neither success nor failure), so gate on no failures instead.
+    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
