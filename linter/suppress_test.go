@@ -49,7 +49,7 @@ func assertFindings(
 			tb.Errorf("findings[%d].Rule = %q, want %q", i, findings[i].Rule, rule)
 		}
 
-		if wantMessageParts[i] != "" &&
+		if len(wantMessageParts) > i && wantMessageParts[i] != "" &&
 			!strings.Contains(findings[i].Message, wantMessageParts[i]) {
 			tb.Errorf(
 				"findings[%d].Message = %q, want it to contain %q",
@@ -73,8 +73,10 @@ func TestSuppression_ValidPlacements(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name string
-		src  string
+		name             string
+		src              string
+		want             []gofinding.RuleName
+		wantMessageParts []string
 	}{
 		{
 			name: "directly above the declaration",
@@ -104,6 +106,8 @@ func TestSuppression_ValidPlacements(t *testing.T) {
 				"type Marker struct{}\n\n" +
 				"type OtherBrand struct{}\n\n" +
 				"func use() { _ = id.ID[Marker, string]{}; _ = id.ID[OtherBrand, string]{} }\n",
+			want:             []gofinding.RuleName{RuleIDBD001},
+			wantMessageParts: []string{"OtherBrand"},
 		},
 	}
 
@@ -112,7 +116,7 @@ func TestSuppression_ValidPlacements(t *testing.T) {
 			t.Parallel()
 
 			findings := detectSource(t, tt.src)
-			assertFindings(t, findings, nil, nil)
+			assertFindings(t, findings, tt.want, tt.wantMessageParts)
 		})
 	}
 }

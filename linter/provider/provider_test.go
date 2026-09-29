@@ -2,6 +2,9 @@ package provider
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/larsartmann/go-branded-id/linter"
@@ -58,8 +61,8 @@ func TestProviderRegistered(t *testing.T) {
 		t.Error("Spec.Detect is nil, want a finding.Detector")
 	}
 
-	if spec.Repair != nil {
-		t.Error("Spec.Repair is non-nil, want detector-only spec (no AST insertion yet)")
+	if spec.Repair == nil {
+		t.Error("Spec.Repair is nil, want a Repairer (AST-based Name() insertion)")
 	}
 }
 
@@ -74,8 +77,8 @@ func TestProviderDetect(t *testing.T) {
 		t.Fatalf("Spec.Detect.Detect() error = %v", err)
 	}
 
-	if len(findings) != 3 {
-		t.Fatalf("Spec.Detect() found %d findings, want 3", len(findings))
+	if len(findings) != 6 {
+		t.Fatalf("Spec.Detect() found %d findings, want 6 (4 BD001 + 2 BD002)", len(findings))
 	}
 
 	for _, f := range findings {
