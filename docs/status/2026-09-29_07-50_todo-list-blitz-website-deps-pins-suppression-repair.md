@@ -54,7 +54,7 @@
    remains; dry-run remains default). Provider registers a real toolsdk
    `Repairer` (BuildFlow measures the delta by re-running Detect, by design).
    BD001 findings now carry `FixStrategy: direct` + Before/AfterCode.
-   **Design pivot mid-task**: built against the *pinned* go-finding v1.13.0 —
+   **Design pivot mid-task**: built against the _pinned_ go-finding v1.13.0 —
    the local checkout's `TextEdit`/`WithEdits` API is 25 commits past the
    last tag and unreleased, so findings use Before/After codes and repair
    drives the same shared `fileScan` as detection (alignment proven by test:
@@ -190,6 +190,7 @@
 ## f) Up to 50 things to do next
 
 **Releases & deployment**
+
 1. Cut linter v0.2.0: bump `Version` const, date the `linter/CHANGELOG.md` section, tag `linter/v0.2.0` (signed, annotated), push tag.
 2. Cut next root release: date the CHANGELOG Unreleased section, tag `vX.Y.Z`, push tag (CI builds the GitHub Release from the section).
 3. Add the new version section to `website/src/content/docs/changelog.mdx` and run `nix run .#deploy` from `website/` (release-time step per AGENTS.md).
@@ -259,7 +260,7 @@
    deploy included), or hold until the 14-repo v0.6.0 ecosystem session so
    downstreams jump straight to the newest versions in one hop?
 2. **Daemon mitigation**: `go-mod-update` is skipped in `.buildflow.yml` yet
-   the daemon still re-bumped `linter/go.mod` twice *during* this session. Do
+   the daemon still re-bumped `linter/go.mod` twice _during_ this session. Do
    you want a local guard (pre-commit hook running `check-go-pins.sh`, or a
    periodic auto-revert loop), or is CI + pre-push enough and the root cause
    should be chased in the daemon/BuildFlow itself?
