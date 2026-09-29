@@ -4,5 +4,7 @@ minimumReleaseAgeExclude:
   - astro@7.3.3
 overrides:
   brace-expansion: "5.0.6"
-  fast-uri: "^3.1.4"
+  devalue: "^5.9.2"
+  fast-uri: "^3.1.7"
   js-yaml: "^4.3.2"
+  svgo: "^4.1.0"

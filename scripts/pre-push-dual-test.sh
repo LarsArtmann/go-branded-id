@@ -22,6 +22,14 @@ else
 	echo "  → imports ok"
 fi
 
+echo "Guarding Go version pins..."
+if bash scripts/check-go-pins.sh; then
+	echo "  → pins ok"
+else
+	echo "  → pins FAILED"
+	fail=1
+fi
+
 echo "Running dual-mode go tests..."
 
 echo "  → json v1..."

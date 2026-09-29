@@ -25,6 +25,19 @@ jobs:
             exit 1
           fi
 
+  go-pins:
+    # Asserts the three-way Go pin agreement (go.mod directive <= flake.nix
+    # go_1_2x pin, CI go-versions match the pins) for BOTH modules. Tripwire
+    # against the daemon's go-mod-update directive bumps; see
+    # scripts/check-go-pins.sh and AGENTS.md "Go Version Pins Must Move
+    # Together".
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check Go version pins
+        run: bash scripts/check-go-pins.sh
+
   build:
     runs-on: ubuntu-latest
     strategy:
