@@ -50,6 +50,9 @@ Thumbs.db
 # Build artifacts
 /go-branded-id
 /namer
+/linter/brandid-lint
+# Website build artifact (Tailwind output; global.css is the source)
+/website/src/styles/global.out.css
 # Sensitive files
 *.db
 # Nix build output
