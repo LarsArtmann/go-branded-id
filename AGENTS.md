@@ -4,32 +4,35 @@
 
 A Go library providing branded, strongly-typed identifiers using phantom types (generics). `ID[Brand, Value]` prevents mixing different entity IDs at compile time. Single package (`package id`) at repository root.
 
+The repository is **two independent Go modules**: the zero-dependency root library and `linter/` (`github.com/larsartmann/go-branded-id/linter`, the `brandid-lint` BuildFlow provider/CLI). The linter sub-module does NOT import the root module, so there is no `go.work` — each module builds standalone with `GOWORK=off`.
+
 ## Essential Commands
 
 All build/test tasks go through the Nix flake. There is no `justfile` and no `Makefile` — all automation is in `flake.nix`.
 
-Standard `go build`/`go test` commands work without any special environment variables. The library supports both `encoding/json` (v1, default) and `encoding/json/v2` (when `GOEXPERIMENT=jsonv2` is set) via build tags — see "Dual JSON v1/v2 Support" in Critical Gotchas below.
+Standard `go build`/`go test` commands work without any special environment variables — in the ROOT module. The linter module has its own floor (`go 1.27.1`, via go-finding) and its own `.golangci.yml`; `cd linter` before running plain `go` commands there. The library supports both `encoding/json` (v1, default) and `encoding/json/v2` (when `GOEXPERIMENT=jsonv2` is set) via build tags — see "Dual JSON v1/v2 Support" in Critical Gotchas below.
 
-| Command                        | Purpose                                                 |
-| ------------------------------ | ------------------------------------------------------- |
-| `nix run .#test`               | Run tests (`go test ./... -count=1`)                    |
-| `nix run .#test-race`          | Run with race detector                                  |
-| `nix run .#build`              | Build (`go build ./...`)                                |
-| `nix run .#lint`               | Run golangci-lint                                       |
-| `nix run .#vet`                | Run `go vet ./...`                                      |
-| `nix run .#coverage`           | Generate and display coverage report                    |
-| `nix run .#clean`              | Clean test cache and coverage.out                       |
-| `nix flake check`              | Run all flake checks (includes build)                   |
-| `nix fmt`                      | Format everything (gofumpt, goimports, golines, nixfmt) |
-| `go test ./... -count=1`       | Plain Go test (no Nix needed)                           |
-| `go test ./... -race -count=1` | Plain race test                                         |
+| Command                             | Purpose                                                                       |
+| ----------------------------------- | ----------------------------------------------------------------------------- |
+| `nix run .#test`                    | Run tests for BOTH modules (root in json v1 + v2, linter once)                |
+| `nix run .#test-race`               | Run with race detector (both modules)                                         |
+| `nix run .#build`                   | Build both modules                                                            |
+| `nix run .#lint`                    | Run golangci-lint (root v1+v2, then `linter/` with its own config)           |
+| `nix run .#vet`                     | Run `go vet ./...` (both modules)                                             |
+| `nix run .#coverage`                | Generate and display coverage report (both modules)                           |
+| `nix run .#clean`                   | Clean test cache and coverage.out                                             |
+| `nix flake check`                   | Run all flake checks (root build/test + linter build/test + format)           |
+| `nix fmt`                           | Format everything (gofumpt, goimports, golines, nixfmt)                       |
+| `go test ./... -count=1`            | Plain Go test in the CURRENT module (root: no Nix needed)                     |
+| `cd linter && go test ./...`        | Linter module tests (needs go ≥ 1.27.1; dev shell ships it)                   |
 
-The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.26, golangci-lint, gopls, and trash-cli.
+The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.27.1 (satisfies both module floors), golangci-lint, gopls, and trash-cli. The root checks in `nix flake check` deliberately build with `go_1_26` to enforce the root consumer floor.
 
 ## Code Organization
 
 ```
 .
+├── go.mod             # module github.com/larsartmann/go-branded-id (go 1.26, ZERO dependencies)
 ├── id.go              # Core ID type, NewID, Get, IsZero, Equal, Compare, Or, String, GoString, Format
 ├── errors.go          # Sentinel errors (ErrInvalidID, ErrNotOrdered, ErrUnsupportedType, etc.)
 ├── id_brand.go        # BrandNamer interface, BrandName, ValidateID, ValidateIDWithValue, MustValidateID
@@ -40,12 +43,19 @@ The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.26, golangci-l
 ├── id_text.go         # MarshalText / UnmarshalText (XML, TOML)
 ├── id_binary.go       # MarshalBinary / UnmarshalBinary (little-endian)
 ├── id_gob.go          # GobEncode / GobDecode (delegates to binary)
-├── cmd/namer/         # Standalone codemod tool: scans Go files for brand types missing Name() method
+├── linter/            # SEPARATE Go module: brandid-lint (see linter/go.mod, linter/CHANGELOG.md)
+│   ├── detect.go      #   Detect(ctx)/DetectPath(path) — BD001 scan over .go files
+│   ├── brands.go      #   Syntactic brand detection (empty struct + id.ID[...] type arg)
+│   ├── finding.go     #   BD001 finding construction (go-finding Builder)
+│   ├── suggest.go     #   Name() suggestion derivation
+│   ├── provider/      #   toolsdk self-registration (BuildFlow blank-imports this)
+│   ├── cmd/brandid-lint/ # CLI: text/SARIF output, exit 0/1/2
+│   └── testdata/      #   Parse-only fixtures (never compiled)
 ├── website/           # Astro + Starlight documentation website (deployed to Firebase Hosting)
 └── *_test.go          # Tests, benchmarks, fuzz tests, example tests
 ```
 
-There is no `internal/` or `pkg/` — this is intentionally a flat, single-package library.
+There is no `internal/` or `pkg/` — this is intentionally a flat, single-package library (root module).
 
 ## Architecture & Data Flow
 
@@ -141,26 +151,31 @@ Binary marshaling uses **little-endian** for all numeric types. `int` is seriali
 
 ### Go Version Pins Must Move Together (go.mod / flake.nix / CI)
 
-The Go toolchain version is pinned in **three places that must agree**: `go.mod`
-(the `go` directive), `flake.nix` (`goPkg = pkgs.go_1_26`), and
-`.github/workflows/go.yml` (`go-version`). Auto-upgraders sometimes bump only
-`go.mod`, which breaks the Nix sandbox build (`could not create module cache:
-mkdir /homeless-shelter`), local shells with `GOTOOLCHAIN=local`, and
-gopls/golangci-lint (`go.mod requires go >= ...`). If `go build ./...` fails
-with a version error while no source changed, compare `go.mod` against
-`flake.nix`. Bump all three in one deliberate commit — the `go` directive is a
-consumer-facing minimum for a library, not something to auto-bump.
+The Go toolchain version is pinned in **three places per module that must
+agree**: the module's `go` directive, `flake.nix` (`goPkg = pkgs.go_1_26` for
+the root, `linterGoPkg = pkgs.go_1_27` for the linter), and
+`.github/workflows/go.yml` (`go-version`, with `GOTOOLCHAIN=local` as
+tripwire). Auto-upgraders sometimes bump only `go.mod`, which breaks the Nix
+sandbox build (`could not create module cache: mkdir /homeless-shelter`),
+local shells with `GOTOOLCHAIN=local`, and gopls/golangci-lint (`go.mod
+requires go >= ...`). If `go build ./...` fails with a version error while no
+source changed, compare the module's `go.mod` against `flake.nix`. Bump all
+three in one deliberate commit — the `go` directive is a consumer-facing
+minimum for a library, not something to auto-bump. The root floor is `go
+1.26`; the linter floor is `go 1.27.1` (go-finding requires it).
 
 **The recurring writer is BuildFlow's `go-mod-update` step** ("Updates Go
 toolchain and dependencies"), NOT `go-auto-upgrade` (that one rewrites JSON
 imports, and was itself fixed upstream in gau v0.6.2). It bumped `go 1.26` →
 `1.27.1` twice (documented pre-v0.6.0, and again on 2026-09-17 via daemon
-commit `1acc808`, caught by CI within minutes). `go-mod-update` is in
-`skip_steps` in `.buildflow.yml` (2026-09-22: `go-auto-upgrade` was un-skipped
-after its upstream fix, so only `go-mod-update` remains skipped). The bump
-lands as a dirty file that the auto-commit daemon later sweeps into an
-unrelated commit — check `git log -p -- go.mod` when CI fails with `go.mod
-requires go >= ...`. CI is the reliable tripwire (it sets `GOTOOLCHAIN=local`).
+commit `1acc808`, caught by CI within minutes). A third instance landed via
+daemon commit `d2e3118` (2026-09-29, `1.27.1` → `1.27`) and broke root builds
+until it was restored to `1.26`. `go-mod-update` is in `skip_steps` in
+`.buildflow.yml` (2026-09-22: `go-auto-upgrade` was un-skipped after its
+upstream fix, so only `go-mod-update` remains skipped). The bump lands as a
+dirty file that the auto-commit daemon later sweeps into an unrelated commit
+— check `git log -p -- go.mod` when CI fails with `go.mod requires go >= ...`.
+CI is the reliable tripwire (root and linter jobs set `GOTOOLCHAIN=local`).
 
 ### Nix Sandbox Build Cache (GOCACHE)
 
@@ -176,7 +191,37 @@ The supported systems are declared inline in `flake.nix` (`x86_64-linux`, `aarch
 
 ### No go.work / GOWORK=off
 
-The flake explicitly sets `GOWORK=off`. This library is not part of a Go workspace.
+The flake explicitly sets `GOWORK=off`. There is deliberately no `go.work`:
+the two modules are independent (the linter does not import the root module),
+so a workspace would add nothing. Run Go commands from inside the module you
+target; `./...` from the root never sees `linter/` (own go.mod) and vice
+versa.
+
+### Two-Module Layout (root stays zero-dependency)
+
+`linter/` is a fully separate Go module (`github.com/larsartmann/go-branded-id/linter`)
+with its own go.mod, go.sum, .golangci.yml (`run.go: 1.27`, no experiment
+build-tags), CHANGELOG.md, and version tags (`linter/vX.Y.Z` — the `linter/`
+prefix is REQUIRED for sub-module tags). It depends on go-finding +
+go-finding/toolsdk. The dependency direction is load-bearing:
+
+- **The root module must NEVER depend on go-finding or on `linter/`.** The
+  root library is the zero-dependency foundation for 14+ downstream repos,
+  and the go-finding CLI itself pins go-branded-id — importing go-finding
+  from the root would invert the layering and create a module cycle.
+- The linter does NOT import the root module either (detection is purely
+  syntactic), so the modules can version independently.
+- BuildFlow integration: `linter/provider` self-registers a toolsdk Spec;
+  BuildFlow consumes it via a blank import in
+  `tools/providers/sdk_imports.go` plus a go.mod require. Tool name:
+  `brandid-lint`, rule ID: `BD001` (stable forever).
+- Known false-positive class: brands whose `String()` is a data key
+  (go-cqrs-lite `StreamMarker`/`TimerMarker`) are deliberate exceptions —
+  see "Brands That Deliberately Skip Name()" below. In-source suppression
+  support is tracked in TODO_LIST.md.
+- The root repo's own test brands (`StringBrand`, `Int64Brand`, … in
+  `*_test.go`) do not implement `Name()` and ARE reported when the linter
+  runs on this repo — expected, not a bug.
 
 ### Dual-Mode Pre-Push Hook
 
@@ -184,7 +229,7 @@ A pre-push git hook (`scripts/pre-push-dual-test.sh`) greps the v1 JSON files fo
 
 ## Ecosystem Context
 
-This library was extracted from `go-composable-business-types/id`. It has 14 downstream repos in the ecosystem. The `cmd/namer` tool was created to help migrate those repos by identifying brand types missing `Name()` methods.
+This library was extracted from `go-composable-business-types/id`. It has 14 downstream repos in the ecosystem. The former `cmd/namer` codemod was created to help migrate those repos and lives on as the `brandid-lint` CLI + BuildFlow provider in the `linter/` sub-module.
 
 When making breaking changes, consider the migration impact across:
 
@@ -192,13 +237,13 @@ When making breaking changes, consider the migration impact across:
 
 ### Brands That Deliberately Skip `Name()`
 
-Not all brand types should implement `Name()`. The `cmd/namer` tool may flag these, but they are correct as-is:
+Not all brand types should implement `Name()`. The `brandid-lint` linter may flag these, but they are correct as-is:
 
 - **go-cqrs-lite marker types** — These brands serve as event/stream type identifiers in the CQRS framework. Their `String()` output is used directly as storage keys and stream names. Adding `Name()` would change `String()` from `"TypeName"` to `"HumanReadable:TypeName"`, breaking the key format in event stores and breaking existing data.
 - **BerryBig** — Test brands only, no production impact.
 - **Cyberdom** — No brand types at all.
 
-**Rule**: If a brand's `String()` output is used as a data key (storage, stream name, routing key), do NOT add `Name()`. The `cmd/namer` tool flags them, but the flag is a false positive in this context.
+**Rule**: If a brand's `String()` output is used as a data key (storage, stream name, routing key), do NOT add `Name()`. The `brandid-lint` linter flags them, but the flag is a false positive in this context.
 
 ## Release Process
 
@@ -206,6 +251,7 @@ Not all brand types should implement `Name()`. The `cmd/namer` tool may flag the
 - Release workflow (`.github/workflows/release.yml`) runs tests with race detector + golangci-lint before creating the release.
 - **Release notes come from the CHANGELOG**: the workflow extracts the `## [X.Y.Z]` section of `CHANGELOG.md` into the release body (`body_path`), with GitHub's `generate_release_notes` appending the compare link. GitHub's generated notes alone are PR-based and nearly empty in this direct-push repo — that's why the CHANGELOG section must be cut **before** tagging. A release with no notes means the tag was pushed without a dated CHANGELOG section.
 - Tags must be signed (SSH) and annotated (`git tag -a`).
+- **The linter sub-module releases separately**: tag `linter/vX.Y.Z` (the `linter/` prefix is mandatory for sub-module tags). Cut its section in `linter/CHANGELOG.md` before tagging. Root releases (`vX.Y.Z`) and linter releases do not have to coincide.
 - **To release**: update CHANGELOG, commit, tag, push the tag: `git push origin vX.Y.Z`.
 - `git-town.toml` configures `master` as the main branch.
 - BuildFlow pre-commit hook runs the configured Go-mode checks (golangci-lint, gofumpt, goimports, statix, gitleaks, doc-files-age-check (max 3w freshness), nix-flake-check); the exact count varies with `.buildflow.yml` — run `buildflow --dry-run` for the current list.

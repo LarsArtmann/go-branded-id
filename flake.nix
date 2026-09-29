@@ -122,31 +122,21 @@
               touch $out
             '';
 
-            linter-build = pkgs.runCommand "brandid-lint-build" { nativeBuildInputs = [ linterGoPkg ]; } ''
-              export GOWORK=off
-              export GOCACHE="$TMPDIR/go-cache"
-              cp -r ${
-                lib.fileset.toSource {
-                  root = ./linter;
-                  fileset = lib.fileset.gitTracked ./linter;
-                }
-              } src && chmod -R u+w src && cd src
-              ${linterGoPkg}/bin/go build ./...
-              touch $out
-            '';
-
-            linter-test = pkgs.runCommand "brandid-lint-test" { nativeBuildInputs = [ linterGoPkg ]; } ''
-              export GOWORK=off
-              export GOCACHE="$TMPDIR/go-cache"
-              cp -r ${
-                lib.fileset.toSource {
-                  root = ./linter;
-                  fileset = lib.fileset.gitTracked ./linter;
-                }
-              } src && chmod -R u+w src && cd src
-              ${linterGoPkg}/bin/go test ./... -count=1
-              touch $out
-            '';
+            # brandid-lint: hermetic build + tests via buildGoModule (the
+            # module has dependencies, so a raw runCommand sandbox fails on
+            # the module cache). Overridden to go_1_27 because the nixpkgs
+            # default Go (1.26) is below the linter's `go 1.27.1` floor.
+            linter = pkgs.buildGoModule.override { go = linterGoPkg; } {
+              pname = "brandid-lint";
+              version = "0.1.0";
+              src = lib.fileset.toSource {
+                root = ./linter;
+                fileset = lib.fileset.gitTracked ./linter;
+              };
+              # Updated via `buildflow -s nix-hash-fix --fix` on FOD mismatch.
+              vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+              doCheck = true;
+            };
           };
 
           apps = {
