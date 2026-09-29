@@ -84,16 +84,16 @@ func main() {
 
 ## Features
 
-| Feature                      | Description                                                                                 |
-| ---------------------------- | ------------------------------------------------------------------------------------------- |
-| **Compile-time type safety** | Phantom types prevent mixing `UserID` with `OrderID` at the compiler level                  |
-| **Zero allocations**         | Core operations (`NewID`, `Get`, `Equal`, `Compare`, `IsZero`) allocate nothing             |
-| **Stdlib-only**              | No third-party dependencies. Uses only the Go standard library                              |
-| **Full serialization**       | JSON, SQL, Text (XML/TOML), Binary, Gob — all implemented                                   |
-| **Named brands**             | Optional `Name()` method enables `"User:abc123"` display strings and brand-aware validation |
-| **Any comparable type**      | `ID[Brand, V comparable]` works with strings, ints, and any comparable type                 |
-| **Zero value semantics**     | Zero value means "unset" — serializes to `null` in JSON, `nil` in SQL                       |
-| **SQL scanner/valuer**       | `Scan` accepts all driver types; `Value` returns the correct type                           |
+| Feature                      | Description                                                                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Compile-time type safety** | Phantom types prevent mixing `UserID` with `OrderID` at the compiler level                                                       |
+| **Zero allocations**         | Core operations (`NewID`, `Get`, `Equal`, `Compare`, `IsZero`) allocate nothing                                                  |
+| **Stdlib-only**              | No third-party dependencies. Uses only the Go standard library                                                                   |
+| **Full serialization**       | JSON, SQL, Text (XML/TOML), Binary, Gob — all implemented                                                                        |
+| **Named brands**             | Optional `Name()` method enables `"User:abc123"` display strings and brand-aware validation                                      |
+| **Any comparable type**      | `ID[Brand, V comparable]` works with strings, ints, and any comparable type                                                      |
+| **Zero value semantics**     | Zero value means "unset" — serializes to `null` in JSON, `nil` in SQL                                                            |
+| **SQL scanner/valuer**       | `Scan` accepts all driver types; `Value` returns the correct type                                                                |
 | **brandid-lint linter**      | [`linter/`](linter/) flags brand types missing `Name()` (rule BD001) as go-finding findings; BuildFlow provider and CLI included |
 
 ## Named Brand Types

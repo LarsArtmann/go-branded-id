@@ -12,19 +12,19 @@ All build/test tasks go through the Nix flake. There is no `justfile` and no `Ma
 
 Standard `go build`/`go test` commands work without any special environment variables — in the ROOT module. The linter module has its own floor (`go 1.27.1`, via go-finding) and its own `.golangci.yml`; `cd linter` before running plain `go` commands there. The library supports both `encoding/json` (v1, default) and `encoding/json/v2` (when `GOEXPERIMENT=jsonv2` is set) via build tags — see "Dual JSON v1/v2 Support" in Critical Gotchas below.
 
-| Command                             | Purpose                                                                       |
-| ----------------------------------- | ----------------------------------------------------------------------------- |
-| `nix run .#test`                    | Run tests for BOTH modules (root in json v1 + v2, linter once)                |
-| `nix run .#test-race`               | Run with race detector (both modules)                                         |
-| `nix run .#build`                   | Build both modules                                                            |
-| `nix run .#lint`                    | Run golangci-lint (root v1+v2, then `linter/` with its own config)           |
-| `nix run .#vet`                     | Run `go vet ./...` (both modules)                                             |
-| `nix run .#coverage`                | Generate and display coverage report (both modules)                           |
-| `nix run .#clean`                   | Clean test cache and coverage.out                                             |
-| `nix flake check`                   | Run all flake checks (root build/test + linter build/test + format)           |
-| `nix fmt`                           | Format everything (gofumpt, goimports, golines, nixfmt)                       |
-| `go test ./... -count=1`            | Plain Go test in the CURRENT module (root: no Nix needed)                     |
-| `cd linter && go test ./...`        | Linter module tests (needs go ≥ 1.27.1; dev shell ships it)                   |
+| Command                      | Purpose                                                             |
+| ---------------------------- | ------------------------------------------------------------------- |
+| `nix run .#test`             | Run tests for BOTH modules (root in json v1 + v2, linter once)      |
+| `nix run .#test-race`        | Run with race detector (both modules)                               |
+| `nix run .#build`            | Build both modules                                                  |
+| `nix run .#lint`             | Run golangci-lint (root v1+v2, then `linter/` with its own config)  |
+| `nix run .#vet`              | Run `go vet ./...` (both modules)                                   |
+| `nix run .#coverage`         | Generate and display coverage report (both modules)                 |
+| `nix run .#clean`            | Clean test cache and coverage.out                                   |
+| `nix flake check`            | Run all flake checks (root build/test + linter build/test + format) |
+| `nix fmt`                    | Format everything (gofumpt, goimports, golines, nixfmt)             |
+| `go test ./... -count=1`     | Plain Go test in the CURRENT module (root: no Nix needed)           |
+| `cd linter && go test ./...` | Linter module tests (needs go ≥ 1.27.1; dev shell ships it)         |
 
 The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.27.1 (satisfies both module floors), golangci-lint, gopls, and trash-cli. The root checks in `nix flake check` deliberately build with `go_1_26` to enforce the root consumer floor.
 
