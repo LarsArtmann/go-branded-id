@@ -153,7 +153,7 @@ func applySuppressions(
 
 	suppressed := make(map[int]bool)
 
-	var findings []gofinding.Finding
+	findings := make([]gofinding.Finding, 0, len(directives))
 
 	for i, decl := range decls {
 		findings = append(findings, directivesForDecl(decl, dirsByDecl[i], suppressed)...)
@@ -232,7 +232,7 @@ func directivesForDecl(
 
 // unplacedFindings reports directives that annotate no brand declaration.
 func unplacedFindings(unplaced []suppressionDirective) []gofinding.Finding {
-	var findings []gofinding.Finding
+	findings := make([]gofinding.Finding, 0, len(unplaced))
 
 	for _, directive := range unplaced {
 		problem := "suppresses nothing: place it on the brand declaration line " +

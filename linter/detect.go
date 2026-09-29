@@ -76,7 +76,7 @@ func walkGoFiles(path string, visit func(filename string) error) error {
 		return nil
 	}
 
-	return filepath.WalkDir(path, func(p string, entry fs.DirEntry, walkErr error) error {
+	walkErr := filepath.WalkDir(path, func(p string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return fmt.Errorf("walk %s: %w", p, walkErr)
 		}
@@ -95,6 +95,11 @@ func walkGoFiles(path string, visit func(filename string) error) error {
 
 		return visit(p)
 	})
+	if walkErr != nil {
+		return fmt.Errorf("walk %s: %w", path, walkErr)
+	}
+
+	return nil
 }
 
 // fileScan is the per-file scan result shared by detection and repair, so

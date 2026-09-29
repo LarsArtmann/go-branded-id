@@ -1,11 +1,17 @@
 ---
-title: Namer Tool
-description: Codemod CLI that finds brand types missing the Name() method.
+title: brandid-lint
+description: Linter CLI that finds brand types missing the Name() method, with in-source suppression and autofix.
 ---
 
-The `cmd/namer` tool scans Go source files for brand types (empty structs used
-as `id.ID[Brand, Value]` type arguments) that are missing the `Name() string`
-method, and generates suggested stubs.
+`brandid-lint` scans Go source files for brand types (empty structs used as
+`id.ID[Brand, Value]` type arguments) that are missing the `Name() string`
+method (rule **BD001**), and can insert the missing stubs for you.
+
+It lives in the separate `linter/` module of this repository:
+
+```bash
+go run github.com/larsartmann/go-branded-id/linter/cmd/brandid-lint@latest ./myproject/
+```
 
 ## Why
 
@@ -16,32 +22,47 @@ these by hand across a large codebase is tedious and error-prone.
 ## Usage
 
 ```bash
-# Dry-run (default): scan and print suggestions
-go run ./cmd/namer ./myproject/
+# Detect (default): scan and print findings
+brandid-lint ./myproject/
 
-# Write mode: print suggestions with write-mode note
-go run ./cmd/namer -write ./myproject/
+# Autofix: insert the suggested Name() stub for every unsuppressed finding
+brandid-lint -fix ./myproject/
 
-# Verbose
-go run ./cmd/namer -v ./myproject/
+# SARIF output for CI dashboards
+brandid-lint -format sarif ./myproject/
 ```
+
+Exit codes: `0` = clean, `1` = findings remain, `2` = invocation or runtime
+error. Detection is a dry run by default; `-fix` is the only mode that writes
+files, and it never touches suppressed brands.
 
 ## Output Format
 
 ```
-Found 3 brand types, 2 missing Name() method:
-
-  main.go:12 — UserBrand
-    → func (UserBrand) Name() string { return "User" }
-  main.go:20 — OrderBrand
-    → func (OrderBrand) Name() string { return "Order" }
-
-(dry-run — no files written)
+main.go:12:6 WARNING BD001: brand type UserBrand is used with id.ID but has no Name() string method
+  💡 func (UserBrand) Name() string { return "User" }
 ```
+
+## Suppressing a Finding
+
+Some brands deliberately skip `Name()` — for example CQRS marker types whose
+`String()` output is used directly as a storage key. Suppress the finding in
+source, where the decision lives:
+
+```go
+// brandid-lint:ignore(BD001) String() output is the stream name key
+type StreamMarker struct{}
+```
+
+The directive may sit on the declaration line or as the last line of the
+comment group directly above it. The reason is mandatory. A directive that
+cannot do its job — malformed syntax, missing reason, unknown rule, stale
+(the brand has `Name()` by now), duplicate, or annotating no declaration —
+is reported as a **BD002** finding instead of silently doing nothing.
 
 ## How It Works
 
-1. Walks `.go` files and parses the AST.
+1. Walks `.go` files (skipping `.git`, `vendor`, `node_modules`) and parses the AST.
 2. Finds `id.ID[Brand, Value]` and `ID[Brand, Value]` usages (both qualified and same-package).
 3. Checks if the brand type (must be an empty struct) has a `Name() string` method.
 4. Derives a suggested name by stripping `Brand`/`ID` suffixes and leading `T` prefix.
@@ -56,16 +77,18 @@ Found 3 brand types, 2 missing Name() method:
 | `EventBrandID` | `Event`                                             |
 | `Brand`        | `Brand` (fallback to original when result is empty) |
 
-## Limitations
+## BuildFlow Integration
 
-- AST-based file insertion is not implemented — the tool prints suggestions but does not write method stubs to files automatically.
-- Only empty-struct types used with `id.ID[...]` are flagged. Plain structs or types not used with `ID` are ignored.
+The `linter/provider` package self-registers the tool as a BuildFlow provider
+(blank-import it), so `buildflow` runs detection — and `--fix` runs repair —
+with zero orchestrator-side glue. Findings are `go-finding` values, so they
+merge with the rest of the linter stack.
 
 ## Running on This Library
 
 ```bash
-go run ./cmd/namer .
+cd linter && go run ./cmd/brandid-lint ..
 ```
 
-Brand types that intentionally skip `Name()` (e.g. CQRS marker types) will be
-flagged — this is expected. See the project AGENTS.md for guidance.
+The library's own test brands intentionally have no `Name()` method and are
+flagged — this is expected.

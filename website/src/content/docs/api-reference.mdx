@@ -93,6 +93,15 @@ Returns `id.Brand(value)` for debugging. Display format, not valid Go syntax.
 func (id ID[B, V]) GoString() string
 ```
 
+### Format
+
+Implements `fmt.Formatter`: `%v`/`%s` render like `String()`, `%#v` renders
+like `GoString()`.
+
+```go
+func (id ID[B, V]) Format(f fmt.State, verb rune)
+```
+
 ## Optional Fields
 
 ### Ptr
