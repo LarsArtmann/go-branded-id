@@ -24,16 +24,18 @@ import (
 // registry. Blank-import this package to activate it:
 //
 //	import _ "github.com/larsartmann/go-branded-id/linter/provider"
-var Provider = gofstoolsdk.Register(gofstoolsdk.Spec{ //nolint:gochecknoglobals // self-registration at import time is the toolsdk contract
-	Name:        linter.ToolName,
-	Description: "BD001: brand types used with id.ID but missing their Name() string method",
-	Trigger:     gofstoolsdk.OnGoModule(),
-	DependsOn:   nil,
-	// Brands are a per-Go-module concept: fan out so findings paths are
-	// module-relative and monorepos get one run per module.
-	ModuleFanOut: true,
-	Inputs:       []string{"**/*.go"},
-	Detect:       gofinding.NamedDetectorFunc(linter.ToolName, linter.Detect),
-	Repair:       nil,
-	HealthCheck:  nil,
-})
+var Provider = gofstoolsdk.Register(
+	gofstoolsdk.Spec{ //nolint:gochecknoglobals // self-registration at import time is the toolsdk contract
+		Name:        linter.ToolName,
+		Description: "BD001: brand types used with id.ID but missing their Name() string method",
+		Trigger:     gofstoolsdk.OnGoModule(),
+		DependsOn:   nil,
+		// Brands are a per-Go-module concept: fan out so findings paths are
+		// module-relative and monorepos get one run per module.
+		ModuleFanOut: true,
+		Inputs:       []string{"**/*.go"},
+		Detect:       gofinding.NamedDetectorFunc(linter.ToolName, linter.Detect),
+		Repair:       nil,
+		HealthCheck:  nil,
+	},
+)

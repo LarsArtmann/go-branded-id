@@ -66,7 +66,7 @@ func collectBrandDecls(
 				Line:     pos.Line,
 				Column:   pos.Column,
 				Offset:   pos.Offset,
-				HasName:  hasName[ts.Name.Name] != "" &&
+				HasName: hasName[ts.Name.Name] != "" &&
 					hasName[ts.Name.Name] != methodNamePlaceholder,
 			})
 		}
@@ -212,6 +212,7 @@ func isNameMethod(fn *ast.FuncDecl) (string, bool) {
 	}
 
 	recv := fn.Recv.List[0].Type
+
 	typeName := typeNameFromExpr(recv)
 	if typeName == "" {
 		return "", false

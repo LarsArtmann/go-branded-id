@@ -11,7 +11,13 @@ import (
 
 // assertBD001 asserts the identity, classification, and fix fields of one
 // BD001 finding.
-func assertBD001(tb testing.TB, f gofinding.Finding, wantFile string, wantLine int, wantType string) {
+func assertBD001(
+	tb testing.TB,
+	f gofinding.Finding,
+	wantFile string,
+	wantLine int,
+	wantType string,
+) {
 	tb.Helper()
 
 	if f.Rule != RuleIDBD001 {

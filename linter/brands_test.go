@@ -97,7 +97,7 @@ func TestBrandTypeArgsFromFile(t *testing.T) {
 			t.Parallel()
 
 			f := parseSource(t, token.NewFileSet(), tt.src)
-		got := brandTypeArgsFromFile(f)
+			got := brandTypeArgsFromFile(f)
 
 			if len(got) != len(tt.want) {
 				t.Fatalf("brandTypeArgsFromFile() found %d brands, want %d", len(got), len(tt.want))

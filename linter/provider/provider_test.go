@@ -24,7 +24,11 @@ func findProviderSpec(tb testing.TB) gofstoolsdk.Spec {
 	}
 
 	if len(found) != 1 {
-		tb.Fatalf("toolsdk registry holds %d specs named %q, want exactly 1", len(found), linter.ToolName)
+		tb.Fatalf(
+			"toolsdk registry holds %d specs named %q, want exactly 1",
+			len(found),
+			linter.ToolName,
+		)
 	}
 
 	return found[0]

@@ -41,13 +41,13 @@ func DetectPath(path string) ([]gofinding.Finding, error) {
 
 	var findings []gofinding.Finding
 
-	walkErr := filepath.WalkDir(path, func(p string, d fs.DirEntry, err error) error {
+	walkErr := filepath.WalkDir(path, func(p string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk %s: %w", p, err)
 		}
 
-		if d.IsDir() {
-			if skipDir(d.Name()) && p != path {
+		if entry.IsDir() {
+			if skipDir(entry.Name()) && p != path {
 				return filepath.SkipDir
 			}
 
@@ -91,7 +91,7 @@ func detectFile(filename string) ([]gofinding.Finding, error) {
 
 	f, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
-		return nil, nil //nolint:nilnil // unparseable files are skipped by design
+		return nil, nil //nolint:nilerr,nilnil // unparseable files are skipped by design
 	}
 
 	var findings []gofinding.Finding

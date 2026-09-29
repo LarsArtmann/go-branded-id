@@ -11,6 +11,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -20,6 +21,11 @@ import (
 
 	"github.com/larsartmann/go-branded-id/linter"
 )
+
+// errUnknownFormat is the sentinel for an unsupported -format value.
+var errUnknownFormat = errors.New(
+	"unknown format: want text or sarif",
+) //nolint:gochecknoglobals // package-level sentinel error
 
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
@@ -84,7 +90,11 @@ func detectAll(paths []string) ([]gofinding.Finding, error) {
 func printFindings(w io.Writer, findings []gofinding.Finding, format string) error {
 	switch format {
 	case "text":
-		return gofinding.FormatTextRich(w, findings)
+		if err := gofinding.FormatTextRich(w, findings); err != nil {
+			return fmt.Errorf("format text: %w", err)
+		}
+
+		return nil
 	case "sarif":
 		report := gofinding.NewReportFromFindings(
 			gofinding.ToolInfo{Name: linter.ToolName, Version: linter.Version},
@@ -96,18 +106,23 @@ func printFindings(w io.Writer, findings []gofinding.Finding, format string) err
 			return fmt.Errorf("render sarif: %w", err)
 		}
 
-		_, err = w.Write(sarif)
+		if _, err := w.Write(sarif); err != nil {
+			return fmt.Errorf("write sarif: %w", err)
+		}
 
-		return err
+		return nil
 	default:
-		return fmt.Errorf("unknown format %q: want \"text\" or \"sarif\"", format)
+		return fmt.Errorf("%w: %q", errUnknownFormat, format)
 	}
 }
 
 func printUsage(w io.Writer, flagSet *flag.FlagSet) {
 	_, _ = fmt.Fprintf(w, "Usage: %s [flags] <path>...\n", linter.ToolName)
 	_, _ = fmt.Fprintln(w, "")
-	_, _ = fmt.Fprintln(w, "Scans Go files for brand types missing their Name() string method (BD001).")
+	_, _ = fmt.Fprintln(
+		w,
+		"Scans Go files for brand types missing their Name() string method (BD001).",
+	)
 	_, _ = fmt.Fprintln(w, "Exit codes: 0 = clean, 1 = findings, 2 = error.")
 	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(w, "Flags:")
