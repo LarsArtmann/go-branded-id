@@ -63,7 +63,7 @@ export default defineConfig({
 						{ label: "Error Handling", slug: "guides/error-handling" },
 						{ label: "Value Types", slug: "guides/value-types" },
 						{ label: "Performance", slug: "guides/performance" },
-						{ label: "brandid-lint", slug: "guides/namer-tool" },
+						{ label: "brandid-lint", slug: "guides/brandid-lint" },
 					],
 				},
 				{

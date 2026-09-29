@@ -188,6 +188,13 @@ upstream fix, so only `go-mod-update` remains skipped). The bump lands as a
 dirty file that the auto-commit daemon later sweeps into an unrelated commit
 — check `git log -p -- go.mod` when CI fails with `go.mod requires go >= ...`.
 CI is the reliable tripwire (root and linter jobs set `GOTOOLCHAIN=local`).
+**Fourth instance (release day, 2026-09-29)**: unpushed daemon commit
+`8262d3c` bumped root `1.26` → `1.27`, and pushed `7a970f5` re-swept
+`linter/go.mod` `1.27.1` → `1.27` — despite `go-mod-update` still being in
+`skip_steps`, so the writer is unidentified (remaining suspect:
+`go-auto-upgrade`'s directive bump; check the BuildFlow audit-log if it
+recurs). Both restored before tagging; `scripts/check-go-pins.sh` caught the
+root bump locally pre-push — the tripwire's first in-anger catch.
 
 ### Nix Sandbox Build Cache (GOCACHE)
 
@@ -268,7 +275,7 @@ Not all brand types should implement `Name()`. Suppress the BD001 finding in sou
 - Release workflow (`.github/workflows/release.yml`) runs tests with race detector + golangci-lint before creating the release.
 - **Release notes come from the CHANGELOG**: the workflow extracts the `## [X.Y.Z]` section of `CHANGELOG.md` into the release body (`body_path`), with GitHub's `generate_release_notes` appending the compare link. GitHub's generated notes alone are PR-based and nearly empty in this direct-push repo — that's why the CHANGELOG section must be cut **before** tagging. A release with no notes means the tag was pushed without a dated CHANGELOG section.
 - Tags must be signed (SSH) and annotated (`git tag -a`).
-- **The linter sub-module releases separately**: tag `linter/vX.Y.Z` (the `linter/` prefix is mandatory for sub-module tags). Cut its section in `linter/CHANGELOG.md` before tagging. Root releases (`vX.Y.Z`) and linter releases do not have to coincide.
+- **The linter sub-module releases separately**: tag `linter/vX.Y.Z` (the `linter/` prefix is mandatory for sub-module tags). Cut its section in `linter/CHANGELOG.md` before tagging. Root releases (`vX.Y.Z`) and linter releases do not have to coincide. Since `linter/v0.2.0`, `release.yml` matches `linter/v*` tags, verifies the sub-module (`linter-verify` job, Go 1.27 + `GOTOOLCHAIN=local`) and creates the GitHub Release from the `linter/CHANGELOG.md` section automatically — `linter/v0.1.0` predates this and has no release page. The CI hygiene job rejects tracked binaries ANYWHERE in the repo (a 7.6 MB `linter/brandid-lint` binary slipped past the old repo-root-only scan on 2026-09-29; `linter/brandid-lint` is gitignored).
 - **To release**: update CHANGELOG, commit, tag, push the tag: `git push origin vX.Y.Z`.
 - `git-town.toml` configures `master` as the main branch.
 - BuildFlow pre-commit hook runs the configured Go-mode checks (golangci-lint, gofumpt, goimports, statix, gitleaks, doc-files-age-check (max 3w freshness), nix-flake-check); the exact count varies with `.buildflow.yml` — run `buildflow --dry-run` for the current list.
