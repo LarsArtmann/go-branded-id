@@ -3,6 +3,23 @@ title: Changelog
 description: All notable changes to go-branded-id.
 ---
 
+## [0.7.0] — 2026-09-29
+
+### Changed
+
+- **`cmd/namer` moved out of the root module**: the migration codemod lives on as the `brandid-lint` CLI inside the new `linter/` sub-module (released separately as `linter/vX.Y.Z`). The root module is a pure library again — zero dependencies, no commands. Use [`brandid-lint`](/guides/brandid-lint/) instead of `cmd/namer`.
+- Released alongside **`linter/v0.2.0`**: rule `BD002` (broken suppression directives), `Name()`-stub autofix (`-fix`), and a BuildFlow Repairer — see the [brandid-lint guide](/guides/brandid-lint/).
+
+### Added
+
+- `SECURITY.md`, a Go-pins consistency tripwire (CI + pre-push), and GitHub Releases for `linter/` tags.
+- `ErrMarshal`/`ErrUnmarshal` delegate-path test coverage (library statement coverage 85.6% → 88.5%).
+
+### Fixed
+
+- Removed a tracked 7.6 MB `linter/brandid-lint` binary (v0.5.0 `namer`-incident class); the CI artifact guard now scans all tracked files, not just the repo root.
+- Two more daemon `go.mod` sweeps repaired (root → `1.26`, linter → `1.27.1`); website dependency advisories cleared.
+
 ## [0.6.0] — 2026-09-17
 
 ### Added
@@ -32,7 +49,7 @@ description: All notable changes to go-branded-id.
 
 ### Added
 
-- **`cmd/namer` codemod tool**: CLI that scans Go source for brand types missing the `Name()` method and generates suggested stubs. See the [Namer Tool guide](/guides/namer-tool/).
+- **`cmd/namer` codemod tool**: CLI that scans Go source for brand types missing the `Name()` method and generates suggested stubs. (Removed in 0.7.0 — its successor is the [`brandid-lint` CLI](/guides/brandid-lint/).)
 - **Dual JSON v1/v2 support**: The library now works with both `encoding/json` (default) and `encoding/json/v2` (via build tags). No `GOEXPERIMENT` required.
 - **Sentinel errors**: All ID operations return wrapped sentinel errors (`ErrInvalidID`, `ErrNotOrdered`, `ErrUnsupportedType`, `ErrCannotScan`, `ErrInsufficientData`, `ErrInternal`, `ErrNilReceiver`). Use `errors.Is()` to branch on error category. See the [Error Handling guide](/guides/error-handling/).
 

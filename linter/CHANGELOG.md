@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Nothing yet.
+
+## [0.2.0] - 2026-09-29
+
+### Added
+
 - **BD002 — broken suppression directives stay loud**: brands that
   deliberately skip `Name()` (e.g. CQRS marker types whose `String()` output
   is a storage key) are suppressed in source with
@@ -51,4 +57,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   findings as text or SARIF. Exit codes: 0 clean, 1 findings, 2 error.
 - Skips `.git`, `vendor`, and `node_modules` directories; scans test files.
 
+[0.2.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.2.0
 [0.1.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.1.0
