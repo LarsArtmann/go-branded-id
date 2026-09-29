@@ -122,6 +122,8 @@ The `goexperiment.jsonv2` build tag is set automatically by the Go toolchain whe
 
 **If the v1 build ever breaks again** with `build constraints exclude all Go files in encoding/json/v2`, the imports in `id_json_v1.go` / `json_helpers_v1_test.go` have been rewritten to `"encoding/json/v2"` — change them back to `"encoding/json"` and confirm `go build ./...` (no GOEXPERIMENT) passes. The pre-push hook greps these imports before running tests, so a push with corrupted imports fails fast with a clear message.
 
+**Dev-shell gotcha (Go 1.27.1 + root module floor `go 1.26`)**: inside `nix develop`, plain `go vet`/`go test ./...` on the ROOT module fails with `json.Marshal requires go1.27 or later (module is go1.26)` — in Go 1.27 the `goexperiment.jsonv2` tag is default-true, so the v2 files compile, but their API is language-version-gated above the module's `go 1.26` directive. Use `GOEXPERIMENT=jsonv2 go test ./...` in the dev shell (or run root tests outside it with ambient Go 1.26.x). `go build ./...` is unaffected; CI and the flake apps orchestrate versions explicitly and are green. Do NOT "fix" this by raising the root `go` directive.
+
 ### String() vs Get() — Know the Difference
 
 `String()` changed behavior in v0.3.0. For named brands it now returns `"Brand:value"`. **Serialization never uses String()** — it always uses `valueString()` internally. But if _user code_ was parsing `String()` output, it will break after adding `Name()` to a brand.
