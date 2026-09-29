@@ -134,7 +134,7 @@
                 fileset = lib.fileset.gitTracked ./linter;
               };
               # Updated via `buildflow -s nix-hash-fix --fix` on FOD mismatch.
-              vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+              vendorHash = "sha256-yJthhxpaCCvV4ReqHwGbh6OkJEQ5IiUQ2PMcAJeF3gY=";
               doCheck = true;
             };
           };
