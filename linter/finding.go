@@ -15,8 +15,8 @@ func nameStub(typeName string) string {
 
 // findingForBrand converts an unnamed brand declaration into a BD001 finding
 // positioned at the type declaration, where the fix (adding Name) lands. The
-// finding carries the fix as a typed insertion edit after the enclosing
-// declaration, so consumers can apply it without string matching.
+// fix is machine-applicable: BeforeCode/AfterCode carry the stub insertion
+// that Repair applies, keyed to the declaration this finding anchors.
 func findingForBrand(b BrandDecl) gofinding.Finding {
 	stub := nameStub(b.TypeName)
 	before := fmt.Sprintf("type %s struct{}", b.TypeName)
@@ -42,11 +42,6 @@ func findingForBrand(b BrandDecl) gofinding.Finding {
 		WithFixStrategy(gofinding.FixStrategyDirect).
 		WithBeforeCode(before).
 		WithAfterCode(before + "\n\n" + stub).
-		WithEdits(gofinding.TextEdit{
-			Start:   gofinding.Position{Offset: b.DeclEnd},
-			End:     gofinding.Position{Offset: -1},
-			NewText: "\n\n" + stub,
-		}).
 		MustBuild()
 }
 

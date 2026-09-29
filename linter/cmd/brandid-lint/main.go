@@ -106,6 +106,23 @@ func detectAll(paths []string) ([]gofinding.Finding, error) {
 	return findings, nil
 }
 
+// repairAll applies the BD001 repair to every path and returns the number of
+// inserted Name() stubs.
+func repairAll(paths []string) (int, error) {
+	inserted := 0
+
+	for _, path := range paths {
+		count, err := linter.RepairPath(path)
+		if err != nil {
+			return inserted, fmt.Errorf("repair %s: %w", path, err)
+		}
+
+		inserted += count
+	}
+
+	return inserted, nil
+}
+
 // printFindings writes findings in the requested format.
 func printFindings(w io.Writer, findings []gofinding.Finding, format string) error {
 	switch format {
