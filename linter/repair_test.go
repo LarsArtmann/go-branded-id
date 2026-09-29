@@ -138,7 +138,7 @@ func TestRepairPath_SkipsSuppressedAndNamedBrands(t *testing.T) {
 
 	src := "package x\n\n" +
 		"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
-		"//brandid-lint:ignore(BD001) String() output is a data key\n" +
+		"// brandid-lint:ignore(BD001) String() output is a data key\n" +
 		"type Marker struct{}\n\n" +
 		"type NamedBrand struct{}\n\n" +
 		"func (NamedBrand) Name() string { return \"Named\" }\n\n" +
@@ -159,10 +159,13 @@ func TestRepairPath_SkipsSuppressedAndNamedBrands(t *testing.T) {
 		t.Error("repaired content misses the PlainBrand stub")
 	}
 
-	for _, unwanted := range []string{"func (Marker) Name()", "func (NamedBrand) Name()"} {
-		if strings.Contains(content, unwanted) {
-			t.Errorf("repaired content must not contain %q", unwanted)
-		}
+	// Marker must gain no method at all; NamedBrand already has exactly one.
+	if strings.Contains(content, "func (Marker) Name()") {
+		t.Error("repaired content must not contain a Marker stub (suppressed)")
+	}
+
+	if got := strings.Count(content, "func (NamedBrand) Name()"); got != 1 {
+		t.Errorf("NamedBrand has %d Name() methods, want exactly the pre-existing 1", got)
 	}
 
 	assertGofmtStable(t, content)
@@ -175,7 +178,7 @@ func TestRepairPath_GroupedTypeBlock(t *testing.T) {
 		"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
 		"type (\n" +
 		"	AlphaBrand struct{}\n" +
-		"	BetaBrand struct{}\n" +
+		"	BetaBrand  struct{}\n" +
 		")\n\n" +
 		"func use() {\n" +
 		"	_ = id.ID[AlphaBrand, string]{}\n" +
@@ -213,13 +216,14 @@ func TestRepairPath_EdgeWhitespace(t *testing.T) {
 			name: "declaration at EOF without trailing newline",
 			src: "package x\n\n" +
 				"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
+				"func use() { _ = id.ID[UserBrand, string]{} }\n\n" +
 				"type UserBrand struct{}",
 		},
 		{
-			name: "blank line already follows the declaration",
+			name: "one blank line already follows the declaration",
 			src: "package x\n\n" +
 				"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
-				"type UserBrand struct{}\n\n\n" +
+				"type UserBrand struct{}\n\n" +
 				"func use() { _ = id.ID[UserBrand, string]{} }\n",
 		},
 		{

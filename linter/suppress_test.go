@@ -172,11 +172,20 @@ func TestSuppression_BrokenDirectivesStayLoud(t *testing.T) {
 			wantMessageParts: []string{"is stale"},
 		},
 		{
-			name: "duplicate directive is redundant",
+			name: "stacked directives: only the last line of the group associates",
 			src: "package x\n\nimport id \"github.com/larsartmann/go-branded-id\"\n\n" +
 				"//brandid-lint:ignore(BD001) reason one\n" +
 				"//brandid-lint:ignore(BD001) reason two\n" +
 				"type Marker struct{}\n\n" +
+				"func use() { _ = id.ID[Marker, string]{} }\n",
+			want:             []gofinding.RuleName{RuleIDBD002},
+			wantMessageParts: []string{"suppresses nothing"},
+		},
+		{
+			name: "above and trailing directive on the same declaration is redundant",
+			src: "package x\n\nimport id \"github.com/larsartmann/go-branded-id\"\n\n" +
+				"//brandid-lint:ignore(BD001) reason above\n" +
+				"type Marker struct{} //brandid-lint:ignore(BD001) reason trailing\n\n" +
 				"func use() { _ = id.ID[Marker, string]{} }\n",
 			want:             []gofinding.RuleName{RuleIDBD002},
 			wantMessageParts: []string{"is redundant"},
@@ -249,10 +258,10 @@ func TestSuppression_BD002FindingShape(t *testing.T) {
 		t.Errorf("Confidence = %v, want %v", directive.Confidence, gofinding.ConfidenceHigh)
 	}
 
-	// The BD002 finding is positioned at the directive comment (line 6), not
-	// at the brand declaration (line 7).
-	if directive.Position.Line != 6 {
-		t.Errorf("Position.Line = %d, want 6 (the directive line)", directive.Position.Line)
+	// The BD002 finding is positioned at the directive comment (line 5), not
+	// at the brand declaration (line 6).
+	if directive.Position.Line != 5 {
+		t.Errorf("Position.Line = %d, want 5 (the directive line)", directive.Position.Line)
 	}
 
 	if want := "//brandid-lint:ignore(BD001)"; directive.Snippet != want {
