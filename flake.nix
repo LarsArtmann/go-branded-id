@@ -122,35 +122,31 @@
               touch $out
             '';
 
-            linter-build = pkgs.runCommand "brandid-lint-build"
-              { nativeBuildInputs = [ linterGoPkg ]; }
-              ''
-                export GOWORK=off
-                export GOCACHE="$TMPDIR/go-cache"
-                cp -r ${
-                  lib.fileset.toSource {
-                    root = ./linter;
-                    fileset = lib.fileset.gitTracked ./linter;
-                  }
-                } src && chmod -R u+w src && cd src
-                ${linterGoPkg}/bin/go build ./...
-                touch $out
-              '';
+            linter-build = pkgs.runCommand "brandid-lint-build" { nativeBuildInputs = [ linterGoPkg ]; } ''
+              export GOWORK=off
+              export GOCACHE="$TMPDIR/go-cache"
+              cp -r ${
+                lib.fileset.toSource {
+                  root = ./linter;
+                  fileset = lib.fileset.gitTracked ./linter;
+                }
+              } src && chmod -R u+w src && cd src
+              ${linterGoPkg}/bin/go build ./...
+              touch $out
+            '';
 
-            linter-test = pkgs.runCommand "brandid-lint-test"
-              { nativeBuildInputs = [ linterGoPkg ]; }
-              ''
-                export GOWORK=off
-                export GOCACHE="$TMPDIR/go-cache"
-                cp -r ${
-                  lib.fileset.toSource {
-                    root = ./linter;
-                    fileset = lib.fileset.gitTracked ./linter;
-                  }
-                } src && chmod -R u+w src && cd src
-                ${linterGoPkg}/bin/go test ./... -count=1
-                touch $out
-              '';
+            linter-test = pkgs.runCommand "brandid-lint-test" { nativeBuildInputs = [ linterGoPkg ]; } ''
+              export GOWORK=off
+              export GOCACHE="$TMPDIR/go-cache"
+              cp -r ${
+                lib.fileset.toSource {
+                  root = ./linter;
+                  fileset = lib.fileset.gitTracked ./linter;
+                }
+              } src && chmod -R u+w src && cd src
+              ${linterGoPkg}/bin/go test ./... -count=1
+              touch $out
+            '';
           };
 
           apps = {
