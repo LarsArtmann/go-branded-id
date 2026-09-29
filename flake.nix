@@ -40,7 +40,13 @@
           ...
         }:
         let
+          # Root module floor: go.mod says `go 1.26` — the consumer-facing
+          # minimum. Root checks build with exactly this toolchain as tripwire.
           goPkg = pkgs.go_1_26;
+
+          # Linter module floor: linter/go.mod says `go 1.27.1` (it depends on
+          # go-finding, which requires 1.27.1).
+          linterGoPkg = pkgs.go_1_27;
 
           mkApp = name: runtimeInputs: text: {
             type = "app";
@@ -60,8 +66,11 @@
 
           checks.format = config.treefmt.build.check self;
           devShells.default = pkgs.mkShellNoCC {
+            # Newest toolchain first: `go` resolves to 1.27.1, which satisfies
+            # both module floors (1.26 root, 1.27.1 linter) so gopls works in
+            # either directory. The checks below pin the true floors.
             packages = [
-              goPkg
+              linterGoPkg
               pkgs.golangci-lint
               pkgs.gopls
               pkgs.trash-cli
@@ -77,6 +86,7 @@
           devShells.ci = pkgs.mkShellNoCC {
             packages = [
               goPkg
+              linterGoPkg
               pkgs.golangci-lint
             ];
 
@@ -111,44 +121,86 @@
               GOEXPERIMENT=jsonv2 ${goPkg}/bin/go test ./... -count=1
               touch $out
             '';
+
+            linter-build = pkgs.runCommand "brandid-lint-build"
+              { nativeBuildInputs = [ linterGoPkg ]; }
+              ''
+                export GOWORK=off
+                export GOCACHE="$TMPDIR/go-cache"
+                cp -r ${
+                  lib.fileset.toSource {
+                    root = ./linter;
+                    fileset = lib.fileset.gitTracked ./linter;
+                  }
+                } src && chmod -R u+w src && cd src
+                ${linterGoPkg}/bin/go build ./...
+                touch $out
+              '';
+
+            linter-test = pkgs.runCommand "brandid-lint-test"
+              { nativeBuildInputs = [ linterGoPkg ]; }
+              ''
+                export GOWORK=off
+                export GOCACHE="$TMPDIR/go-cache"
+                cp -r ${
+                  lib.fileset.toSource {
+                    root = ./linter;
+                    fileset = lib.fileset.gitTracked ./linter;
+                  }
+                } src && chmod -R u+w src && cd src
+                ${linterGoPkg}/bin/go test ./... -count=1
+                touch $out
+              '';
           };
 
           apps = {
-            test = mkApp "test" [ goPkg ] ''
+            test = mkApp "test" [ linterGoPkg ] ''
               echo "=== Testing json v1 ==="
               go test ./... -count=1 "$@"
               echo "=== Testing json v2 ==="
               GOEXPERIMENT=jsonv2 go test ./... -count=1 "$@"
+              echo "=== Testing brandid-lint module ==="
+              (cd linter && go test ./... -count=1 "$@")
             '';
 
-            test-race = mkApp "test-race" [ goPkg ] ''
+            test-race = mkApp "test-race" [ linterGoPkg ] ''
               echo "=== Race testing json v1 ==="
               go test ./... -race -count=1 "$@"
               echo "=== Race testing json v2 ==="
               GOEXPERIMENT=jsonv2 go test ./... -race -count=1 "$@"
+              echo "=== Race testing brandid-lint module ==="
+              (cd linter && go test ./... -race -count=1 "$@")
             '';
 
-            build = mkApp "build" [ goPkg ] ''
+            build = mkApp "build" [ linterGoPkg ] ''
               echo "=== Building json v1 ==="
               go build ./...
               echo "=== Building json v2 ==="
               GOEXPERIMENT=jsonv2 go build ./...
+              echo "=== Building brandid-lint module ==="
+              (cd linter && go build ./...)
             '';
 
-            vet = mkApp "vet" [ goPkg ] ''
+            vet = mkApp "vet" [ linterGoPkg ] ''
               go vet ./...
+              (cd linter && go vet ./...)
             '';
 
-            lint = mkApp "lint" [ pkgs.golangci-lint ] ''
+            lint = mkApp "lint" [ pkgs.golangci-lint linterGoPkg ] ''
               echo "=== Linting json v1 ==="
               golangci-lint run ./...
               echo "=== Linting json v2 ==="
               golangci-lint run --build-tags goexperiment.jsonv2 ./...
+              echo "=== Linting brandid-lint module ==="
+              (cd linter && golangci-lint run ./...)
             '';
 
-            coverage = mkApp "coverage" [ goPkg ] ''
+            coverage = mkApp "coverage" [ linterGoPkg ] ''
               go test ./... -coverprofile=coverage.out -covermode=atomic "$@"
               go tool cover -func=coverage.out
+              (cd linter \
+                && go test ./... -coverprofile="$TMPDIR/linter-coverage.out" -covermode=atomic "$@" \
+                && go tool cover -func="$TMPDIR/linter-coverage.out")
             '';
 
             clean = mkApp "clean" [ goPkg pkgs.trash-cli ] ''

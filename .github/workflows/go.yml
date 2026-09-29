@@ -42,6 +42,7 @@ jobs:
         run: go build ./...
         env:
           GOEXPERIMENT: ${{ matrix.mode == 'v2' && 'jsonv2' || '' }}
+          GOTOOLCHAIN: local
 
   test:
     runs-on: ubuntu-latest
@@ -60,6 +61,38 @@ jobs:
         run: go test ./... -race -count=1 -cover
         env:
           GOEXPERIMENT: ${{ matrix.mode == 'v2' && 'jsonv2' || '' }}
+          GOTOOLCHAIN: local
+
+  linter-build:
+    # brandid-lint sub-module (linter/go.mod requires go 1.27.1 via go-finding).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27"
+
+      - name: Build brandid-lint
+        run: go build ./...
+        working-directory: linter
+        env:
+          GOTOOLCHAIN: local
+
+  linter-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27"
+
+      - name: Test brandid-lint
+        run: go test ./... -race -count=1 -cover
+        working-directory: linter
+        env:
+          GOTOOLCHAIN: local
 
   lint:
     runs-on: ubuntu-latest
@@ -82,6 +115,21 @@ jobs:
         with:
           version: latest
           args: ${{ matrix.mode == 'v2' && '--build-tags goexperiment.jsonv2' || '' }}
+
+  linter-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27"
+
+      - name: golangci-lint (brandid-lint)
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: latest
+          working-directory: linter
 
   flake-check:
     runs-on: ubuntu-latest
