@@ -24,39 +24,76 @@ func Repair(ctx context.Context) (int, error) {
 }
 
 // RepairPath scans path and inserts the suggested Name() stub after every
-// unsuppressed brand declaration flagged by BD001, one stub per finding. It
+// unsuppressed brand declaration flagged by BD001, one stub per brand. It
 // returns the number of applied insertions. Suppressed brands are never
 // touched — a documented exception must stay an exception — and repair is
 // idempotent: brands that already have Name() produce no finding, so a
 // second run inserts nothing.
 func RepairPath(path string) (int, error) {
-	findings, err := DetectPath(path)
-	if err != nil {
-		return 0, fmt.Errorf("detect %s: %w", path, err)
+	inserted := 0
+
+	walkErr := walkGoFiles(path, func(filename string) error {
+		count, repairErr := repairFile(filename)
+		if repairErr != nil {
+			return fmt.Errorf("repair %s: %w", filename, repairErr)
+		}
+
+		inserted += count
+
+		return nil
+	})
+	if walkErr != nil {
+		return inserted, walkErr
 	}
 
-	byFile := make(map[gofinding.FilePath][]gofinding.Finding)
+	return inserted, nil
+}
 
-	for _, f := range findings {
-		if f.Rule != RuleIDBD001 || len(f.Edits) == 0 {
+// repairFile inserts Name() stubs into one file for every unsuppressed,
+// still-unnamed brand declaration. It returns the number of insertions.
+func repairFile(filename string) (int, error) {
+	scan := scanFile(filename)
+
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return 0, fmt.Errorf("read file: %w", err)
+	}
+
+	edits := make([]nameStubEdit, 0, len(scan.decls))
+
+	for _, decl := range scan.decls {
+		if decl.HasName || scan.suppressed[decl.Offset] {
 			continue
 		}
 
-		byFile[f.Position.File] = append(byFile[f.Position.File], f)
-	}
-
-	total := 0
-
-	for file, fileFindings := range byFile {
-		applied, err := applyNameStubs(file, fileFindings)
-		if err != nil {
-			return total, fmt.Errorf("repair %s: %w", file, err)
+		if decl.DeclEnd < 0 || decl.DeclEnd > len(content) {
+			return 0, fmt.Errorf(
+				"brand %s: insertion offset %d outside file bounds [0, %d]",
+				decl.TypeName, decl.DeclEnd, len(content),
+			)
 		}
 
-		total += applied
+		edits = append(edits, nameStubEdit{
+			offset: decl.DeclEnd,
+			line:   decl.Line,
+			text:   completeInsertion(string(content), decl.DeclEnd, "\n\n"+nameStub(decl.TypeName)),
+		})
 	}
 
-	return total, nil
+	if len(edits) == 0 {
+		return 0, nil
+	}
+
+	mode := os.FileMode(0o644)
+	if info, statErr := os.Stat(filename); statErr == nil {
+		mode = info.Mode().Perm()
+	}
+
+	if err := os.WriteFile(filename, spliceInsertions(content, edits), mode); err != nil {
+		return 0, fmt.Errorf("write file: %w", err)
+	}
+
+	return len(edits), nil
 }
 
 // nameStubEdit is one pending byte-level insertion.
@@ -66,34 +103,11 @@ type nameStubEdit struct {
 	text   string
 }
 
-// applyNameStubs inserts one stub per finding into a single file. Insertions
-// are applied in memory, back to front, so no edit shifts another; for
-// grouped type declarations (identical offsets) the later declaration is
-// written first, keeping stub order aligned with declaration order.
-func applyNameStubs(file gofinding.FilePath, findings []gofinding.Finding) (int, error) {
-	content, err := os.ReadFile(string(file))
-	if err != nil {
-		return 0, fmt.Errorf("read file: %w", err)
-	}
-
-	edits := make([]nameStubEdit, 0, len(findings))
-
-	for _, f := range findings {
-		offset := f.Edits[0].Start.Offset
-		if offset < 0 || offset > len(content) {
-			return 0, fmt.Errorf(
-				"finding %s: insertion offset %d outside file bounds [0, %d]",
-				f.ID, offset, len(content),
-			)
-		}
-
-		edits = append(edits, nameStubEdit{
-			offset: offset,
-			line:   f.Position.Line,
-			text:   completeInsertion(string(content), offset, f.Edits[0].NewText),
-		})
-	}
-
+// spliceInsertions applies pure insertions to content, back to front, so no
+// edit shifts another; for grouped type declarations (identical offsets) the
+// later declaration is written first, keeping stub order aligned with
+// declaration order.
+func spliceInsertions(content []byte, edits []nameStubEdit) []byte {
 	slices.SortFunc(edits, func(a, b nameStubEdit) int {
 		if c := cmp.Compare(b.offset, a.offset); c != 0 {
 			return c
@@ -102,29 +116,19 @@ func applyNameStubs(file gofinding.FilePath, findings []gofinding.Finding) (int,
 		return cmp.Compare(b.line, a.line)
 	})
 
-	var out strings.Builder
-
+	out := make([]byte, 0, len(content)+len(edits)*64)
 	cursor := len(content)
 
 	for _, edit := range edits {
-		out.Write(content[edit.offset:cursor])
-		out.WriteString(edit.text)
+		out = append(out, content[edit.offset:cursor]...)
+		out = append(out, edit.text...)
 
 		cursor = edit.offset
 	}
 
-	out.Write(content[0:cursor])
+	out = append(out, content[0:cursor]...)
 
-	mode := os.FileMode(0o644)
-	if info, statErr := os.Stat(string(file)); statErr == nil {
-		mode = info.Mode().Perm()
-	}
-
-	if err := os.WriteFile(string(file), []byte(out.String()), mode); err != nil {
-		return 0, fmt.Errorf("write file: %w", err)
-	}
-
-	return len(edits), nil
+	return out
 }
 
 // completeInsertion adjusts an insertion's trailing newline so the repaired

@@ -27,43 +27,15 @@ func Detect(ctx context.Context) ([]gofinding.Finding, error) {
 
 // DetectPath scans path (a single Go file or a directory tree) and returns
 // one BD001 finding per brand type that is used with id.ID but has no Name()
-// string method. Files that fail to parse are skipped: a syntax error is not
-// a BD001 finding, and the Go toolchain reports it far more precisely.
+// string method, plus one BD002 finding per broken suppression directive
+// (see suppress.go). Files that fail to parse are skipped: a syntax error is
+// not a brandid-lint finding, and the Go toolchain reports it far more
+// precisely.
 func DetectPath(path string) ([]gofinding.Finding, error) {
-	info, err := os.Stat(path)
-	if err != nil {
-		return nil, fmt.Errorf("stat %s: %w", path, err)
-	}
-
-	if !info.IsDir() {
-		return detectFile(path)
-	}
-
 	var findings []gofinding.Finding
 
-	walkErr := filepath.WalkDir(path, func(p string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return fmt.Errorf("walk %s: %w", p, err)
-		}
-
-		if entry.IsDir() {
-			if skipDir(entry.Name()) && p != path {
-				return filepath.SkipDir
-			}
-
-			return nil
-		}
-
-		if filepath.Ext(p) != ".go" {
-			return nil
-		}
-
-		fileFindings, fileErr := detectFile(p)
-		if fileErr != nil {
-			return fileErr
-		}
-
-		findings = append(findings, fileFindings...)
+	walkErr := walkGoFiles(path, func(filename string) error {
+		findings = append(findings, detectFile(filename)...)
 
 		return nil
 	})
@@ -84,33 +56,86 @@ func skipDir(name string) bool {
 	}
 }
 
-// detectFile scans one Go file. Files that fail to parse yield no findings
-// and no error (see DetectPath). Brands with a valid in-source suppression
-// directive (see suppress.go) yield no BD001 finding; broken directives
-// yield BD002 findings instead.
-func detectFile(filename string) ([]gofinding.Finding, error) {
+// walkGoFiles walks path (a single Go file or a directory tree), skipping
+// the directories .git, vendor, and node_modules and every non-Go file, and
+// calls visit for each Go file in deterministic lexicographic order. The
+// first error returned by visit aborts the walk.
+func walkGoFiles(path string, visit func(filename string) error) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		return fmt.Errorf("stat %s: %w", path, err)
+	}
+
+	if !info.IsDir() {
+		if filepath.Ext(path) == ".go" {
+			if err := visit(path); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	return filepath.WalkDir(path, func(p string, entry fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return fmt.Errorf("walk %s: %w", p, walkErr)
+		}
+
+		if entry.IsDir() {
+			if skipDir(entry.Name()) && p != path {
+				return filepath.SkipDir
+			}
+
+			return nil
+		}
+
+		if filepath.Ext(p) != ".go" {
+			return nil
+		}
+
+		return visit(p)
+	})
+}
+
+// fileScan is the per-file scan result shared by detection and repair, so
+// both see exactly the same brand declarations and suppressions.
+type fileScan struct {
+	decls      []BrandDecl
+	suppressed map[int]bool
+	directives []gofinding.Finding
+}
+
+// scanFile parses one Go file and pairs its brand declarations with their
+// suppression directives. Unparseable files yield an empty scan: a syntax
+// error is not a brandid-lint finding (see DetectPath).
+func scanFile(filename string) fileScan {
 	fset := token.NewFileSet()
 
 	f, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
-		return nil, nil //nolint:nilerr // unparseable files are skipped by design
+		return fileScan{}
 	}
 
 	decls := brandDeclsFromFile(f, fset)
-	suppressed, directiveFindings := applySuppressions(
-		decls,
-		suppressionDirectivesFromFile(f, fset),
-	)
+	suppressed, directiveFindings := applySuppressions(decls, suppressionDirectivesFromFile(f, fset))
+
+	return fileScan{decls: decls, suppressed: suppressed, directives: directiveFindings}
+}
+
+// detectFile returns the findings of one Go file: one BD001 per unsuppressed
+// unnamed brand declaration, plus the file's BD002 directive findings.
+func detectFile(filename string) []gofinding.Finding {
+	scan := scanFile(filename)
 
 	var findings []gofinding.Finding
 
-	for _, decl := range decls {
-		if decl.HasName || suppressed[decl.Offset] {
+	for _, decl := range scan.decls {
+		if decl.HasName || scan.suppressed[decl.Offset] {
 			continue
 		}
 
 		findings = append(findings, findingForBrand(decl))
 	}
 
-	return append(findings, directiveFindings...), nil
+	return append(findings, scan.directives...)
 }

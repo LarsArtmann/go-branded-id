@@ -54,6 +54,20 @@ func assertBD001(
 		tb.Errorf("Suggestion = %q, want %q", f.Suggestion, wantSuggestion)
 	}
 
+	if f.FixStrategy != gofinding.FixStrategyDirect {
+		tb.Errorf("FixStrategy = %q, want %q", f.FixStrategy, gofinding.FixStrategyDirect)
+	}
+
+	wantBefore := "type " + wantType + " struct{}"
+	if f.BeforeCode != wantBefore {
+		tb.Errorf("BeforeCode = %q, want %q", f.BeforeCode, wantBefore)
+	}
+
+	wantAfter := wantBefore + "\n\n" + wantSuggestion
+	if f.AfterCode != wantAfter {
+		tb.Errorf("AfterCode = %q, want %q", f.AfterCode, wantAfter)
+	}
+
 	wantSnippet := "type " + wantType + " struct{}"
 	if f.Snippet != wantSnippet {
 		tb.Errorf("Snippet = %q, want %q", f.Snippet, wantSnippet)
@@ -97,16 +111,28 @@ func TestDetectPath_Directory(t *testing.T) {
 		t.Fatalf("DetectPath() error = %v", err)
 	}
 
-	// WalkDir order is lexicographic: missing_name.go before mixed.go.
-	wantTypes := []string{"UserBrand", "TenantBrand", "SessionBrand"}
-	if len(findings) != len(wantTypes) {
-		t.Fatalf("DetectPath() found %d findings, want %d", len(findings), len(wantTypes))
+	// WalkDir order is lexicographic; suppression_valid.go and
+	// suppression_trailing.go contribute nothing (valid suppressions).
+	want := []gofinding.RuleName{
+		RuleIDBD001, // missing_name.go: UserBrand
+		RuleIDBD001, // mixed.go: TenantBrand
+		RuleIDBD001, // mixed.go: SessionBrand
+		RuleIDBD001, // suppression_invalid.go: WaitBrand (directive without reason)
+		RuleIDBD002, // suppression_invalid.go: missing reason
+		RuleIDBD002, // suppression_stale.go: stale directive on named brand
+	}
+	if len(findings) != len(want) {
+		t.Fatalf("DetectPath() found %d findings, want %d", len(findings), len(want))
 	}
 
-	for i, want := range wantTypes {
-		if got := findings[i].Snippet; got != "type "+want+" struct{}" {
-			t.Errorf("findings[%d].Snippet = %q, want %q", i, got, "type "+want+" struct{}")
+	for i, rule := range want {
+		if findings[i].Rule != rule {
+			t.Errorf("findings[%d].Rule = %q, want %q", i, findings[i].Rule, rule)
 		}
+	}
+
+	if snippet := findings[0].Snippet; snippet != "type UserBrand struct{}" {
+		t.Errorf("findings[0].Snippet = %q, want %q", snippet, "type UserBrand struct{}")
 	}
 }
 
@@ -203,8 +229,8 @@ func TestDetect_UsesWorkingDirFromContext(t *testing.T) {
 		t.Fatalf("Detect() error = %v", err)
 	}
 
-	if len(findings) != 3 {
-		t.Fatalf("Detect() found %d findings, want 3", len(findings))
+	if len(findings) != 6 {
+		t.Fatalf("Detect() found %d findings, want 6", len(findings))
 	}
 }
 
@@ -219,8 +245,8 @@ func TestDetect_FallsBackToProcessWorkingDirectory(t *testing.T) {
 	// The process working directory is the linter package itself, whose
 	// non-test files declare no brands; testdata is excluded from scanning
 	// only in vendor/.git/node_modules terms, so its fixtures ARE scanned
-	// here and must yield the same three findings.
-	if len(findings) != 3 {
-		t.Fatalf("Detect() found %d findings, want 3", len(findings))
+	// here and must yield the same six findings (4 BD001 + 2 BD002).
+	if len(findings) != 6 {
+		t.Fatalf("Detect() found %d findings, want 6", len(findings))
 	}
 }
