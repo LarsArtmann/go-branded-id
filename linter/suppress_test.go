@@ -9,11 +9,11 @@ import (
 	gofinding "github.com/larsartmann/go-finding"
 )
 
-// writeTestFile writes src as a Go file into dir and returns its path.
-func writeTestFile(tb testing.TB, dir, name, src string) string {
+// writeTestFile writes src as src.go into dir and returns its path.
+func writeTestFile(tb testing.TB, dir, src string) string {
 	tb.Helper()
 
-	filename := filepath.Join(dir, name)
+	filename := filepath.Join(dir, "src.go")
 
 	if err := os.WriteFile(filename, []byte(src), 0o600); err != nil {
 		tb.Fatalf("WriteFile(%s) error = %v", filename, err)
@@ -27,7 +27,7 @@ func writeTestFile(tb testing.TB, dir, name, src string) string {
 func detectSource(tb testing.TB, src string) []gofinding.Finding {
 	tb.Helper()
 
-	return detectFile(writeTestFile(tb, tb.TempDir(), "src.go", src))
+	return detectFile(writeTestFile(tb, tb.TempDir(), src))
 }
 
 // assertFindings asserts the exact multiset of rules plus one required

@@ -22,7 +22,7 @@ func repairSource(tb testing.TB, src string) (int, string) {
 	tb.Helper()
 
 	dir := tb.TempDir()
-	writeTestFile(tb, dir, "src.go", src)
+	writeTestFile(tb, dir, src)
 
 	inserted, err := RepairPath(dir)
 	if err != nil {
@@ -66,7 +66,10 @@ func TestRepairPath_InsertsStub(t *testing.T) {
 		t.Errorf("repaired content misses stub %q:\n%s", wantStub, content)
 	}
 
-	if want := "type UserBrand struct{}\n\n" + wantStub + "\n\nfunc use()"; !strings.Contains(content, want) {
+	if want := "type UserBrand struct{}\n\n" + wantStub + "\n\nfunc use()"; !strings.Contains(
+		content,
+		want,
+	) {
 		t.Errorf("repaired content =\n%s\nwant it to contain\n%s", content, want)
 	}
 
@@ -77,7 +80,7 @@ func TestRepairPath_IsIdempotent(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
-	filename := writeTestFile(t, dir, "src.go", repairBaseSource)
+	filename := writeTestFile(t, dir, repairBaseSource)
 
 	first, err := RepairPath(dir)
 	if err != nil {
@@ -119,7 +122,7 @@ func TestRepairPath_LeavesDetectionClean(t *testing.T) {
 
 	dir := t.TempDir()
 
-	writeTestFile(t, dir, "src.go", repairBaseSource)
+	writeTestFile(t, dir, repairBaseSource)
 
 	if _, err := RepairPath(dir); err != nil {
 		t.Fatalf("RepairPath() error = %v", err)
@@ -267,7 +270,7 @@ func TestRepair_WorkingDirFromContext(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
-	writeTestFile(t, dir, "src.go", repairBaseSource)
+	writeTestFile(t, dir, repairBaseSource)
 
 	inserted, err := Repair(gofinding.WithWorkingDir(context.Background(), dir))
 	if err != nil {

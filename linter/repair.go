@@ -85,7 +85,11 @@ func repairFile(filename string) (int, error) {
 		edits = append(edits, nameStubEdit{
 			offset: decl.DeclEnd,
 			line:   decl.Line,
-			text:   completeInsertion(string(content), decl.DeclEnd, "\n\n"+nameStub(decl.TypeName)),
+			text: completeInsertion(
+				string(content),
+				decl.DeclEnd,
+				"\n\n"+nameStub(decl.TypeName),
+			),
 		})
 	}
 

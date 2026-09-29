@@ -244,5 +244,5 @@ func unplacedFindings(unplaced []suppressionDirective) []gofinding.Finding {
 		findings = append(findings, findingForDirective(directive, problem))
 	}
 
-	return suppressed, findings
+	return findings
 }

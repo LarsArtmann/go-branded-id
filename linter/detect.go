@@ -118,7 +118,10 @@ func scanFile(filename string) fileScan {
 	}
 
 	decls := brandDeclsFromFile(f, fset)
-	suppressed, directiveFindings := applySuppressions(decls, suppressionDirectivesFromFile(f, fset))
+	suppressed, directiveFindings := applySuppressions(
+		decls,
+		suppressionDirectivesFromFile(f, fset),
+	)
 
 	return fileScan{decls: decls, suppressed: suppressed, directives: directiveFindings}
 }

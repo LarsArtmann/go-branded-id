@@ -139,7 +139,10 @@ func TestRun_FixAppliesRepairs(t *testing.T) {
 		t.Fatalf("ReadFile() error = %v", err)
 	}
 
-	if want := "func (FixBrand) Name() string { return \"Fix\" }"; !strings.Contains(string(content), want) {
+	if want := "func (FixBrand) Name() string { return \"Fix\" }"; !strings.Contains(
+		string(content),
+		want,
+	) {
 		t.Errorf("repaired file misses %q:\n%s", want, content)
 	}
 }
