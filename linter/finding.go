@@ -48,20 +48,20 @@ func findingForBrand(b BrandDecl) gofinding.Finding {
 // findingForDirective turns a broken suppression directive into a BD002
 // finding positioned at the directive comment itself, so the fix (correcting
 // or removing the comment) lands where the user is looking.
-func findingForDirective(d suppressionDirective, problem string) gofinding.Finding {
+func findingForDirective(directive suppressionDirective, problem string) gofinding.Finding {
 	return gofinding.NewBuilder(
 		RuleIDBD002,
 		ToolName,
 		fmt.Sprintf("//%s directive %s", directivePrefix, problem),
 		gofinding.SeverityWarning,
 		gofinding.Position{
-			File:   gofinding.FilePath(d.File),
-			Line:   d.Line,
-			Column: d.Column,
-			Offset: d.Offset,
+			File:   gofinding.FilePath(directive.File),
+			Line:   directive.Line,
+			Column: directive.Column,
+			Offset: directive.Offset,
 		},
 	).WithCategory(gofinding.CategoryConfiguration).
 		WithConfidence(gofinding.ConfidenceHigh).
-		WithSnippet(d.Comment).
+		WithSnippet(directive.Comment).
 		MustBuild()
 }

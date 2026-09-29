@@ -40,7 +40,7 @@ func DetectPath(path string) ([]gofinding.Finding, error) {
 		return nil
 	})
 	if walkErr != nil {
-		return nil, fmt.Errorf("walk %s: %w", path, walkErr)
+		return nil, walkErr
 	}
 
 	return findings, nil
@@ -69,7 +69,7 @@ func walkGoFiles(path string, visit func(filename string) error) error {
 	if !info.IsDir() {
 		if filepath.Ext(path) == ".go" {
 			if err := visit(path); err != nil {
-				return err
+				return fmt.Errorf("visit %s: %w", path, err)
 			}
 		}
 
@@ -113,6 +113,7 @@ func scanFile(filename string) fileScan {
 
 	f, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
+		//nolint:exhaustruct_v5 // zero value: an unparseable file has no scan result
 		return fileScan{}
 	}
 

@@ -6,7 +6,7 @@ func (id ID[B, V]) Ptr() *ID[B, V] { return &id }
 // FromPtr dereferences a pointer-to-ID, returning the zero value if the pointer is nil.
 func FromPtr[B any, V comparable](p *ID[B, V]) ID[B, V] {
 	if p == nil {
-		return ID[B, V]{} //nolint:exhaustruct // intentional zero value
+		return ID[B, V]{} //nolint:exhaustruct_v5 // intentional zero value
 	}
 
 	return *p

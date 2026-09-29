@@ -3,6 +3,7 @@ package linter
 import (
 	"cmp"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"slices"
@@ -10,6 +11,14 @@ import (
 
 	gofinding "github.com/larsartmann/go-finding"
 )
+
+// defaultFileMode is the fallback permission for files whose mode cannot be
+// stat'ed; repaired files keep their existing permissions otherwise.
+const defaultFileMode = 0o644
+
+// errOffsetOutOfBounds is wrapped when a declaration's insertion point no
+// longer lies inside the file content read from disk.
+var errOffsetOutOfBounds = errors.New("insertion offset outside file bounds")
 
 // Repair runs the BD001 repair on the working directory carried by ctx (see
 // gofinding.WorkingDirFromContext), falling back to the process working
@@ -68,8 +77,8 @@ func repairFile(filename string) (int, error) {
 
 		if decl.DeclEnd < 0 || decl.DeclEnd > len(content) {
 			return 0, fmt.Errorf(
-				"brand %s: insertion offset %d outside file bounds [0, %d]",
-				decl.TypeName, decl.DeclEnd, len(content),
+				"brand %s: %w [%d, %d]",
+				decl.TypeName, errOffsetOutOfBounds, decl.DeclEnd, len(content),
 			)
 		}
 
@@ -84,11 +93,12 @@ func repairFile(filename string) (int, error) {
 		return 0, nil
 	}
 
-	mode := os.FileMode(0o644)
+	mode := os.FileMode(defaultFileMode)
 	if info, statErr := os.Stat(filename); statErr == nil {
 		mode = info.Mode().Perm()
 	}
 
+	//nolint:gosec // G703: filename originates from WalkDir over the caller-provided scan root, the same paths Detect reads.
 	if err := os.WriteFile(filename, spliceInsertions(content, edits), mode); err != nil {
 		return 0, fmt.Errorf("write file: %w", err)
 	}

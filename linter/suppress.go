@@ -82,17 +82,17 @@ func suppressionDirectivesFromFile(f *ast.File, fset *token.FileSet) []suppressi
 // of silently suppressing nothing.
 func parseSuppressionDirective(comment *ast.Comment) (suppressionDirective, bool) {
 	if !strings.HasPrefix(comment.Text, "//") {
-		//nolint:exhaustruct // zero value: not a directive, caller ignores it
+		//nolint:exhaustruct_v5 // zero value: not a directive, caller ignores it
 		return suppressionDirective{}, false
 	}
 
 	body := strings.TrimLeft(strings.TrimPrefix(comment.Text, "//"), " \t")
 	if !strings.HasPrefix(body, directivePrefix) {
-		//nolint:exhaustruct // zero value: not a directive, caller ignores it
+		//nolint:exhaustruct_v5 // zero value: not a directive, caller ignores it
 		return suppressionDirective{}, false
 	}
 
-	//nolint:exhaustruct // position fields are filled by suppressionDirectivesFromFile
+	//nolint:exhaustruct_v5 // position fields are filled by suppressionDirectivesFromFile
 	directive := suppressionDirective{Comment: comment.Text}
 
 	rest := body[len(directivePrefix):]
@@ -144,55 +144,95 @@ func applySuppressions(
 	}
 
 	dirsByDecl := make(map[int][]suppressionDirective)
+
 	var unplaced []suppressionDirective
 
 	for _, directive := range directives {
-		switch idx, ok := declByLine[directive.Line]; {
-		case ok: // trailing comment on the declaration line
-			dirsByDecl[idx] = append(dirsByDecl[idx], directive)
-		default:
-			aboveIdx, aboveOK := declByLine[directive.Line+1]
-			if directive.LastInGroup && aboveOK {
-				// last line of the comment group directly above the declaration
-				dirsByDecl[aboveIdx] = append(dirsByDecl[aboveIdx], directive)
-
-				continue
-			}
-
-			unplaced = append(unplaced, directive)
-		}
+		associateDirective(directive, declByLine, dirsByDecl, &unplaced)
 	}
 
 	suppressed := make(map[int]bool)
+
 	var findings []gofinding.Finding
 
 	for i, decl := range decls {
-		for _, directive := range dirsByDecl[i] {
-			if decl.HasName {
-				findings = append(findings, findingForDirective(
-					directive,
-					fmt.Sprintf("is stale: brand %s already has a Name() method", decl.TypeName),
-				))
+		findings = append(findings, directivesForDecl(decl, dirsByDecl[i], suppressed)...)
+	}
 
-				continue
-			}
+	findings = append(findings, unplacedFindings(unplaced)...)
 
-			switch {
-			case !directive.wellFormed():
-				findings = append(findings, findingForDirective(directive, directive.Problem))
-			case suppressed[decl.Offset]:
-				findings = append(findings, findingForDirective(
-					directive,
-					fmt.Sprintf(
-						"is redundant: brand %s is already suppressed by another directive",
-						decl.TypeName,
-					),
-				))
-			default:
-				suppressed[decl.Offset] = true
-			}
+	return suppressed, findings
+}
+
+// associateDirective attaches one directive to the brand declaration it
+// annotates: a trailing comment on the declaration line, or the last line of
+// the comment group directly above it. Directives annotating nothing land in
+// unplaced.
+func associateDirective(
+	directive suppressionDirective,
+	declByLine map[int]int,
+	dirsByDecl map[int][]suppressionDirective,
+	unplaced *[]suppressionDirective,
+) {
+	if idx, ok := declByLine[directive.Line]; ok {
+		dirsByDecl[idx] = append(dirsByDecl[idx], directive)
+
+		return
+	}
+
+	if directive.LastInGroup {
+		if aboveIdx, ok := declByLine[directive.Line+1]; ok {
+			dirsByDecl[aboveIdx] = append(dirsByDecl[aboveIdx], directive)
+
+			return
 		}
 	}
+
+	*unplaced = append(*unplaced, directive)
+}
+
+// directivesForDecl applies the directives annotated on one brand
+// declaration: the first well-formed directive suppresses the BD001 finding,
+// every other directive yields a BD002 finding.
+func directivesForDecl(
+	decl BrandDecl,
+	directives []suppressionDirective,
+	suppressed map[int]bool,
+) []gofinding.Finding {
+	var findings []gofinding.Finding
+
+	for _, directive := range directives {
+		if decl.HasName {
+			findings = append(findings, findingForDirective(
+				directive,
+				fmt.Sprintf("is stale: brand %s already has a Name() method", decl.TypeName),
+			))
+
+			continue
+		}
+
+		switch {
+		case !directive.wellFormed():
+			findings = append(findings, findingForDirective(directive, directive.Problem))
+		case suppressed[decl.Offset]:
+			findings = append(findings, findingForDirective(
+				directive,
+				fmt.Sprintf(
+					"is redundant: brand %s is already suppressed by another directive",
+					decl.TypeName,
+				),
+			))
+		default:
+			suppressed[decl.Offset] = true
+		}
+	}
+
+	return findings
+}
+
+// unplacedFindings reports directives that annotate no brand declaration.
+func unplacedFindings(unplaced []suppressionDirective) []gofinding.Finding {
+	var findings []gofinding.Finding
 
 	for _, directive := range unplaced {
 		problem := "suppresses nothing: place it on the brand declaration line " +
