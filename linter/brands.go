@@ -20,6 +20,7 @@ type BrandDecl struct {
 	Line     int    // 1-based line of the type declaration
 	Column   int    // 1-based column of the type declaration
 	Offset   int    // 0-based byte offset of the type declaration
+	DeclEnd  int    // 0-based byte offset after the enclosing GenDecl (repair insertion point)
 	HasName  bool   // Whether a Name() string method exists
 }
 
@@ -66,6 +67,7 @@ func collectBrandDecls(
 				Line:     pos.Line,
 				Column:   pos.Column,
 				Offset:   pos.Offset,
+				DeclEnd:  fset.Position(typeDecl.End()).Offset,
 				HasName: hasName[ts.Name.Name] != "" &&
 					hasName[ts.Name.Name] != methodNamePlaceholder,
 			})

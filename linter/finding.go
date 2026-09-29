@@ -6,13 +6,20 @@ import (
 	gofinding "github.com/larsartmann/go-finding"
 )
 
+// nameStub returns the Name() method text for a brand type, without leading
+// newlines. It is the single source of the suggestion, the display codes, and
+// the repair insertion text.
+func nameStub(typeName string) string {
+	return fmt.Sprintf("func (%s) Name() string { return %q }", typeName, suggestName(typeName))
+}
+
 // findingForBrand converts an unnamed brand declaration into a BD001 finding
-// positioned at the type declaration, where the fix (adding Name) lands.
+// positioned at the type declaration, where the fix (adding Name) lands. The
+// finding carries the fix as a typed insertion edit after the enclosing
+// declaration, so consumers can apply it without string matching.
 func findingForBrand(b BrandDecl) gofinding.Finding {
-	suggestion := fmt.Sprintf(
-		"func (%s) Name() string { return %q }",
-		b.TypeName, suggestName(b.TypeName),
-	)
+	stub := nameStub(b.TypeName)
+	before := fmt.Sprintf("type %s struct{}", b.TypeName)
 
 	return gofinding.NewBuilder(
 		RuleIDBD001,
@@ -30,7 +37,36 @@ func findingForBrand(b BrandDecl) gofinding.Finding {
 		},
 	).WithCategory(gofinding.CategoryNaming).
 		WithConfidence(gofinding.ConfidenceHigh).
-		WithSuggestion(suggestion).
-		WithSnippet(fmt.Sprintf("type %s struct{}", b.TypeName)).
+		WithSuggestion(stub).
+		WithSnippet(before).
+		WithFixStrategy(gofinding.FixStrategyDirect).
+		WithBeforeCode(before).
+		WithAfterCode(before + "\n\n" + stub).
+		WithEdits(gofinding.TextEdit{
+			Start:   gofinding.Position{Offset: b.DeclEnd},
+			End:     gofinding.Position{Offset: -1},
+			NewText: "\n\n" + stub,
+		}).
+		MustBuild()
+}
+
+// findingForDirective turns a broken suppression directive into a BD002
+// finding positioned at the directive comment itself, so the fix (correcting
+// or removing the comment) lands where the user is looking.
+func findingForDirective(d suppressionDirective, problem string) gofinding.Finding {
+	return gofinding.NewBuilder(
+		RuleIDBD002,
+		ToolName,
+		fmt.Sprintf("//%s directive %s", directivePrefix, problem),
+		gofinding.SeverityWarning,
+		gofinding.Position{
+			File:   gofinding.FilePath(d.File),
+			Line:   d.Line,
+			Column: d.Column,
+			Offset: d.Offset,
+		},
+	).WithCategory(gofinding.CategoryConfiguration).
+		WithConfidence(gofinding.ConfidenceHigh).
+		WithSnippet(d.Comment).
 		MustBuild()
 }
