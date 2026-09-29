@@ -14,18 +14,19 @@
 package provider
 
 import (
+	"github.com/larsartmann/go-branded-id/linter"
 	gofinding "github.com/larsartmann/go-finding"
 	gofstoolsdk "github.com/larsartmann/go-finding/toolsdk"
-
-	"github.com/larsartmann/go-branded-id/linter"
 )
 
 // Provider registers the brandid-lint Spec in the process-global toolsdk
 // registry. Blank-import this package to activate it:
 //
 //	import _ "github.com/larsartmann/go-branded-id/linter/provider"
+//
+//nolint:gochecknoglobals // self-registration at import time is the toolsdk contract
 var Provider = gofstoolsdk.Register(
-	gofstoolsdk.Spec{ //nolint:gochecknoglobals // self-registration at import time is the toolsdk contract
+	gofstoolsdk.Spec{
 		Name:        linter.ToolName,
 		Description: "BD001: brand types used with id.ID but missing their Name() string method",
 		Trigger:     gofstoolsdk.OnGoModule(),

@@ -4,10 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/larsartmann/go-branded-id/linter"
 	gofinding "github.com/larsartmann/go-finding"
 	gofstoolsdk "github.com/larsartmann/go-finding/toolsdk"
-
-	"github.com/larsartmann/go-branded-id/linter"
 )
 
 // findProviderSpec returns the brandid-lint spec from the process-global

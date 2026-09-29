@@ -17,15 +17,12 @@ import (
 	"io"
 	"os"
 
-	gofinding "github.com/larsartmann/go-finding"
-
 	"github.com/larsartmann/go-branded-id/linter"
+	gofinding "github.com/larsartmann/go-finding"
 )
 
 // errUnknownFormat is the sentinel for an unsupported -format value.
-var errUnknownFormat = errors.New(
-	"unknown format: want text or sarif",
-) //nolint:gochecknoglobals // package-level sentinel error
+var errUnknownFormat = errors.New("unknown format: want text or sarif")
 
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))

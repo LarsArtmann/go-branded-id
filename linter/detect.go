@@ -91,7 +91,7 @@ func detectFile(filename string) ([]gofinding.Finding, error) {
 
 	f, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
-		return nil, nil //nolint:nilerr,nilnil // unparseable files are skipped by design
+		return nil, nil //nolint:nilerr // unparseable files are skipped by design
 	}
 
 	var findings []gofinding.Finding
