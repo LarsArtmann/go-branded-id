@@ -44,12 +44,14 @@ The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.27.1 (satisfie
 ├── id_binary.go       # MarshalBinary / UnmarshalBinary (little-endian)
 ├── id_gob.go          # GobEncode / GobDecode (delegates to binary)
 ├── linter/            # SEPARATE Go module: brandid-lint (see linter/go.mod, linter/CHANGELOG.md)
-│   ├── detect.go      #   Detect(ctx)/DetectPath(path) — BD001 scan over .go files
+│   ├── detect.go      #   Detect(ctx)/DetectPath(path) — BD001 scan + shared fileScan over .go files
 │   ├── brands.go      #   Syntactic brand detection (empty struct + id.ID[...] type arg)
-│   ├── finding.go     #   BD001 finding construction (go-finding Builder)
+│   ├── finding.go     #   BD001/BD002 finding construction (go-finding Builder)
 │   ├── suggest.go     #   Name() suggestion derivation
+│   ├── suppress.go    #   //brandid-lint:ignore(BD001) directive parsing + BD002
+│   ├── repair.go      #   Repair(ctx)/RepairPath(path) — Name() stub insertion (idempotent)
 │   ├── provider/      #   toolsdk self-registration (BuildFlow blank-imports this)
-│   ├── cmd/brandid-lint/ # CLI: text/SARIF output, exit 0/1/2
+│   ├── cmd/brandid-lint/ # CLI: text/SARIF output, -fix, exit 0/1/2
 │   └── testdata/      #   Parse-only fixtures (never compiled)
 ├── website/           # Astro + Starlight documentation website (deployed to Firebase Hosting)
 └── *_test.go          # Tests, benchmarks, fuzz tests, example tests
@@ -87,7 +89,8 @@ There is no `internal/` or `pkg/` — this is intentionally a flat, single-packa
 
 ## Linting & Code Quality
 
-- **golangci-lint v2** with an extremely strict config (`.golangci.yml`). Many linters enabled including `exhaustruct`, `gochecknoglobals`, `paralleltest`, `wrapcheck`, `cyclop`, `funlen`, etc.
+- **golangci-lint v2** with an extremely strict config (`.golangci.yml`). Many linters enabled including `exhaustruct_v5`, `gochecknoglobals`, `paralleltest`, `wrapcheck`, `cyclop`, `funlen`, etc.
+- **Linter renames break `nolint` comments silently**: current golangci-lint ships `exhaustruct_v5` (renamed from `exhaustruct`); a `//nolint:exhaustruct` comment no longer suppresses anything and the finding reappears. `nolint` comments must reference the linter's CURRENT name (2026-09-29: all `exhaustruct` nolints and the `.golangci.yml` test-file exclusion entry were updated to `exhaustruct_v5`).
 - Cyclop max complexity: 12.
 - Line length: 120 (golines).
 - Formatter: gofumpt (stricter than gofmt) + goimports + golines.
@@ -95,7 +98,7 @@ There is no `internal/` or `pkg/` — this is intentionally a flat, single-packa
   - `//nolint:forcetypeassert // guaranteed by type switch`
   - `//nolint:gosec,forcetypeassert // G115: ... safe for serialization; guaranteed by type switch`
   - `//nolint:cyclop,funlen // exhaustive type switch over numeric types`
-- `exhaustruct` is disabled for test files (`_test\.go`) and generated files.
+- `exhaustruct_v5` is disabled for test files (`_test\.go`) and generated files.
 - `exported` and `package-comments` rules in revive are **disabled** — no package comment required on every file.
 - Tests count toward linting (`tests: true` in config).
 
@@ -164,6 +167,13 @@ three in one deliberate commit — the `go` directive is a consumer-facing
 minimum for a library, not something to auto-bump. The root floor is `go
 1.26`; the linter floor is `go 1.27.1` (go-finding requires it).
 
+**Machine tripwire**: `scripts/check-go-pins.sh` asserts the three-way
+agreement for BOTH modules (go.mod directive ≤ flake `go_1_2x` pin on
+major.minor, and every CI `go-version` matches one of the pins). It runs as
+the CI `go-pins` job in `go.yml` and as the first guard in the pre-push
+hook. When it fires, restore the directive AND check the other two pins —
+never "fix" it by bumping the flake pin to match the daemon's rewrite.
+
 **The recurring writer is BuildFlow's `go-mod-update` step** ("Updates Go
 toolchain and dependencies"), NOT `go-auto-upgrade` (that one rewrites JSON
 imports, and was itself fixed upstream in gau v0.6.2). It bumped `go 1.26` →
@@ -211,21 +221,26 @@ go-finding/toolsdk. The dependency direction is load-bearing:
   from the root would invert the layering and create a module cycle.
 - The linter does NOT import the root module either (detection is purely
   syntactic), so the modules can version independently.
-- BuildFlow integration: `linter/provider` self-registers a toolsdk Spec;
-  BuildFlow consumes it via a blank import in
+- BuildFlow integration: `linter/provider` self-registers a toolsdk Spec
+  (Detect + Repair); BuildFlow consumes it via a blank import in
   `tools/providers/sdk_imports.go` plus a go.mod require. Tool name:
-  `brandid-lint`, rule ID: `BD001` (stable forever).
-- Known false-positive class: brands whose `String()` is a data key
-  (go-cqrs-lite `StreamMarker`/`TimerMarker`) are deliberate exceptions —
-  see "Brands That Deliberately Skip Name()" below. In-source suppression
-  support is tracked in TODO_LIST.md.
+  `brandid-lint`, rule IDs: `BD001` and `BD002` (stable forever). Repair
+  inserts `Name()` stubs; BuildFlow re-runs Detect to measure the delta.
+- In-source suppression: `//brandid-lint:ignore(BD001) <reason>` on the decl
+  line or the last line of the comment group directly above it suppresses
+  BD001; a broken directive (missing reason, unknown rule, stale, duplicate,
+  unplaced) is reported as BD002. Suppressed brands are never repaired.
+- Known false-positive class resolved by suppression: brands whose
+  `String()` is a data key (go-cqrs-lite `StreamMarker`/`TimerMarker`) now
+  carry the suppression directive in their own repos —
+  see "Brands That Deliberately Skip Name()" below.
 - The root repo's own test brands (`StringBrand`, `Int64Brand`, … in
   `*_test.go`) do not implement `Name()` and ARE reported when the linter
   runs on this repo — expected, not a bug.
 
 ### Dual-Mode Pre-Push Hook
 
-A pre-push git hook (`scripts/pre-push-dual-test.sh`) greps the v1 JSON files for `encoding/json/v2` imports, then runs `go test` in both v1 and v2 JSON modes, reporting both results. It's installed at `.git/hooks/pre-push` (reinstall after editing the script). Plain `go test` only exercises v1; the hook catches code that passes v1 but breaks v2 (build tag issues, import corruption) — and the grep guard catches import corruption that would prevent the v1 package from compiling at all, which no in-package test can observe.
+A pre-push git hook (`scripts/pre-push-dual-test.sh`) first runs `scripts/check-go-pins.sh` (the three-way Go-pin guard), then greps the v1 JSON files for `encoding/json/v2` imports, then runs `go test` in both v1 and v2 JSON modes, reporting all results. It's installed at `.git/hooks/pre-push` (reinstall after editing the script: `cp scripts/pre-push-dual-test.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push`). Plain `go test` only exercises v1; the hook catches code that passes v1 but breaks v2 (build tag issues, import corruption) — and the grep guard catches import corruption that would prevent the v1 package from compiling at all, which no in-package test can observe.
 
 ## Ecosystem Context
 
@@ -237,13 +252,13 @@ When making breaking changes, consider the migration impact across:
 
 ### Brands That Deliberately Skip `Name()`
 
-Not all brand types should implement `Name()`. The `brandid-lint` linter may flag these, but they are correct as-is:
+Not all brand types should implement `Name()`. Suppress the BD001 finding in source with `//brandid-lint:ignore(BD001) <reason>` — the reason documents the decision where it lives:
 
 - **go-cqrs-lite marker types** — These brands serve as event/stream type identifiers in the CQRS framework. Their `String()` output is used directly as storage keys and stream names. Adding `Name()` would change `String()` from `"TypeName"` to `"HumanReadable:TypeName"`, breaking the key format in event stores and breaking existing data.
 - **BerryBig** — Test brands only, no production impact.
 - **Cyberdom** — No brand types at all.
 
-**Rule**: If a brand's `String()` output is used as a data key (storage, stream name, routing key), do NOT add `Name()`. The `brandid-lint` linter flags them, but the flag is a false positive in this context.
+**Rule**: If a brand's `String()` output is used as a data key (storage, stream name, routing key), do NOT add `Name()` — write the suppression directive instead. A directive without a reason is itself a BD002 finding.
 
 ## Release Process
 
