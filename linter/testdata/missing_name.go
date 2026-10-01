@@ -6,6 +6,8 @@ import id "github.com/larsartmann/go-branded-id"
 // The brandid-lint should flag this as missing.
 type UserBrand struct{}
 
+func (UserBrand) Name() string { return "User" }
+
 func exampleMissing() {
 	_ = id.ID[UserBrand, string]{}
 }

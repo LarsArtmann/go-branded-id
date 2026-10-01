@@ -24,6 +24,28 @@ type (
 	Uint64Brand struct{}
 )
 
+func (StringBrand) Name() string { return "String" }
+
+func (IntBrand) Name() string { return "Int" }
+
+func (Int8Brand) Name() string { return "Int8" }
+
+func (Int16Brand) Name() string { return "Int16" }
+
+func (Int32Brand) Name() string { return "Int32" }
+
+func (Int64Brand) Name() string { return "Int64" }
+
+func (UintBrand) Name() string { return "Uint" }
+
+func (Uint8Brand) Name() string { return "Uint8" }
+
+func (Uint16Brand) Name() string { return "Uint16" }
+
+func (Uint32Brand) Name() string { return "Uint32" }
+
+func (Uint64Brand) Name() string { return "Uint64" }
+
 func assertIDValue[B any, V comparable](t *testing.T, v, expected V) {
 	t.Helper()
 	assertCmpEqual(t, NewID[B](v).Get(), expected)

@@ -14,7 +14,11 @@ type (
 	sentinelUnsupportedType  struct{ X int } // comparable, no serialization interface
 )
 
+func (sentinelUnsupportedBrand) Name() string { return "sentinelUnsupported" }
+
 type sentinelMarshalBrand struct{}
+
+func (sentinelMarshalBrand) Name() string { return "sentinelMarshal" }
 
 // sentinelFailingBinary implements BinaryMarshaler but always returns an error.
 type sentinelFailingBinary struct{ X int }
