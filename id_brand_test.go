@@ -99,11 +99,14 @@ func TestFormat_HashV_NamedBrand(t *testing.T) {
 func TestFormat_HashV_UnnamedBrand(t *testing.T) {
 	t.Parallel()
 
-	id := NewID[Int64Brand, int64](42)
+	//brandid-lint:ignore(BD001) deliberately unnamed to exercise the %T fallback path
+	type localUnnamedBrand struct{}
+
+	id := NewID[localUnnamedBrand, int64](42)
 
 	got := fmt.Sprintf("%#v", id)
-	if got != "id.id.Int64Brand(42)" {
-		t.Errorf("expected 'id.id.Int64Brand(42)', got %q", got)
+	if got != "id.id.localUnnamedBrand(42)" {
+		t.Errorf("expected 'id.id.localUnnamedBrand(42)', got %q", got)
 	}
 }
 

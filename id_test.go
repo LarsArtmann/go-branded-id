@@ -387,10 +387,10 @@ func TestIDString(t *testing.T) {
 		id       any
 		expected string
 	}{
-		{"string", NewID[StringBrand](testIDValue), testIDValue},
-		{"int64", NewID[Int64Brand, int64](42), "42"},
-		{"int32", NewID[Int32Brand, int32](42), "42"},
-		{"uint64", NewID[Uint64Brand, uint64](42), "42"},
+		{"string", NewID[StringBrand](testIDValue), "String:" + testIDValue},
+		{"int64", NewID[Int64Brand, int64](42), "Int64:42"},
+		{"int32", NewID[Int32Brand, int32](42), "Int32:42"},
+		{"uint64", NewID[Uint64Brand, uint64](42), "Uint64:42"},
 	}
 
 	for _, tt := range tests {
@@ -420,7 +420,7 @@ func TestIDGoString(t *testing.T) {
 
 	id := NewID[StringBrand](testIDValue)
 
-	expected := "id.id.StringBrand(" + testIDValue + ")"
+	expected := "id.String(" + testIDValue + ")"
 	if id.GoString() != expected {
 		t.Errorf("expected %s, got %s", expected, id.GoString())
 	}
@@ -435,11 +435,11 @@ func TestIDFormat(t *testing.T) {
 		format   string
 		expected string
 	}{
-		{"%s", "42"},
+		{"%s", "Int64:42"},
 		{"%d", "42"},
-		{"%q", `"42"`},
-		{"%v", "42"},
-		{"%#v", "id.id.Int64Brand(42)"},
+		{"%q", `"Int64:42"`},
+		{"%v", "Int64:42"},
+		{"%#v", "id.Int64(42)"},
 	}
 
 	for _, tt := range tests {

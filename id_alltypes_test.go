@@ -88,17 +88,17 @@ func TestStringAllTypes(t *testing.T) {
 		id       any
 		expected string
 	}{
-		{"string", NewID[StringBrand](testIDValue), testIDValue},
-		{"int", NewID[IntBrand, int](42), "42"},
-		{"int8", NewID[Int8Brand, int8](42), "42"},
-		{"int16", NewID[Int16Brand, int16](42), "42"},
-		{expectedInt32Str, NewID[Int32Brand, int32](42), expectedInt32Str},
-		{expectedInt64Str, NewID[Int64Brand, int64](42), expectedInt64Str},
-		{"uint", NewID[UintBrand, uint](42), "42"},
-		{"uint8", NewID[Uint8Brand, uint8](42), "42"},
-		{"uint16", NewID[Uint16Brand, uint16](42), "42"},
-		{"uint32", NewID[Uint32Brand, uint32](42), "42"},
-		{expectedUint64Str, NewID[Uint64Brand, uint64](42), expectedUint64Str},
+		{"string", NewID[StringBrand](testIDValue), "String:" + testIDValue},
+		{"int", NewID[IntBrand, int](42), "Int:42"},
+		{"int8", NewID[Int8Brand, int8](42), "Int8:42"},
+		{"int16", NewID[Int16Brand, int16](42), "Int16:42"},
+		{expectedInt32Str, NewID[Int32Brand, int32](42), "Int32:42"},
+		{expectedInt64Str, NewID[Int64Brand, int64](42), "Int64:42"},
+		{"uint", NewID[UintBrand, uint](42), "Uint:42"},
+		{"uint8", NewID[Uint8Brand, uint8](42), "Uint8:42"},
+		{"uint16", NewID[Uint16Brand, uint16](42), "Uint16:42"},
+		{"uint32", NewID[Uint32Brand, uint32](42), "Uint32:42"},
+		{expectedUint64Str, NewID[Uint64Brand, uint64](42), "Uint64:42"},
 	}
 
 	for _, tt := range tests {
