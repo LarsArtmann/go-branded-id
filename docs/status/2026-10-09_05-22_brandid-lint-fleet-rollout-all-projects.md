@@ -9,12 +9,12 @@
 
 ## Resolution Summary
 
-| Resolution | Count | Projects |
-|---|---|---|
-| `Name()` stubs kept | 41 | accountability-system (19), GmbH (12), Rolls-Royce (8), gomend (1), SKILLS snippet (1) |
-| Suppressed — `String()` is load-bearing | 22 | CV (4), SwettySwipperWeb (6), standard-bug-tracking-schema (10), template-arch-lint (2) |
-| Malformed directives repaired | 2 | go-output (`D2NodeIDBrand`, `GraphNodeIDBrand`) |
-| Real bugs fixed (surfaced by stubs) | 6 sites | GmbH (1), accountability-system (2 production + 3 test) |
+| Resolution                              | Count   | Projects                                                                                |
+| --------------------------------------- | ------- | --------------------------------------------------------------------------------------- |
+| `Name()` stubs kept                     | 41      | accountability-system (19), GmbH (12), Rolls-Royce (8), gomend (1), SKILLS snippet (1)  |
+| Suppressed — `String()` is load-bearing | 22      | CV (4), SwettySwipperWeb (6), standard-bug-tracking-schema (10), template-arch-lint (2) |
+| Malformed directives repaired           | 2       | go-output (`D2NodeIDBrand`, `GraphNodeIDBrand`)                                         |
+| Real bugs fixed (surfaced by stubs)     | 6 sites | GmbH (1), accountability-system (2 production + 3 test)                                 |
 
 ---
 
@@ -80,58 +80,58 @@
 
 ## f) Up to 50 things to get done next (impact-sorted; most are ROADMAP fuel, not commitments)
 
-| # | Task | Repo | Impact |
-|---|---|---|---|
-| 1 | Linter: emit copy-pasteable single-line directive text in BD001 findings | go-branded-id/linter | High |
-| 2 | Linter: `-fix` repairs BD002 placement (rewrap wrapped directives) | go-branded-id/linter | High |
-| 3 | SwettySwipperWeb api: revert or finish the daemon dependency sweep; get suite green | SwettySwipperWeb | High |
-| 4 | gomend: repair go.mod `replace ../BuildFlow` desync; verify ViolationGroupBrand stub builds | gomend | High |
-| 5 | Systematic `\.String\(\)`-as-data audit in every stubbed repo (GmbH bug class) | accountability, GmbH, Rolls-Royce, gomend | High |
-| 6 | Fleet-wide grep for `uuid.Parse(<ID>.String())` and similar parse-display patterns | all ~/projects | High |
-| 7 | CV: fix adoption-policy wording drift (AGENTS.md vs .goreleaser.yml) | CV | Med |
-| 8 | sbts: triage 7 pre-existing failures (cache/github/tracker/sync) | standard-bug-tracking-schema | Med |
-| 9 | Linter: package/file-level suppression syntax for uniform-reason packages | go-branded-id/linter | Med |
-| 10 | Linter: config/exclusion-file support for fleet scans (no more grep -v pipes) | go-branded-id/linter | Med |
-| 11 | Rollout playbook doc (pre-flight classification checklist) into linter docs | go-branded-id/linter | Med |
-| 12 | AGENTS.md: add 5 new precedent links to "Brands That Deliberately Skip Name()" | go-branded-id | Med |
-| 13 | Add testdata fixture: directive line + continuation comment (my exact BD002 case) if not covered | go-branded-id/linter | Med |
-| 14 | go-cqrs-lite: add the canonical BD001 directives to StreamMarker/TimerMarker | ci-siblings/go-cqrs-lite | Med |
-| 15 | RR: fix chromedp API usage in visualtest | Rolls-Royce | Med |
-| 16 | Run each touched repo's own golangci-lint/BuildFlow against new stubs/directives | 10 repos | Med |
-| 17 | GmbH + accountability: CHANGELOG entries for the `.Get()` fixes | GmbH, accountability | Med |
-| 18 | Verify BuildFlow provider picks up new directives (run buildflow in go-output) | go-output | Med |
-| 19 | template-arch-lint: decide raw-carrier forever vs migrate seams to `.Value()`; document | template-arch-lint | Med |
-| 20 | SKILLS: find the sync that reverted snippet 01, or delete generated dir | SKILLS | Med |
-| 21 | SKILLS: audit domain-types-02..08 for the same staleness | SKILLS | Low |
-| 22 | CI: scheduled fleet-wide brandid-lint scan with checked-in exclusion list | go-branded-id | Med |
-| 23 | Release linter/vX.Y.Z if items 1–2 land (CHANGELOG first) | go-branded-id/linter | Med |
-| 24 | Run linter's own test suite + `nix run .#test-race` (not run this session) | go-branded-id | Low |
-| 25 | Document "String() vs Get() at wire seams" contract in each consumer repo's AGENTS.md | 5 repos | Med |
-| 26 | Investigate daemon sweep attribution (BuildFlow audit-log) for gomend/Swetty go.mod | cross | Low |
-| 27 | Decide policy for excluded dirs: delete `BuildFlow.vendor.bak`, suppress or leave archived/ | cross | Low |
-| 28 | doc.go: add URL/query-param use case (SwettySwipperWeb) to the suppression guidance | go-branded-id/linter | Low |
-| 29 | Check ops/log-parsing impact of new `"Brand:"` log prefixes in GmbH/accountability | GmbH, accountability | Low |
-| 30 | Linter: SARIF output covered by CI test? verify | go-branded-id/linter | Low |
-| 31 | Linter: suggestion text for lowercase marker types reads awkward — polish or skip | go-branded-id/linter | Low |
-| 32 | Confirm `brandid-lint` actually runs in each repo's next `buildflow` run (provider wiring proof) | 10 repos | Low |
-| 33 | Baseline scan performance (~53k files) noted; decide scan cadence (monthly?) | cross | Low |
-| 34 | Harvest this report's section f into TODO_LIST.md / ROADMAP.md (docs-health HARVEST) | go-branded-id | Med |
-| 35 | Add `.String()` data-use audit as a documented step in the rollout playbook | go-branded-id/linter | Low |
-| 36 | CV: confirm new directive comments never trip CV source-text scanners (add a test?) | CV | Low |
-| 37 | go-output: CHANGELOG note for directive repair (comment-only) | go-output | Low |
-| 38 | sbts: fold "brands must stay unnamed" package-doc reason into directive texts verbatim (currently paraphrased) | standard-bug-tracking-schema | Low |
-| 39 | template-arch-lint: resolve the three-home split brain for the raw-carrier decision | template-arch-lint | Low |
-| 40 | Publish fleet-rollout story to branded-id.lars.software changelog page | go-branded-id/website | Low |
-| 41 | Add brandid-lint pre-commit hook template for consumer repos | go-branded-id/linter | Low |
-| 42 | Consider `//brandid-lint:ignore` for BD002 — currently only BD001; document why | go-branded-id/linter | Low |
-| 43 | Benchmark linter on 53k files; record runtime in README | go-branded-id/linter | Low |
-| 44 | Consider detecting "intentionally do NOT implement BrandNamer" comments → suggest suppression automatically | go-branded-id/linter | Low |
-| 45 | Verify go-output downstream consumers (nom etc.) unaffected — comment-only, but confirm CI | go-output | Low |
-| 46 | Add fleet scan baseline (0 live findings) somewhere machine-checkable (CI job #22) | go-branded-id | Low |
-| 47 | Roll the 22 new directives' wording through each repo's own linter (line-length) | 5 repos | Low |
-| 48 | Delete stale `/tmp` scan artifacts (`/tmp/brandid-*.txt`) or archive into docs | local | Low |
-| 49 | Update go-branded-id AGENTS.md: linter saw first fleet rollout; record counts + date | go-branded-id | Low |
-| 50 | Re-run `nix flake check` on go-branded-id (untouched this session; confirm clean) | go-branded-id | Low |
+| #  | Task                                                                                                           | Repo                                      | Impact |
+| -- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------ |
+| 1  | Linter: emit copy-pasteable single-line directive text in BD001 findings                                       | go-branded-id/linter                      | High   |
+| 2  | Linter: `-fix` repairs BD002 placement (rewrap wrapped directives)                                             | go-branded-id/linter                      | High   |
+| 3  | SwettySwipperWeb api: revert or finish the daemon dependency sweep; get suite green                            | SwettySwipperWeb                          | High   |
+| 4  | gomend: repair go.mod `replace ../BuildFlow` desync; verify ViolationGroupBrand stub builds                    | gomend                                    | High   |
+| 5  | Systematic `\.String\(\)`-as-data audit in every stubbed repo (GmbH bug class)                                 | accountability, GmbH, Rolls-Royce, gomend | High   |
+| 6  | Fleet-wide grep for `uuid.Parse(<ID>.String())` and similar parse-display patterns                             | all ~/projects                            | High   |
+| 7  | CV: fix adoption-policy wording drift (AGENTS.md vs .goreleaser.yml)                                           | CV                                        | Med    |
+| 8  | sbts: triage 7 pre-existing failures (cache/github/tracker/sync)                                               | standard-bug-tracking-schema              | Med    |
+| 9  | Linter: package/file-level suppression syntax for uniform-reason packages                                      | go-branded-id/linter                      | Med    |
+| 10 | Linter: config/exclusion-file support for fleet scans (no more grep -v pipes)                                  | go-branded-id/linter                      | Med    |
+| 11 | Rollout playbook doc (pre-flight classification checklist) into linter docs                                    | go-branded-id/linter                      | Med    |
+| 12 | AGENTS.md: add 5 new precedent links to "Brands That Deliberately Skip Name()"                                 | go-branded-id                             | Med    |
+| 13 | Add testdata fixture: directive line + continuation comment (my exact BD002 case) if not covered               | go-branded-id/linter                      | Med    |
+| 14 | go-cqrs-lite: add the canonical BD001 directives to StreamMarker/TimerMarker                                   | ci-siblings/go-cqrs-lite                  | Med    |
+| 15 | RR: fix chromedp API usage in visualtest                                                                       | Rolls-Royce                               | Med    |
+| 16 | Run each touched repo's own golangci-lint/BuildFlow against new stubs/directives                               | 10 repos                                  | Med    |
+| 17 | GmbH + accountability: CHANGELOG entries for the `.Get()` fixes                                                | GmbH, accountability                      | Med    |
+| 18 | Verify BuildFlow provider picks up new directives (run buildflow in go-output)                                 | go-output                                 | Med    |
+| 19 | template-arch-lint: decide raw-carrier forever vs migrate seams to `.Value()`; document                        | template-arch-lint                        | Med    |
+| 20 | SKILLS: find the sync that reverted snippet 01, or delete generated dir                                        | SKILLS                                    | Med    |
+| 21 | SKILLS: audit domain-types-02..08 for the same staleness                                                       | SKILLS                                    | Low    |
+| 22 | CI: scheduled fleet-wide brandid-lint scan with checked-in exclusion list                                      | go-branded-id                             | Med    |
+| 23 | Release linter/vX.Y.Z if items 1–2 land (CHANGELOG first)                                                      | go-branded-id/linter                      | Med    |
+| 24 | Run linter's own test suite + `nix run .#test-race` (not run this session)                                     | go-branded-id                             | Low    |
+| 25 | Document "String() vs Get() at wire seams" contract in each consumer repo's AGENTS.md                          | 5 repos                                   | Med    |
+| 26 | Investigate daemon sweep attribution (BuildFlow audit-log) for gomend/Swetty go.mod                            | cross                                     | Low    |
+| 27 | Decide policy for excluded dirs: delete `BuildFlow.vendor.bak`, suppress or leave archived/                    | cross                                     | Low    |
+| 28 | doc.go: add URL/query-param use case (SwettySwipperWeb) to the suppression guidance                            | go-branded-id/linter                      | Low    |
+| 29 | Check ops/log-parsing impact of new `"Brand:"` log prefixes in GmbH/accountability                             | GmbH, accountability                      | Low    |
+| 30 | Linter: SARIF output covered by CI test? verify                                                                | go-branded-id/linter                      | Low    |
+| 31 | Linter: suggestion text for lowercase marker types reads awkward — polish or skip                              | go-branded-id/linter                      | Low    |
+| 32 | Confirm `brandid-lint` actually runs in each repo's next `buildflow` run (provider wiring proof)               | 10 repos                                  | Low    |
+| 33 | Baseline scan performance (~53k files) noted; decide scan cadence (monthly?)                                   | cross                                     | Low    |
+| 34 | Harvest this report's section f into TODO_LIST.md / ROADMAP.md (docs-health HARVEST)                           | go-branded-id                             | Med    |
+| 35 | Add `.String()` data-use audit as a documented step in the rollout playbook                                    | go-branded-id/linter                      | Low    |
+| 36 | CV: confirm new directive comments never trip CV source-text scanners (add a test?)                            | CV                                        | Low    |
+| 37 | go-output: CHANGELOG note for directive repair (comment-only)                                                  | go-output                                 | Low    |
+| 38 | sbts: fold "brands must stay unnamed" package-doc reason into directive texts verbatim (currently paraphrased) | standard-bug-tracking-schema              | Low    |
+| 39 | template-arch-lint: resolve the three-home split brain for the raw-carrier decision                            | template-arch-lint                        | Low    |
+| 40 | Publish fleet-rollout story to branded-id.lars.software changelog page                                         | go-branded-id/website                     | Low    |
+| 41 | Add brandid-lint pre-commit hook template for consumer repos                                                   | go-branded-id/linter                      | Low    |
+| 42 | Consider `//brandid-lint:ignore` for BD002 — currently only BD001; document why                                | go-branded-id/linter                      | Low    |
+| 43 | Benchmark linter on 53k files; record runtime in README                                                        | go-branded-id/linter                      | Low    |
+| 44 | Consider detecting "intentionally do NOT implement BrandNamer" comments → suggest suppression automatically    | go-branded-id/linter                      | Low    |
+| 45 | Verify go-output downstream consumers (nom etc.) unaffected — comment-only, but confirm CI                     | go-output                                 | Low    |
+| 46 | Add fleet scan baseline (0 live findings) somewhere machine-checkable (CI job #22)                             | go-branded-id                             | Low    |
+| 47 | Roll the 22 new directives' wording through each repo's own linter (line-length)                               | 5 repos                                   | Low    |
+| 48 | Delete stale `/tmp` scan artifacts (`/tmp/brandid-*.txt`) or archive into docs                                 | local                                     | Low    |
+| 49 | Update go-branded-id AGENTS.md: linter saw first fleet rollout; record counts + date                           | go-branded-id                             | Low    |
+| 50 | Re-run `nix flake check` on go-branded-id (untouched this session; confirm clean)                              | go-branded-id                             | Low    |
 
 ## g) Questions I cannot figure out myself
 
@@ -141,4 +141,4 @@
 
 ---
 
-*Point-in-time snapshot. Section f is HARVEST input for TODO_LIST/ROADMAP (docs-health), not yet harvested. Format note: user explicitly requested `.md`; status-report skill's canonical format is HTML — flagged, not propagated as default.*
+_Point-in-time snapshot. Section f is HARVEST input for TODO_LIST/ROADMAP (docs-health), not yet harvested. Format note: user explicitly requested `.md`; status-report skill's canonical format is HTML — flagged, not propagated as default._
