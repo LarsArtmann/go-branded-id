@@ -71,10 +71,10 @@ func TestDetectPrimitiveIDs_Fixtures(t *testing.T) {
 		rule gofinding.RuleName
 	}
 
-	join := func(parts ...string) string { return filepath.Join(parts...) }
+	join := filepath.Join
 
 	want := []wantFinding{
-		// cmdwire/main.go is excluded (cmd/ path), fields.go first in walk order.
+		// cmd/main.go is excluded (cmd/ path), fields.go first in walk order.
 		{file: join("testdata", "bd003", "fields.go"), line: 9, name: "OrderID", rule: RuleIDBD003},
 		{file: join("testdata", "bd003", "fields.go"), line: 10, name: "userID", rule: RuleIDBD003},
 		{

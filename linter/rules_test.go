@@ -17,6 +17,7 @@ func TestParseRuleSet(t *testing.T) {
 		{spec: "BD001,BD003", want: RuleSet{BD001: true, BD003: true}},
 		{spec: "BD001, BD003", want: RuleSet{BD001: true, BD003: true}},
 		{spec: "BD001,BD001", want: RuleSet{BD001: true}},
+		{spec: "BD001,", want: RuleSet{BD001: true}}, // trailing comma tolerated (SplitSeq drops the empty tail)
 		{spec: "BD002", wantErr: true},
 		{spec: "BD999", wantErr: true},
 		{spec: "bd001", wantErr: true},

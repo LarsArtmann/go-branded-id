@@ -263,18 +263,28 @@ func TestCreatePrimitiveIDMessage(t *testing.T) {
 
 	tests := []struct {
 		name string
+		call func() string
 		want string
 	}{
 		{
 			name: "compound param with parent",
+			call: func() string {
+				return createPrimitiveIDMessage("userId", "string", "UserID", "getUser", locationParam)
+			},
 			want: "Replace parameter 'userId' (string) with strong ID type UserID in getUser",
 		},
 		{
 			name: "standalone id return without parent",
+			call: func() string {
+				return createPrimitiveIDMessage("id", "string", "GenericID", "", locationReturn)
+			},
 			want: "Change type of return value 'id' from string to strong ID type GenericID",
 		},
 		{
 			name: "field kind",
+			call: func() string {
+				return createPrimitiveIDMessage("orderId", "int", "OrderID", "Order", locationField)
+			},
 			want: "Replace field 'orderId' (int) with strong ID type OrderID in Order",
 		},
 	}
@@ -283,23 +293,7 @@ func TestCreatePrimitiveIDMessage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			var got string
-			switch tt.name {
-			case "compound param with parent":
-				got = createPrimitiveIDMessage(
-					"userId",
-					"string",
-					"UserID",
-					"getUser",
-					locationParam,
-				)
-			case "standalone id return without parent":
-				got = createPrimitiveIDMessage("id", "string", "GenericID", "", locationReturn)
-			case "field kind":
-				got = createPrimitiveIDMessage("orderId", "int", "OrderID", "Order", locationField)
-			}
-
-			if got != tt.want {
+			if got := tt.call(); got != tt.want {
 				t.Errorf("createPrimitiveIDMessage() = %q, want %q", got, tt.want)
 			}
 		})
