@@ -183,6 +183,7 @@ func TestProviderDetectRulesOption(t *testing.T) {
 		}
 
 		sawBD003 := false
+
 		for _, f := range findings {
 			if f.Rule == linter.RuleIDBD001 {
 				t.Errorf("BD003-only run emitted %s", linter.RuleIDBD001)
