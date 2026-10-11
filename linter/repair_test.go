@@ -336,3 +336,51 @@ func TestRepair_WorkingDirFromContext(t *testing.T) {
 		t.Fatalf("Repair() inserted %d, want 1", inserted)
 	}
 }
+
+// TestRepairPath_NeverTouchesTestData guards the fixture-corruption class:
+// repair invoked with a testdata path (as scan root or single file) must
+// insert nothing, even when the fixtures contain unnamed brands. This linter's
+// own testdata was corrupted three times before the guard existed.
+func TestRepairPath_NeverTouchesTestData(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	testdata := filepath.Join(dir, "testdata")
+
+	if err := os.MkdirAll(testdata, 0o750); err != nil {
+		t.Fatalf("MkdirAll() error = %v", err)
+	}
+
+	src := "package testdata\n\nimport id \"github.com/larsartmann/go-branded-id\"\n\n" +
+		"type FixtureBrand struct{}\n\nfunc use() { _ = id.ID[FixtureBrand, string]{} }\n"
+
+	fixture := filepath.Join(testdata, "fixture.go")
+	if err := os.WriteFile(fixture, []byte(src), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+
+	for _, target := range []string{testdata, fixture, dir} {
+		t.Run(filepath.Base(target), func(t *testing.T) {
+			t.Parallel()
+
+			inserted, err := RepairPath(target)
+			if err != nil {
+				t.Fatalf("RepairPath(%s) error = %v", target, err)
+			}
+
+			if target != dir && inserted != 0 {
+				t.Errorf("RepairPath(%s) inserted %d stub(s), want 0 (testdata is never repaired)",
+					target, inserted)
+			}
+		})
+	}
+
+	content, err := os.ReadFile(fixture)
+	if err != nil {
+		t.Fatalf("ReadFile() error = %v", err)
+	}
+
+	if string(content) != src {
+		t.Errorf("fixture was modified:\n%s", content)
+	}
+}

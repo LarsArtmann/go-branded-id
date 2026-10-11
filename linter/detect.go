@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	gofinding "github.com/larsartmann/go-finding"
 )
@@ -70,6 +71,17 @@ func skipDir(name string) bool {
 	default:
 		return false
 	}
+}
+
+// underTestDataPath reports whether any path segment of filename is named
+// testdata, on any operating system separator convention. Walk-level dir
+// skipping (skipDir) does not apply to a testdata path passed as the scan
+// root or to single-file invocations, so repair guards with this check
+// instead: parse-only fixtures must never be rewritten, no matter how the
+// path reaches the tool.
+func underTestDataPath(filename string) bool {
+	return strings.Contains(filepath.ToSlash(filename), "/testdata/") ||
+		filepath.Base(filename) == "testdata"
 }
 
 // walkGoFiles walks path (a single Go file or a directory tree), skipping

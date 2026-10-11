@@ -39,10 +39,21 @@ func Repair(ctx context.Context) (int, error) {
 // duplicates an existing method: a brand that declares a Name() string
 // method is skipped whatever its body returns, so repair is idempotent and
 // a second run inserts nothing.
+//
+// Files under a testdata/ path segment are never repaired. Detection keeps
+// scanning a testdata root passed explicitly (the fixture tests depend on
+// it), but repair must not rewrite fixtures: this linter's own testdata was
+// corrupted three times before the guard existed, once by an orchestrator
+// replaying stale per-file findings, which walk-level dir skipping cannot
+// stop.
 func RepairPath(path string) (int, error) {
 	inserted := 0
 
 	walkErr := walkGoFiles(path, func(filename string) error {
+		if underTestDataPath(filename) {
+			return nil
+		}
+
 		count, repairErr := repairFile(filename)
 		if repairErr != nil {
 			return fmt.Errorf("repair %s: %w", filename, repairErr)

@@ -269,7 +269,13 @@ func TestCreatePrimitiveIDMessage(t *testing.T) {
 		{
 			name: "compound param with parent",
 			call: func() string {
-				return createPrimitiveIDMessage("userId", "string", "UserID", "getUser", locationParam)
+				return createPrimitiveIDMessage(
+					"userId",
+					"string",
+					"UserID",
+					"getUser",
+					locationParam,
+				)
 			},
 			want: "Replace parameter 'userId' (string) with strong ID type UserID in getUser",
 		},
