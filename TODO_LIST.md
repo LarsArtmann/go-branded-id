@@ -18,6 +18,10 @@
 _All high-impact items completed 2026-09-29 (website dependency advisories,
 Go-pins CI tripwire) — see `CHANGELOG.md` [Unreleased]._
 
+| Task                                                                     | Status    | Impact | Evidence                                                                                                                                                                                          |
+| ------------------------------------------------------------------------ | --------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Migrate branching-flow strong-id linter into `linter/` as opt-in BD003 | 🔴 `TODO` | High   | Comprehensive plan: `docs/planning/2026-10-11_04-16_SUPERB-strongid-migration-bd003.md` (staged port → parity gate → release → deprecate → fleet re-point → remove; BD003 detect-only, opt-in via `-rules`, zero fleet blast radius day one). |
+
 ## Medium Impact
 
 _All medium-impact items completed 2026-09-29 (website page audit,
