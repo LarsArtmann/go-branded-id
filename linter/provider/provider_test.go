@@ -46,7 +46,10 @@ func TestProviderRegistered(t *testing.T) {
 	}
 
 	if !strings.Contains(spec.Description, "BD003") {
-		t.Errorf("Spec.Description = %q, want it to mention the opt-in BD003 rule", spec.Description)
+		t.Errorf(
+			"Spec.Description = %q, want it to mention the opt-in BD003 rule",
+			spec.Description,
+		)
 	}
 
 	if spec.Trigger.Language != "go" {
