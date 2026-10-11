@@ -1,6 +1,6 @@
 module github.com/larsartmann/go-branded-id/linter
 
-go 1.27
+go 1.27.1
 
 require (
 	github.com/larsartmann/go-finding v1.13.0
