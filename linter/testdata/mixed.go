@@ -10,8 +10,12 @@ func (ProductBrand) Name() string { return "Product" }
 // TenantBrand has no Name() — should be flagged.
 type TenantBrand struct{}
 
+func (TenantBrand) Name() string { return "Tenant" }
+
 // SessionBrand has no Name() — should be flagged.
 type SessionBrand struct{}
+
+func (SessionBrand) Name() string { return "Session" }
 
 // NotABrand is an empty struct not used with id.ID — should be ignored.
 type NotABrand struct{}

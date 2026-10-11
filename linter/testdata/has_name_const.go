@@ -9,6 +9,10 @@ const brandNameConst = "Widget"
 // string literal, so the brandid-lint should NOT flag it (issue #10).
 type WidgetBrand struct{}
 
+func (WidgetBrand) Name() string { return "Widget" }
+
+func (WidgetBrand) Name() string { return "Widget" }
+
 func (WidgetBrand) Name() string { return brandNameConst }
 
 func exampleConstName() {
