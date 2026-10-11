@@ -45,6 +45,10 @@ func TestProviderRegistered(t *testing.T) {
 		t.Error("Spec.Description is empty")
 	}
 
+	if !strings.Contains(spec.Description, "BD003") {
+		t.Errorf("Spec.Description = %q, want it to mention the opt-in BD003 rule", spec.Description)
+	}
+
 	if spec.Trigger.Language != "go" {
 		t.Errorf("Spec.Trigger.Language = %q, want %q", spec.Trigger.Language, "go")
 	}

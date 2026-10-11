@@ -11,6 +11,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Nothing yet.
 
+## [0.4.0] - 2026-10-11
+
+### Added
+
+- **Rule BD003: primitive-typed ID detection, ported from
+  `branching-flow strong-id`** (finding parity gated by
+  `scripts/parity-bd003.sh`). BD003 flags `string`/`int`/`uint`/`bool`
+  parameters, named return values, and struct fields whose name marks them
+  as an identifier (`userId`, `order_id`, `PID`) and suggests the branded ID
+  type to adopt. Every finding carries `suggestedTypeName`,
+  `suggestedBrand`, `importPath`, and a complete `typeDefinition` in
+  metadata. **BD003 is opt-in** — the default rule set stays BD001+BD002
+  (byte-identical behavior for every existing consumer) because
+  brandid-lint runs fleet-wide and repos that deliberately silenced the old
+  strong-id rule must not be flooded by an upgrade.
+- **`-rules` flag** on the CLI: comma-separated rule selection
+  (`-rules BD003`, `-rules BD001,BD003`). Unknown rules and BD002 (not
+  selectable; it rides along automatically) are hard errors. `-fix` with
+  BD001 deselected is rejected — repair applies BD001 stubs only.
+- **`RuleSet` API**: `DefaultRuleSet`, `AllRules`, `ParseRuleSet`, and
+  `DetectPathWithRules` select rules programmatically. `DetectPath` and the
+  BuildFlow provider `Detect` keep the default rule set.
+- **BD003 suppression**: `//brandid-lint:ignore(BD003) <reason>` suppresses
+  the primitive-ID findings it covers (trailing on the declaration line,
+  directly above it, or attached to the enclosing function/type — a doc
+  directive covers the whole declaration). Directives that suppress nothing
+  are BD002 findings. Directives of inactive rules are neither honored nor
+  policed; malformed directives stay loud in every mode. BD003 has no
+  repair by design: a real fix rewrites the declaration and every call
+  site, which is a codemod's job, not a lint repair.
+
+### Fixed
+
+- **Repair never touches files under a testdata path.** Walk-level dir
+  skipping did not apply to testdata paths passed directly or to
+  single-file invocations, and an orchestrator replaying stale per-file
+  findings corrupted this linter's own parse-only fixtures through that
+  hole. Repair now skips every file under a `testdata/` path segment
+  (detection keeps scanning explicitly-passed testdata roots so fixture
+  tests still work).
+
+### Migration from branching-flow strong-id
+
+- Replace `branching-flow strong-id <path>` with
+  `brandid-lint -rules BD003 <path>` (add BD001 if you also want brand
+  hygiene; SARIF and text output available via `-format`).
+- `//nolint:branching-flow` and `//lint:ignore STRONG_ID` suppressions are
+  not bridged (verified: zero uses outside branching-flow's own fixtures).
+  Use `//brandid-lint:ignore(BD003) <reason>`.
+- Parity evidence: `docs/status/2026-10-11_11-50_bd003-parity-report.md` —
+  26/26 findings identical on the frozen corpus; both documented
+  divergences are the intended suppression-contract change.
+
 ## [0.3.0] - 2026-10-11
 
 ### Fixed

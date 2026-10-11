@@ -94,7 +94,7 @@ func main() {
 | **Any comparable type**      | `ID[Brand, V comparable]` works with strings, ints, and any comparable type                                                      |
 | **Zero value semantics**     | Zero value means "unset" — serializes to `null` in JSON, `nil` in SQL                                                            |
 | **SQL scanner/valuer**       | `Scan` accepts all driver types; `Value` returns the correct type                                                                |
-| **brandid-lint linter**      | [`linter/`](linter/) flags brand types missing `Name()` (rule BD001) as go-finding findings; BuildFlow provider and CLI included |
+| **brandid-lint linter**      | [`linter/`](linter/) flags brand types missing `Name()` (rule BD001) and, opt-in via `-rules BD003`, primitive-typed ID params/fields that should become branded types; BuildFlow provider and CLI included |
 
 ## Named Brand Types
 

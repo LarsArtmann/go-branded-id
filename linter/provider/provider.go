@@ -31,7 +31,7 @@ import (
 var Provider = gofstoolsdk.Register(
 	gofstoolsdk.Spec{
 		Name:        linter.ToolName,
-		Description: "BD001: brand types used with id.ID but missing their Name() string method",
+		Description: "BD001: brand types used with id.ID but missing their Name() string method; BD002: broken suppression directives; BD003 (opt-in via a RuleSet): primitive-typed ID parameters, returns, and fields that should become branded ID types",
 		Trigger:     gofstoolsdk.OnGoModule(),
 		DependsOn:   nil,
 		// Brands are a per-Go-module concept: fan out so findings paths are
