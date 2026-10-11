@@ -70,7 +70,10 @@ no autofix: a real fix rewrites the declaration and every call site, which is
 a codemod's job. Severities rank the domain (`user`/`order`/`product` →
 error in signatures, `config`/`item` → warning, the rest → info), and the
 scan skips `cmd/`, `ui/`, output, test-helper, and tooling paths plus
-`_test.go` files. `String`/`Error` method declarations are exempt (interface
+`_test.go` files, and generated files (the standard
+`Code generated ... DO NOT EDIT.` header — sqlc, templ, protobuf, mocks) are
+skipped for every rule, exactly like the rule's branching-flow ancestor.
+`String`/`Error` method declarations are exempt (interface
 contracts stay primitive).
 
 Suppress a BD003 finding where the decision lives:
