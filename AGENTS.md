@@ -44,14 +44,19 @@ The dev shell (`nix develop`) sets `GOWORK=off` and provides Go 1.27.1 (satisfie
 ├── id_binary.go       # MarshalBinary / UnmarshalBinary (little-endian)
 ├── id_gob.go          # GobEncode / GobDecode (delegates to binary)
 ├── linter/            # SEPARATE Go module: brandid-lint (see linter/go.mod, linter/CHANGELOG.md)
-│   ├── detect.go      #   Detect(ctx)/DetectPath(path) — BD001 scan + shared fileScan over .go files
+│   ├── detect.go      #   Detect/DetectWithRules — shared fileScan walk (skips testdata/, vendor/, generated)
+│   ├── rules.go       #   RuleSet (BD001 default, BD003 opt-in) + ParseRuleSet for -rules
 │   ├── brands.go      #   Syntactic brand detection (empty struct + id.ID[...] type arg)
-│   ├── finding.go     #   BD001/BD002 finding construction (go-finding Builder)
+│   ├── primitives.go  #   BD003: primitive-typed ID params/returns/fields, path exclusions, suppression
+│   ├── idpattern.go   #   BD003 name heuristic (containsIDPattern: id/ids, _id suffix, PID-class acronyms)
+│   ├── suggest_id.go  #   BD003 suggested type/brand names, message, severity ranking tables
+│   ├── finding.go     #   BD001/BD002/BD003 finding construction (go-finding Builder)
+│   ├── generated.go   #   "Code generated ... DO NOT EDIT." header detection (skip lint + repair)
 │   ├── suggest.go     #   Name() suggestion derivation
-│   ├── suppress.go    #   //brandid-lint:ignore(BD001) directive parsing + BD002
-│   ├── repair.go      #   Repair(ctx)/RepairPath(path) — Name() stub insertion (idempotent)
+│   ├── suppress.go    #   //brandid-lint:ignore(...) directive parsing + BD002
+│   ├── repair.go      #   Repair(ctx)/RepairPath(path) — Name() stub insertion (idempotent, BD001 only)
 │   ├── provider/      #   toolsdk self-registration (BuildFlow blank-imports this)
-│   ├── cmd/brandid-lint/ # CLI: text/SARIF output, -fix, exit 0/1/2
+│   ├── cmd/brandid-lint/ # CLI: -rules, -format text|sarif, -fix; exit 0=clean/1=findings/2=error
 │   └── testdata/      #   Parse-only fixtures (never compiled)
 ├── website/           # Astro + Starlight documentation website (deployed to Firebase Hosting)
 └── *_test.go          # Tests, benchmarks, fuzz tests, example tests
@@ -239,8 +244,9 @@ go-finding/toolsdk. The dependency direction is load-bearing:
 - BuildFlow integration: `linter/provider` self-registers a toolsdk Spec
   (Detect + Repair); BuildFlow consumes it via a blank import in
   `tools/providers/sdk_imports.go` plus a go.mod require. Tool name:
-  `brandid-lint`, rule IDs: `BD001` and `BD002` (stable forever). Repair
-  inserts `Name()` stubs; BuildFlow re-runs Detect to measure the delta.
+  `brandid-lint`, rule IDs: `BD001`, `BD002`, `BD003` (stable forever).
+  Repair inserts `Name()` stubs (BD001 only); BuildFlow re-runs Detect to
+  measure the delta.
 - In-source suppression: `//brandid-lint:ignore(BD001) <reason>` on the decl
   line or the last line of the comment group directly above it suppresses
   BD001; a broken directive (missing reason, unknown rule, stale, duplicate,
@@ -268,6 +274,105 @@ go-finding/toolsdk. The dependency direction is load-bearing:
   (kept in `79ef83d`) so the linter runs clean on this repo. If they are
   ever stripped again, repo-wide scans will report them — that is the
   linter working as designed, not a bug.
+
+### BD003 — Opt-In Primitive-ID Rule (ported from branching-flow strong-id)
+
+BD003 (linter v0.4.0+) flags primitive-typed identifiers — `string`, `bool`,
+all `int`/`uint` family params, named returns, and struct fields whose name
+marks them as an ID — that should become branded `id.ID` types. Detection is
+purely syntactic (`primitives.go` + `idpattern.go`): pointers, slices, and
+named types never match; `String`/`Error` method decls are skipped (their
+signatures must stay primitive). The name heuristic (`containsIDPattern`)
+matches standalone `id`/`ids`, `_id`/`_ids` suffixes, compound names whose
+LAST token is id/ids (`userId`, `validationID`), and single-letter-head
+all-caps acronyms (PID, UID, RID) — but NOT English words (`isValid`,
+`valid`, `paid`, `VALID`).
+
+- **Opt-in only.** `DefaultRuleSet()` is BD001 alone: brandid-lint runs
+  fleet-wide, and repos that deliberately silenced the old strong-id rule
+  (webphone, DiscordSync) must not be flooded by an upgrade. Select via CLI
+  `-rules BD001,BD003`, API `DetectWithRules`/`DetectPathWithRules`, or
+  BuildFlow `tool_options: brandid-lint: {rules: "BD001,BD003"}`. BD002 is
+  not selectable (rides along automatically); a typo'd or empty `-rules`
+  token is a hard error, never a silent wrong-rules scan.
+- **Detect-only.** `-fix` applies BD001 repairs only — a real BD003 fix
+  rewrites the declaration and every call site (codemod territory, not a
+  lint repair). Findings carry FixStrategy Suggest plus metadata:
+  `suggestedTypeName`, `suggestedBrand`, `importPath`, and a paste-ready
+  `typeDefinition`.
+- **Severity model** (`suggest_id.go` prefix tables, ported for parity):
+  high-priority domains (user, order, product, customer, account,
+  transaction, payment, session, token) → error in signatures / warning in
+  struct fields; medium-priority (entity, resource, item, record, entry,
+  document, file, config, setting) → warning / info; everything else info.
+  BuildFlow guards use `error_rules: brandid-lint: [BD003]`.
+- **Path exclusions, BD003 only** (ported from strong-id; BD001 keeps
+  scanning): `ui/`, `internal/output/`, `cmd/`, `testhelpers/`, `testutil/`,
+  `docs/examples/`, `tools/` substrings, plus `_test.go`-family suffixes.
+  Presentation/CLI wiring primitives are not domain-model debt.
+- **Generated files are skipped** (v0.5.1): the standard `Code generated ...
+  DO NOT EDIT.` header before the package clause (sqlc/templ/protoc/mockgen/
+  stringer output) short-circuits `scanFile`, so detection AND repair stay
+  out of machine-written code. The v0.4.0–v0.5.0 parity hole here (~90 false
+  findings on CV's first real scan) is why the frozen parity corpus must
+  always contain generated-shaped fixtures.
+- **Suppression**: `//brandid-lint:ignore(BD003) <reason>` on the
+  primitive-ID declaration line, the line directly above it, or the
+  enclosing function/type declaration. A directive that covers nothing
+  (bad placement) or is redundant with another directive is itself a BD002
+  finding.
+- **The legacy rule is gone**: branching-flow removed strong-id in v0.6.7;
+  `branching-flow strong-id` remains reachable only through the parity
+  script's v0.6.6 worktree. Consumers use `brandid-lint -rules BD003`.
+
+### Linter vendorHash — Nix FOD Content-Addressing Trap
+
+The linter module's deps are vendored through a fixed-output derivation
+pinned by `vendorHash` in `flake.nix`. A stale hash does NOT fail with a
+hash-mismatch error: FOD outputs are content-addressed, so the stale hash
+resolves to an already-present store path and nix silently injects the OLD
+vendor tree — surfacing later as misleading "inconsistent vendoring" build
+errors (or worse, a green build of stale code).
+
+- **Procedure after any linter dependency change**:
+  `cd linter && go mod vendor && nix hash path linter/vendor`, paste the SRI
+  hash into `flake.nix` `vendorHash`, then verify with `nix flake check`.
+- **Escape hatch** when already confused: paste any valid-length dummy SRI
+  hash to force the real `got:` printout, then use that.
+- **BuildFlow side of the same coin**: BuildFlow's nix build embeds
+  LarsArtmann deps via preparedSrc from **flake.lock input revs**, NOT
+  go.mod versions — bumping go.mod alone changes nothing in the embedded
+  provider. Re-embedding a linter release into BuildFlow requires the
+  flake.lock input bump AND a profile reinstall; the installed binary is
+  whatever the profile last installed, not what master says.
+
+### Parity Gate (scripts/parity-bd003.sh) + Testdata-Corruption Postmortem
+
+`scripts/parity-bd003.sh` A/B-diffs `brandid-lint -rules BD003` against the
+legacy branching-flow strong-id analyzer (both render SARIF via go-finding;
+normalized to `file:startLine` pairs) over a frozen corpus. Exit 0 = parity
+or documented accepts, 1 = divergence (must be triaged in
+`docs/status/*bd003-parity*.md`). Run:
+`nix develop -c bash -c "bash scripts/parity-bd003.sh"`.
+
+- **Self-healing legacy side** (post-v0.6.7-removal): when the
+  branching-flow checkout no longer carries `pkg/strongid`, the script
+  materializes a detached worktree of `BRANCHING_FLOW_TAG` (default v0.6.6,
+  the last strong-id release) and fails LOUD if it cannot. Before this
+  existed, the gate silently built an old-side binary WITHOUT the strong-id
+  subcommand and compared against empty — a vacuous verdict. General rule:
+  an A/B gate must fail loud when one side cannot run; an empty-side diff is
+  not parity.
+- **Testdata-corruption postmortem**: the recurring `linter/testdata`
+  rewrites (2026-10-05 `79ef83d` restore, 2026-10-08 daemon `9e5190d`
+  re-corruption) were caused by the daemon-side BuildFlow binary embedding
+  linter v0.2.0, whose provider "repaired" parse-only fixtures during
+  repo-wide runs. Fixed in three layers: `skipDir`/`underTestDataPath`
+  guards in `detect.go` (scan + repair), the v0.5.0 re-embed into the
+  BuildFlow profile binary (the corruption source itself), and the parity
+  gate as regression harness. If fixtures corrupt again, check BOTH
+  `git log -p -- linter/testdata` and which buildflow binary the daemon
+  runs (`buildflow --version`).
 
 ### Dual-Mode Pre-Push Hook
 
