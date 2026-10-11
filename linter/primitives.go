@@ -118,7 +118,11 @@ func excludedFromPrimitiveScan(filename string) bool {
 // was ported from: one AST walk over function declarations (parameters and
 // named returns; String/Error method declarations are skipped) and type
 // declarations (struct fields, including function-local type declarations).
-func primitiveIDViolations(f *ast.File, fset *token.FileSet, filename string) []primitiveIDViolation {
+func primitiveIDViolations(
+	f *ast.File,
+	fset *token.FileSet,
+	filename string,
+) []primitiveIDViolation {
 	if f == nil || fset == nil || excludedFromPrimitiveScan(filename) {
 		return nil
 	}
@@ -167,8 +171,15 @@ func violationsFromFuncDecl(fn *ast.FuncDecl, fset *token.FileSet) []primitiveID
 
 	if fn.Type.Params != nil {
 		for _, field := range fn.Type.Params.List {
-			violations = append(violations,
-				violationsFromField(field, fn.Name.Name, locationParam, fset.Position(fn.Pos()).Line, fset)...)
+			violations = append(
+				violations,
+				violationsFromField(
+					field,
+					fn.Name.Name,
+					locationParam,
+					fset.Position(fn.Pos()).Line,
+					fset,
+				)...)
 		}
 	}
 
@@ -178,8 +189,15 @@ func violationsFromFuncDecl(fn *ast.FuncDecl, fset *token.FileSet) []primitiveID
 				continue
 			}
 
-			violations = append(violations,
-				violationsFromField(field, fn.Name.Name, locationReturn, fset.Position(fn.Pos()).Line, fset)...)
+			violations = append(
+				violations,
+				violationsFromField(
+					field,
+					fn.Name.Name,
+					locationReturn,
+					fset.Position(fn.Pos()).Line,
+					fset,
+				)...)
 		}
 	}
 
@@ -196,8 +214,15 @@ func violationsFromTypeSpec(ts *ast.TypeSpec, fset *token.FileSet) []primitiveID
 	var violations []primitiveIDViolation
 
 	for _, field := range structType.Fields.List {
-		violations = append(violations,
-			violationsFromField(field, ts.Name.Name, locationField, fset.Position(ts.Pos()).Line, fset)...)
+		violations = append(
+			violations,
+			violationsFromField(
+				field,
+				ts.Name.Name,
+				locationField,
+				fset.Position(ts.Pos()).Line,
+				fset,
+			)...)
 	}
 
 	return violations

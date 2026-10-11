@@ -23,8 +23,8 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 echo "== building both linters =="
-( cd "$LINTER_DIR" && go build -o "$WORK/brandid-lint" ./cmd/brandid-lint )
-( cd "$BF_DIR" && go build -o "$WORK/branching-flow" ./cmd/branching-flow )
+(cd "$LINTER_DIR" && go build -o "$WORK/brandid-lint" ./cmd/brandid-lint)
+(cd "$BF_DIR" && go build -o "$WORK/branching-flow" ./cmd/branching-flow)
 
 # The corpus: every non-testdata .go file of this repo (both modules), the
 # BD003 fixture corpus (including its cmd/ exclusion case), and the legacy

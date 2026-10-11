@@ -123,14 +123,14 @@ func walkGoFiles(path string, visit func(filename string) error) error {
 // file and its FileSet ride along for the opt-in BD003 scan, which reuses
 // the same parse instead of re-reading the file.
 type fileScan struct {
-	decls           []BrandDecl
-	suppressed      map[int]bool
-	bd001Directives []gofinding.Finding      // BD002s policing BD001 directives
-	brokenDirectives []gofinding.Finding     // BD002s for malformed directives
-	bd003Directives []suppressionDirective   // well-formed ignore(BD003) directives
-	file            *ast.File
-	fset            *token.FileSet
-	filename        string
+	decls            []BrandDecl
+	suppressed       map[int]bool
+	bd001Directives  []gofinding.Finding    // BD002s policing BD001 directives
+	brokenDirectives []gofinding.Finding    // BD002s for malformed directives
+	bd003Directives  []suppressionDirective // well-formed ignore(BD003) directives
+	file             *ast.File
+	fset             *token.FileSet
+	filename         string
 }
 
 // scanFile parses one Go file and pairs its brand declarations with their

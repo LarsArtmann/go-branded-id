@@ -132,10 +132,10 @@ func parseSuppressionDirective(comment *ast.Comment) (suppressionDirective, bool
 // BD003 scan — policed when BD003 is active, silent when it is not, because
 // a directive for a rule that is not running is neither broken nor noisy.
 type suppressionOutcome struct {
-	suppressed      map[int]bool            // BD001 suppression map keyed by brand offset
-	bd001Findings   []gofinding.Finding     // BD002s policing BD001 directives
-	brokenFindings  []gofinding.Finding     // BD002s for malformed directives (any rule)
-	bd003Directives []suppressionDirective  // well-formed ignore(BD003) directives
+	suppressed      map[int]bool           // BD001 suppression map keyed by brand offset
+	bd001Findings   []gofinding.Finding    // BD002s policing BD001 directives
+	brokenFindings  []gofinding.Finding    // BD002s for malformed directives (any rule)
+	bd003Directives []suppressionDirective // well-formed ignore(BD003) directives
 }
 
 // applySuppressions pairs directives with brand declarations and decides

@@ -68,7 +68,10 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	if *fix {
 		if !ruleSet.BD001 {
-			_, _ = fmt.Fprintln(stderr, "error: -fix applies BD001 repairs only; include BD001 in -rules")
+			_, _ = fmt.Fprintln(
+				stderr,
+				"error: -fix applies BD001 repairs only; include BD001 in -rules",
+			)
 
 			return 2
 		}

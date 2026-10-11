@@ -77,13 +77,33 @@ func TestDetectPrimitiveIDs_Fixtures(t *testing.T) {
 		// cmdwire/main.go is excluded (cmd/ path), fields.go first in walk order.
 		{file: join("testdata", "bd003", "fields.go"), line: 9, name: "OrderID", rule: RuleIDBD003},
 		{file: join("testdata", "bd003", "fields.go"), line: 10, name: "userID", rule: RuleIDBD003},
-		{file: join("testdata", "bd003", "fields.go"), line: 17, name: "ownerID", rule: RuleIDBD003},
-		{file: join("testdata", "bd003", "fields.go"), line: 17, name: "tenantID", rule: RuleIDBD003},
-		{file: join("testdata", "bd003", "fields.go"), line: 23, name: "sessionTokenID", rule: RuleIDBD003},
+		{
+			file: join("testdata", "bd003", "fields.go"),
+			line: 17,
+			name: "ownerID",
+			rule: RuleIDBD003,
+		},
+		{
+			file: join("testdata", "bd003", "fields.go"),
+			line: 17,
+			name: "tenantID",
+			rule: RuleIDBD003,
+		},
+		{
+			file: join("testdata", "bd003", "fields.go"),
+			line: 23,
+			name: "sessionTokenID",
+			rule: RuleIDBD003,
+		},
 		{file: join("testdata", "bd003", "params.go"), line: 8, name: "userId", rule: RuleIDBD003},
 		{file: join("testdata", "bd003", "params.go"), line: 11, name: "id", rule: RuleIDBD003},
 		{file: join("testdata", "bd003", "params.go"), line: 14, name: "PID", rule: RuleIDBD003},
-		{file: join("testdata", "bd003", "returns.go"), line: 6, name: "orderId", rule: RuleIDBD003},
+		{
+			file: join("testdata", "bd003", "returns.go"),
+			line: 6,
+			name: "orderId",
+			rule: RuleIDBD003,
+		},
 		{file: join("testdata", "bd003", "returns.go"), line: 9, name: "userId", rule: RuleIDBD003},
 		{file: join("testdata", "bd003", "suppressed.go"), line: 27, name: "", rule: RuleIDBD002},
 	}
@@ -376,9 +396,9 @@ func TestPrimitiveTypeOf(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		src       string
-		wantType  string
-		wantPrim  bool
+		src      string
+		wantType string
+		wantPrim bool
 	}{
 		{src: "string", wantType: "string", wantPrim: true},
 		{src: "int64", wantType: "int64", wantPrim: true},

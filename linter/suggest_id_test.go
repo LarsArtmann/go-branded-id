@@ -89,9 +89,9 @@ func TestSuggestIDTypeName(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		param      string
-		parent     string
-		want       string
+		param  string
+		parent string
+		want   string
 	}{
 		{param: "userId", parent: "", want: "UserID"},
 		{param: "product_id", parent: "", want: "ProductID"},
@@ -108,7 +108,13 @@ func TestSuggestIDTypeName(t *testing.T) {
 			t.Parallel()
 
 			if got := suggestIDTypeName(tt.param, tt.parent); got != tt.want {
-				t.Errorf("suggestIDTypeName(%q, %q) = %q, want %q", tt.param, tt.parent, got, tt.want)
+				t.Errorf(
+					"suggestIDTypeName(%q, %q) = %q, want %q",
+					tt.param,
+					tt.parent,
+					got,
+					tt.want,
+				)
 			}
 		})
 	}
@@ -158,16 +164,22 @@ func TestBuildCodeSnippet(t *testing.T) {
 		want       string
 	}{
 		{
-			name: "param with parent", typeStr: "string", kind: locationParam, parentName: "getUser",
-			want: "func getUser(orderId string)",
+			name:       "param with parent",
+			typeStr:    "string",
+			kind:       locationParam,
+			parentName: "getUser",
+			want:       "func getUser(orderId string)",
 		},
 		{
 			name: "field with parent", typeStr: "int", kind: locationField, parentName: "Order",
 			want: "type Order struct { orderId int }",
 		},
 		{
-			name: "return with parent", typeStr: "string", kind: locationReturn, parentName: "nextOrder",
-			want: "func nextOrder() (orderId string, ...)",
+			name:       "return with parent",
+			typeStr:    "string",
+			kind:       locationReturn,
+			parentName: "nextOrder",
+			want:       "func nextOrder() (orderId string, ...)",
 		},
 		{
 			name: "return without parent", typeStr: "string", kind: locationReturn,
@@ -183,7 +195,12 @@ func TestBuildCodeSnippet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got := buildCodeSnippet("orderId", tt.typeStr, tt.kind, tt.parentName); got != tt.want {
+			if got := buildCodeSnippet(
+				"orderId",
+				tt.typeStr,
+				tt.kind,
+				tt.parentName,
+			); got != tt.want {
 				t.Errorf("buildCodeSnippet() = %q, want %q", got, tt.want)
 			}
 		})
@@ -245,8 +262,8 @@ func TestCreatePrimitiveIDMessage(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name   string
-		want   string
+		name string
+		want string
 	}{
 		{
 			name: "compound param with parent",
@@ -269,7 +286,13 @@ func TestCreatePrimitiveIDMessage(t *testing.T) {
 			var got string
 			switch tt.name {
 			case "compound param with parent":
-				got = createPrimitiveIDMessage("userId", "string", "UserID", "getUser", locationParam)
+				got = createPrimitiveIDMessage(
+					"userId",
+					"string",
+					"UserID",
+					"getUser",
+					locationParam,
+				)
 			case "standalone id return without parent":
 				got = createPrimitiveIDMessage("id", "string", "GenericID", "", locationReturn)
 			case "field kind":
