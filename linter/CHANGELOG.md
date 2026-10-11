@@ -11,6 +11,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Nothing yet.
 
+## [0.5.0] - 2026-10-11
+
+### Added
+
+- **`rules` tool option on the BuildFlow provider** — repos can now run
+  BD003 through BuildFlow instead of shelling out to the CLI:
+  `tool_options: { brandid-lint: { rules: "BD001,BD003" } }`. The value is
+  parsed by `ParseRuleSet`, so an invalid entry is a hard Detect error (a
+  config typo cannot quietly scan with the wrong rules). Without the
+  option the provider runs the default rule set, byte-identical to every
+  earlier release. Also adds `linter.DetectWithRules(ctx, rules)` for
+  library consumers. Requires go-finding/toolsdk v1.15.0 for the Option
+  declaration API (same stack branching-flow dogfoods).
+
 ## [0.4.0] - 2026-10-11
 
 ### Added

@@ -66,8 +66,8 @@ var Provider = gofstoolsdk.Register(
 		// Brands are a per-Go-module concept: fan out so findings paths are
 		// module-relative and monorepos get one run per module.
 		ModuleFanOut: true,
-		Inputs: []string{"**/*.go"},
-		Detect: gofinding.NamedDetectorFunc(linter.ToolName, detect),
+		Inputs:       []string{"**/*.go"},
+		Detect:       gofinding.NamedDetectorFunc(linter.ToolName, detect),
 		Options: []gofstoolsdk.Option{
 			{
 				Name:        optionRules,

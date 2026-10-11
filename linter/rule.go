@@ -12,7 +12,7 @@ const ToolName = "brandid-lint"
 // Version is the brandid-lint tool version, independent of the library
 // version of the go-branded-id root module. It is bumped only when the
 // linter module itself is released (tag linter/vX.Y.Z).
-const Version = "0.4.0"
+const Version = "0.5.0"
 
 // RuleIDBD001 flags brand types that are used with id.ID but have no Name()
 // string method. The ID is stable forever: suppressions and configs key on
