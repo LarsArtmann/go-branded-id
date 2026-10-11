@@ -144,3 +144,70 @@ func TestProviderRepair(t *testing.T) {
 		t.Errorf("repaired file misses %q:\n%s", want, content)
 	}
 }
+
+// TestProviderDetectRulesOption pins the `rules` tool option: BD003 joins
+// only when the orchestrator selects it, an invalid value is a hard error,
+// and absent options keep the default rule set.
+func TestProviderDetectRulesOption(t *testing.T) {
+	t.Parallel()
+
+	spec := findProviderSpec(t)
+
+	t.Run("default without options", func(t *testing.T) {
+		t.Parallel()
+
+		findings, err := spec.Detect.Detect(
+			gofinding.WithWorkingDir(context.Background(), "../testdata/bd003"))
+		if err != nil {
+			t.Fatalf("Detect() error = %v", err)
+		}
+
+		for _, f := range findings {
+			if f.Rule == linter.RuleIDBD003 {
+				t.Errorf("default run emitted %s; BD003 must stay opt-in", linter.RuleIDBD003)
+			}
+		}
+	})
+
+	t.Run("BD003 via options", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := gofstoolsdk.WithOptions(
+			gofinding.WithWorkingDir(context.Background(), "../testdata/bd003/params.go"),
+			gofstoolsdk.OptionValues{optionRules: "BD003"},
+		)
+
+		findings, err := spec.Detect.Detect(ctx)
+		if err != nil {
+			t.Fatalf("Detect() error = %v", err)
+		}
+
+		sawBD003 := false
+		for _, f := range findings {
+			if f.Rule == linter.RuleIDBD001 {
+				t.Errorf("BD003-only run emitted %s", linter.RuleIDBD001)
+			}
+
+			if f.Rule == linter.RuleIDBD003 {
+				sawBD003 = true
+			}
+		}
+
+		if !sawBD003 {
+			t.Error("BD003 option did not enable BD003 findings")
+		}
+	})
+
+	t.Run("invalid rule is a hard error", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := gofstoolsdk.WithOptions(
+			gofinding.WithWorkingDir(context.Background(), "../testdata"),
+			gofstoolsdk.OptionValues{optionRules: "BD999"},
+		)
+
+		if _, err := spec.Detect.Detect(ctx); err == nil {
+			t.Error("Detect() error = nil, want unknown-rule failure")
+		}
+	})
+}

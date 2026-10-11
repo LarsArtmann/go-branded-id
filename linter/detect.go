@@ -19,12 +19,19 @@ import (
 // directory. This is the entry point the BuildFlow provider and any
 // go-finding pipeline consumer call.
 func Detect(ctx context.Context) ([]gofinding.Finding, error) {
+	return DetectWithRules(ctx, DefaultRuleSet())
+}
+
+// DetectWithRules is Detect with an explicitly selected rule set, so
+// orchestrators can opt into BD003 without shelling out to the CLI. See
+// rules.go for the rule-set contract.
+func DetectWithRules(ctx context.Context, rules RuleSet) ([]gofinding.Finding, error) {
 	root := gofinding.WorkingDirFromContext(ctx)
 	if root == "" {
 		root = "."
 	}
 
-	return DetectPath(root)
+	return DetectPathWithRules(root, rules)
 }
 
 // DetectPath scans path (a single Go file or a directory tree) with the
