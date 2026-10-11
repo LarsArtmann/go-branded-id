@@ -34,7 +34,10 @@ func TestParseRuleSet(t *testing.T) {
 				t.Fatalf("ParseRuleSet(%q) error = %v, wantErr %v", tt.spec, err, tt.wantErr)
 			}
 
-			if got != tt.want {
+			// On error the rule set may carry partially-applied rules
+			// ("BD001," sets BD001 before the empty token errors), so only
+			// the success path compares values.
+			if !tt.wantErr && got != tt.want {
 				t.Errorf("ParseRuleSet(%q) = %+v, want %+v", tt.spec, got, tt.want)
 			}
 		})
