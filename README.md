@@ -117,6 +117,23 @@ fmt.Println(id.BrandName[UserBrand]()) // User
 
 IDs without `Name()` work exactly as before — `String()` returns just the value.
 
+## When NOT to brand
+
+Branding is the default for anything that crosses a package boundary, but a
+plain defined string is the RIGHT answer when one of these holds:
+
+| Situation                                                        | Why the brand buys nothing                                                                                                                                                   |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `encoding/xml` round-trips the field                             | The XML decoder constructs values reflectively; a brand forces custom marshalers for zero type-safety gain                                                                   |
+| Untyped-constant compares are the local idiom (enum slugs)       | A closed constant set keyed by `switch value == SlugX` comparisons would need `.Get()` ceremony at every site                                                                |
+| The value is registry text compared against DB-read-back strings | Migration ordinals and similar registry rows compare raw-to-raw; the comparison seam is the only operation                                                                   |
+| The state is ephemeral process state                             | In-memory session/lesson keys that are never persisted and never cross-referenced gain nothing from compile-time separation — brand them when they start crossing boundaries |
+
+Rule of thumb from a 142-site migration: brand when an ID KIND could be
+confused with ANOTHER ID KIND or a plain string at a boundary (wire DTOs,
+HTTP path params, event payloads); keep defined strings at string-native
+seams. When in doubt, brand — `NewXFrom` at the parse point is one line.
+
 ## Error Handling
 
 All ID operations return [sentinel errors](https://pkg.go.dev/github.com/larsartmann/go-branded-id#pkg-variables) that you can match with `errors.Is`:
@@ -180,6 +197,18 @@ var userID UserID
 row.Scan(&userID)
 db.Exec("INSERT INTO users (id) VALUES (?)", userID)
 ```
+
+Two wire-shape traps worth pinning:
+
+- **Zero encodes `null`, not `""`** — a branded field converted from a
+  plain string changes its zero JSON encoding from `""` to `null`. Tagged
+  wire fields that mean absence at zero need `omitzero`
+  (`encoding/json/v2`); `omitempty` never drops it (a struct is never
+  "empty") and does not drop zero numerics under json/v2 either.
+- **Zero `String()` delegates to the value type** — for struct-ish value
+  types (e.g. a ULID-backed ID from go-cqrs-lite) the zero ID's `String()`
+  is the value type's zero rendering (the all-zero ULID string), NOT `""`.
+  Keep any zero→empty display mapping explicit at templ/log seams.
 
 ## API Reference
 

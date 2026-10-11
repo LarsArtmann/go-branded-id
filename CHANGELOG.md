@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Nothing yet.
+- **"When NOT to brand" README rubric** (distilled from the CV strong-id zero-conversion wave's 130-site evidence): the four defined-string exception classes (encoding/xml round-trips, untyped-constant enum slugs, registry-text comparisons, ephemeral process state) plus the brand-at-boundaries rule of thumb, and two wire-shape trap pins in Serialization (zero encodes `null` → `omitzero` for absence semantics; zero `String()` delegates to struct-ish value types such as ULID, rendering the all-zero string rather than `""`).
 
 ### Fixed
 
