@@ -6,9 +6,6 @@ import (
 )
 
 const (
-	// methodNamePlaceholder marks a Name() method whose return value could
-	// not be statically resolved from the AST.
-	methodNamePlaceholder = "(method on T)"
 	// stringTypeName is the Go AST identifier for the built-in string type.
 	stringTypeName = "string"
 )
@@ -68,8 +65,7 @@ func collectBrandDecls(
 				Column:   pos.Column,
 				Offset:   pos.Offset,
 				DeclEnd:  fset.Position(typeDecl.End()).Offset,
-				HasName: hasName[ts.Name.Name] != "" &&
-					hasName[ts.Name.Name] != methodNamePlaceholder,
+				HasName:  hasName[ts.Name.Name],
 			})
 		}
 	}
@@ -163,11 +159,15 @@ func typeNameFromExpr(e ast.Expr) string {
 	}
 }
 
-// collectNameMethods returns a map of type names to their Name() string
-// return values (or methodNamePlaceholder when the return value cannot be
-// determined statically).
-func collectNameMethods(f *ast.File) map[string]string {
-	result := make(map[string]string)
+// collectNameMethods returns the set of type names in f that declare a
+// Name() string method. Existence is the only question BD001 asks (see
+// rule.go): what the method returns is the brand author's business, so any
+// body counts — a string literal, a constant identifier, or a computed
+// value. Parsing return values instead would report brands that satisfy the
+// contract as missing it, and repair would then insert a duplicate method
+// that does not compile (issue #10).
+func collectNameMethods(f *ast.File) map[string]bool {
+	result := make(map[string]bool)
 
 	for _, decl := range f.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
@@ -180,13 +180,7 @@ func collectNameMethods(f *ast.File) map[string]string {
 			continue
 		}
 
-		if strVal := parseNameReturnValue(fn); strVal != "" {
-			result[typeName] = strVal
-
-			continue
-		}
-
-		result[typeName] = methodNamePlaceholder
+		result[typeName] = true
 	}
 
 	return result
@@ -221,26 +215,6 @@ func isNameMethod(fn *ast.FuncDecl) (string, bool) {
 	}
 
 	return typeName, true
-}
-
-// parseNameReturnValue returns the string literal of a single-statement
-// `return "..."` body, or "" when the value cannot be determined statically.
-func parseNameReturnValue(fn *ast.FuncDecl) string {
-	if fn.Body == nil || len(fn.Body.List) != 1 {
-		return ""
-	}
-
-	ret, ok := fn.Body.List[0].(*ast.ReturnStmt)
-	if !ok || len(ret.Results) != 1 {
-		return ""
-	}
-
-	lit, ok := ret.Results[0].(*ast.BasicLit)
-	if !ok || lit.Kind != token.STRING {
-		return ""
-	}
-
-	return lit.Value
 }
 
 // isStringType reports whether the type expression resolves to string.
