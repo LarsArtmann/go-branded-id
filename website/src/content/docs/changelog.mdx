@@ -3,6 +3,26 @@ title: Changelog
 description: All notable changes to go-branded-id.
 ---
 
+## [linter/v0.4.0] — 2026-10-11
+
+### Added
+
+- **Rule BD003 (opt-in): primitive-typed ID detection**, ported from
+  `branching-flow strong-id` with gated finding parity. Flags
+  `string`/`int`/`uint`/`bool` parameters, named returns, and struct fields
+  whose name marks them as an ID (`userId`, `order_id`, `PID`) and carries
+  the suggested type, brand, import path, and complete type definition in
+  every finding's metadata. Select it with `-rules BD003` — the default
+  rule set stays BD001+BD002. See the [brandid-lint guide](/guides/brandid-lint/).
+- `-rules` CLI flag and the `RuleSet` API (`ParseRuleSet`,
+  `DetectPathWithRules`); `//brandid-lint:ignore(BD003) <reason>`
+  suppression, policed by BD002.
+
+### Fixed
+
+- Repair never touches files under a testdata path, closing the hole an
+  orchestrator used to corrupt this repo's own parse-only fixtures.
+
 ## [0.7.0] — 2026-09-29
 
 ### Changed
