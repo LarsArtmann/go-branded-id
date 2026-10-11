@@ -10,6 +10,8 @@ import (
 // LAST token (split on "_" and lower->upper camel boundaries) is "id"/"ids".
 // CamelCase compounds like "isValid" and English words like "valid"/"paid" do
 // NOT match, but single-letter-head all-caps acronyms (PID, UID, RID) do.
+//
+//nolint:cyclop // ported verbatim from branching-flow strongid; the branch count IS the rule
 func containsIDPattern(name string) bool {
 	if name == "" {
 		return false

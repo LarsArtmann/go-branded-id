@@ -1,8 +1,24 @@
 package linter
 
 import (
+	"errors"
 	"fmt"
 	"strings"
+)
+
+// Rule-set parse errors. Sentinels so callers can match on them; dynamic
+// detail (the offending token) rides along via %w wrapping.
+var (
+	// errEmptyRuleSet rejects a blank -rules value, which is usually a shell
+	// quoting mistake rather than "run nothing".
+	errEmptyRuleSet = errors.New("empty rule set: want a comma-separated list of BD001 and BD003")
+	// errUnknownRule rejects a rule ID this tool never had.
+	errUnknownRule = errors.New("unknown rule")
+	// errBD002NotSelectable rejects selecting the directive-integrity rule on
+	// its own: BD002 rides along with every active rule automatically.
+	errBD002NotSelectable = errors.New(
+		"rule BD002 is not selectable: BD002 findings are emitted automatically for active rules",
+	)
 )
 
 // RuleSet selects which detection rules a scan runs. BD002 is not selectable:
@@ -54,8 +70,7 @@ func ParseRuleSet(spec string) (RuleSet, error) {
 	rules := RuleSet{}
 
 	if strings.TrimSpace(spec) == "" {
-		return rules, fmt.Errorf("empty rule set: want a comma-separated list of %s and %s",
-			RuleIDBD001, RuleIDBD003)
+		return rules, errEmptyRuleSet
 	}
 
 	for _, token := range strings.Split(spec, ",") {
@@ -67,13 +82,10 @@ func ParseRuleSet(spec string) (RuleSet, error) {
 		case string(RuleIDBD003):
 			rules.BD003 = true
 		case string(RuleIDBD002):
-			return RuleSet{}, fmt.Errorf(
-				"rule %s is not selectable: BD002 findings are emitted automatically for active rules",
-				RuleIDBD002,
-			)
+			return RuleSet{}, errBD002NotSelectable
 		default:
-			return RuleSet{}, fmt.Errorf("unknown rule %q: want %s or %s",
-				token, RuleIDBD001, RuleIDBD003)
+			return RuleSet{}, fmt.Errorf("%w %q: want %s or %s",
+				errUnknownRule, token, RuleIDBD001, RuleIDBD003)
 		}
 	}
 
