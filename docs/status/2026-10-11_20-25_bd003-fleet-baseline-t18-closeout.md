@@ -37,7 +37,7 @@ record exactly (anchors: branching-flow 0=0, go-finding 2=2, CV 0, journal
 | standard-bug-tracking-schema  | 692   | 107   | 41      | 544  | advisory                                      |
 | picoclaw                      | 510   | 18    | 27      | 465  | advisory                                      |
 | BuildFlow                     | 1     | 0     | 0       | 1    | advisory (dogfooding candidate, f.18)        |
-| **Totals**                    | 4745  | 264   | 279     | 4202 |                                               |
+| **Totals**                    | 4965  | 262   | 293     | 4410 |                                               |
 
 **Key invariant:** every error- severity finding lives in a repo whose
 BuildFlow config does NOT error-gate BD003. The two gated repos (journal,
