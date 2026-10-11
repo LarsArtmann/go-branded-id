@@ -22,6 +22,22 @@ BF_DIR="${BRANCHING_FLOW_DIR:-$HOME/projects/branching-flow}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
+# The legacy analyzer exists only up to branching-flow v0.6.6: the v0.6.7
+# removal deleted pkg/strongid. When the checkout no longer carries it, build
+# the old side from a detached worktree of the last strong-id release instead,
+# so this gate stays runnable (and loud, not silently empty) forever.
+if [ ! -d "$BF_DIR/pkg/strongid" ]; then
+	BF_REPO="$BF_DIR"
+	LEGACY_TAG="${BRANCHING_FLOW_TAG:-v0.6.6}"
+	LEGACY_DIR="$(mktemp -d)/branching-flow"
+	if ! git -C "$BF_REPO" worktree add --detach "$LEGACY_DIR" "$LEGACY_TAG" >/dev/null 2>&1; then
+		echo "parity: cannot materialize legacy strong-id checkout ($LEGACY_TAG from $BF_REPO)" >&2
+		exit 1
+	fi
+	BF_DIR="$LEGACY_DIR"
+	trap 'git -C "$BF_REPO" worktree remove --force "$LEGACY_DIR" >/dev/null 2>&1 || true; rm -rf "$WORK" "$(dirname "$LEGACY_DIR")"' EXIT
+fi
+
 echo "== building both linters =="
 (cd "$LINTER_DIR" && go build -o "$WORK/brandid-lint" ./cmd/brandid-lint)
 (cd "$BF_DIR" && go build -o "$WORK/branching-flow" ./cmd/branching-flow)

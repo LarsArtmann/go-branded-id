@@ -3,6 +3,19 @@ title: Changelog
 description: All notable changes to go-branded-id.
 ---
 
+## [linter/v0.5.1] — 2026-10-11
+
+### Fixed
+
+- **Generated files are skipped** — files with the standard
+  `Code generated ... DO NOT EDIT.` header (sqlc, templ, protoc-gen-go,
+  mockgen, stringer) are neither linted nor repaired, matching the
+  `excludeGenerated` default the rule had in branching-flow. The parity
+  corpus contained no generated files, so the gap first surfaced on real
+  sqlc/templ output (~90 false findings on a repo whose old strong-id
+  baseline was zero). Repair also never inserts `Name()` stubs into
+  generated files. Pinned by `TestGeneratedFilesAreSkipped`.
+
 ## [linter/v0.5.0] — 2026-10-11
 
 ### Added
