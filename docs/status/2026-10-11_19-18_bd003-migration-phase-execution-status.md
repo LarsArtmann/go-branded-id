@@ -5,6 +5,14 @@ successor to `docs/status/2026-10-11_18-20_bd003-migration-execution-status.md`.
 **Status at write time: T16 (branching-flow strongid removal) IN FLIGHT, paused mid-task on
 user request. Everything before T16 is shipped and verified.**
 
+> **UPDATE 2026-10-11 20:25:** the T16 tail described in §c is DONE — all 4
+> test failures fixed, v0.6.7 released, T17 (CV gate + fleet scan) done, and
+> T18 knowledge capture complete. The migration is finished. Current state:
+> `2026-10-11_20-10_bd003-migration-t16-t18-execution-status.md` (execution
+> detail) and `2026-10-11_20-25_bd003-fleet-baseline-t18-closeout.md`
+> (close-out + fleet baseline). The incidents and deferred-decision notes
+> below remain accurate history.
+
 ## a) What was completed this session
 
 ### linter/v0.5.0 — released end to end

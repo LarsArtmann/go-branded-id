@@ -5,6 +5,12 @@
 **Plan:** `docs/planning/2026-10-11_04-16_SUPERB-strongid-migration-bd003.md`
 **Scope executed:** T01–T15 (partial) of the 18-task plan; Stage 1 complete and shipped, Stage 2 shipped, Stage 3 opened.
 
+> **Superseded by** `2026-10-11_19-18_bd003-migration-phase-execution-status.md`
+> (T16 in flight) → `2026-10-11_20-10_bd003-migration-t16-t18-execution-status.md`
+> (T16+T17 done, v0.6.7 + linter v0.5.1 released) →
+> `2026-10-11_20-25_bd003-fleet-baseline-t18-closeout.md` (T18 done, migration
+> COMPLETE). Read the newest for current state.
+
 ---
 
 ## a) FULLY DONE ✅

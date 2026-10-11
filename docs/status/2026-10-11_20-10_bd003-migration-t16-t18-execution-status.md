@@ -151,3 +151,13 @@
 ---
 
 *Execution paused here per instruction. Next action on resume: T18 items 1–6, then the f) list in order.*
+
+> **T18 executed 2026-10-11 20:25** — see
+> `2026-10-11_20-25_bd003-fleet-baseline-t18-closeout.md`: AGENTS.md knowledge
+> sections (f.1–f.3), TODO/ROADMAP harvest both repos (f.4), report cross-links
+> (f.5–f.6), CV verified + gate re-run (f.7, f.40), CI-dead acceptance left as
+> the existing TODO blocker (f.8, owner), SystemNix pin left to owner (f.10,
+> g.1), fleet baseline table committed (f.11), worktrees pruned + tags checked
+> + coverage locked + SPLIT-BRAIN archived (f.29, f.42, f.43, f.22). Journal
+> inventory prepared for g.2. Remaining f)-items are routed into
+> `TODO_LIST.md` / `ROADMAP.md` or blocked on the owner questions in §g.

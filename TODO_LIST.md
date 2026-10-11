@@ -36,7 +36,7 @@ BD001 in-source suppression via BD002, brandid-lint Repair + `-fix`) — see
 | Task                                                                        | Status    | Impact | Evidence                                                                                                                                                                     |
 | --------------------------------------------------------------------------- | --------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Add a nix flake app/package attr for the brandid-lint CLI                   | 🔴 `TODO` | Med    | Only `checks.linter` builds it today; consumers (CV's gate) hand-build via `go build -o`. A `packages.brandid-lint`/`apps.brandid-lint` attr removes the manual step. (20:10 report f.24.) |
-| Publish the BD003 fleet baseline table (done 2026-10-11, drift mode pending) | 🟡 `IN_PROGRESS` | Med | Table committed in `docs/status/2026-10-11_21-*_bd003-fleet-baseline.md`; the script drift-check mode is tracked in High Impact above. (20:10 report f.11.)                 |
+| Publish the BD003 fleet baseline table (done 2026-10-11, drift mode pending) | 🟡 `IN_PROGRESS` | Med | Table committed in `docs/status/2026-10-11_20-25_bd003-fleet-baseline-t18-closeout.md`; the script drift-check mode is tracked in High Impact above. (20:10 report f.11.)                 |
 
 ## Ecosystem tracking
 
