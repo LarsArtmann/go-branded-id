@@ -22,8 +22,8 @@ import (
 const directivePrefix = "brandid-lint:ignore"
 
 // suppressionDirective is one parsed directive comment. Problem is empty
-// only for well-formed directives: correct grammar, the suppressible rule
-// BD001, and a non-empty reason.
+// only for well-formed directives: correct grammar, a suppressible rule
+// (BD001 or BD003), and a non-empty reason.
 type suppressionDirective struct {
 	Comment     string // Raw comment text (including "//"), reused as the finding snippet
 	Rule        string
@@ -112,9 +112,10 @@ func parseSuppressionDirective(comment *ast.Comment) (suppressionDirective, bool
 		switch {
 		case directive.Rule == "":
 			directive.Problem = "missing rule ID"
-		case directive.Rule != string(RuleIDBD001):
+		case directive.Rule != string(RuleIDBD001) && directive.Rule != string(RuleIDBD003):
 			directive.Problem = fmt.Sprintf(
-				"unknown rule %q: only %s is suppressible", directive.Rule, RuleIDBD001,
+				"unknown rule %q: only %s and %s are suppressible",
+				directive.Rule, RuleIDBD001, RuleIDBD003,
 			)
 		case directive.Reason == "":
 			directive.Problem = "missing reason: document why this brand deliberately skips Name()"
@@ -124,17 +125,46 @@ func parseSuppressionDirective(comment *ast.Comment) (suppressionDirective, bool
 	return directive, true
 }
 
+// suppressionOutcome is what one file's directives produced, split by the
+// rule that must emit them: malformed directives are broken (always loud),
+// BD001-rule directives are policed against the brand declarations (emitted
+// when BD001 is active), and well-formed BD003 directives are handed to the
+// BD003 scan — policed when BD003 is active, silent when it is not, because
+// a directive for a rule that is not running is neither broken nor noisy.
+type suppressionOutcome struct {
+	suppressed      map[int]bool            // BD001 suppression map keyed by brand offset
+	bd001Findings   []gofinding.Finding     // BD002s policing BD001 directives
+	brokenFindings  []gofinding.Finding     // BD002s for malformed directives (any rule)
+	bd003Directives []suppressionDirective  // well-formed ignore(BD003) directives
+}
+
 // applySuppressions pairs directives with brand declarations and decides
 // which BD001 findings are suppressed. It returns the byte offsets of
-// suppressed brand declarations plus one BD002 finding per broken directive:
-// malformed syntax, a directive on a brand that already has Name() (stale),
-// a duplicate suppression, or one that annotates no brand declaration at
-// all. Every broken directive stays loud — a silent no-op directive is worse
-// than none.
+// suppressed brand declarations, one BD002 finding per broken directive
+// (malformed syntax, a missing reason, an unknown rule), and one BD002 per
+// misplaced BD001 directive: stale (the brand has Name() by now), a duplicate
+// suppression, or one that annotates no brand declaration at all. Every
+// broken directive stays loud — a silent no-op directive is worse than none.
 func applySuppressions(
 	decls []BrandDecl,
 	directives []suppressionDirective,
-) (map[int]bool, []gofinding.Finding) {
+) suppressionOutcome {
+	outcome := suppressionOutcome{suppressed: make(map[int]bool)}
+
+	var bd001Directives []suppressionDirective
+
+	for _, directive := range directives {
+		switch {
+		case directive.Problem != "":
+			outcome.brokenFindings = append(outcome.brokenFindings,
+				findingForDirective(directive, directive.Problem))
+		case directive.Rule == string(RuleIDBD003):
+			outcome.bd003Directives = append(outcome.bd003Directives, directive)
+		default:
+			bd001Directives = append(bd001Directives, directive)
+		}
+	}
+
 	declByLine := make(map[int]int, len(decls))
 
 	for i, decl := range decls {
@@ -147,21 +177,20 @@ func applySuppressions(
 
 	var unplaced []suppressionDirective
 
-	for _, directive := range directives {
+	for _, directive := range bd001Directives {
 		associateDirective(directive, declByLine, dirsByDecl, &unplaced)
 	}
 
-	suppressed := make(map[int]bool)
-
-	findings := make([]gofinding.Finding, 0, len(directives))
-
 	for i, decl := range decls {
-		findings = append(findings, directivesForDecl(decl, dirsByDecl[i], suppressed)...)
+		outcome.bd001Findings = append(
+			outcome.bd001Findings,
+			directivesForDecl(decl, dirsByDecl[i], outcome.suppressed)...,
+		)
 	}
 
-	findings = append(findings, unplacedFindings(unplaced)...)
+	outcome.bd001Findings = append(outcome.bd001Findings, unplacedFindings(unplaced)...)
 
-	return suppressed, findings
+	return outcome
 }
 
 // associateDirective attaches one directive to the brand declaration it

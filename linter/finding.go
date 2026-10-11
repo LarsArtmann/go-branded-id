@@ -106,9 +106,12 @@ func findingForPrimitiveID(v primitiveIDViolation) gofinding.Finding {
 		})
 
 	if v.DeclEndLine > v.Line {
+		//nolint:exhaustruct_v5 // Range end carries line only; 0 column/offset mean "not set"
 		builder = builder.WithRange(gofinding.Range{
+			//nolint:exhaustruct_v5 // 0 column/offset mean "not set"
 			Start: gofinding.Position{File: gofinding.FilePath(v.File), Line: v.Line},
-			End:   gofinding.Position{File: gofinding.FilePath(v.File), Line: v.DeclEndLine},
+			//nolint:exhaustruct_v5 // 0 column/offset mean "not set"
+			End: gofinding.Position{File: gofinding.FilePath(v.File), Line: v.DeclEndLine},
 		})
 	}
 

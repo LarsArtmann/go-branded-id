@@ -3,6 +3,7 @@ package linter
 import (
 	"context"
 	"fmt"
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"io/fs"
@@ -25,17 +26,27 @@ func Detect(ctx context.Context) ([]gofinding.Finding, error) {
 	return DetectPath(root)
 }
 
-// DetectPath scans path (a single Go file or a directory tree) and returns
-// one BD001 finding per brand type that is used with id.ID but has no Name()
-// string method, plus one BD002 finding per broken suppression directive
-// (see suppress.go). Files that fail to parse are skipped: a syntax error is
-// not a brandid-lint finding, and the Go toolchain reports it far more
-// precisely.
+// DetectPath scans path (a single Go file or a directory tree) with the
+// default rule set and returns one BD001 finding per brand type that is used
+// with id.ID but has no Name() string method, plus one BD002 finding per
+// broken suppression directive (see suppress.go). It is byte-identical to
+// DetectPathWithRules(path, DefaultRuleSet()). Files that fail to parse are
+// skipped: a syntax error is not a brandid-lint finding, and the Go
+// toolchain reports it far more precisely.
 func DetectPath(path string) ([]gofinding.Finding, error) {
+	return DetectPathWithRules(path, DefaultRuleSet())
+}
+
+// DetectPathWithRules scans path with an explicitly selected rule set.
+// Selecting BD003 adds primitive-ID findings and polices ignore(BD003)
+// directives; deselecting BD001 drops brand findings and the BD002s that
+// police BD001 directives. Malformed directives stay BD002 findings in every
+// mode. See rules.go for the rule-set contract.
+func DetectPathWithRules(path string, rules RuleSet) ([]gofinding.Finding, error) {
 	var findings []gofinding.Finding
 
 	walkErr := walkGoFiles(path, func(filename string) error {
-		findings = append(findings, detectFile(filename)...)
+		findings = append(findings, detectFile(filename, rules)...)
 
 		return nil
 	})
@@ -108,11 +119,18 @@ func walkGoFiles(path string, visit func(filename string) error) error {
 }
 
 // fileScan is the per-file scan result shared by detection and repair, so
-// both see exactly the same brand declarations and suppressions.
+// both see exactly the same brand declarations and suppressions. The parsed
+// file and its FileSet ride along for the opt-in BD003 scan, which reuses
+// the same parse instead of re-reading the file.
 type fileScan struct {
-	decls      []BrandDecl
-	suppressed map[int]bool
-	directives []gofinding.Finding
+	decls           []BrandDecl
+	suppressed      map[int]bool
+	bd001Directives []gofinding.Finding      // BD002s policing BD001 directives
+	brokenDirectives []gofinding.Finding     // BD002s for malformed directives
+	bd003Directives []suppressionDirective   // well-formed ignore(BD003) directives
+	file            *ast.File
+	fset            *token.FileSet
+	filename        string
 }
 
 // scanFile parses one Go file and pairs its brand declarations with their
@@ -128,28 +146,53 @@ func scanFile(filename string) fileScan {
 	}
 
 	decls := brandDeclsFromFile(f, fset)
-	suppressed, directiveFindings := applySuppressions(
-		decls,
-		suppressionDirectivesFromFile(f, fset),
-	)
+	outcome := applySuppressions(decls, suppressionDirectivesFromFile(f, fset))
 
-	return fileScan{decls: decls, suppressed: suppressed, directives: directiveFindings}
+	return fileScan{
+		decls:            decls,
+		suppressed:       outcome.suppressed,
+		bd001Directives:  outcome.bd001Findings,
+		brokenDirectives: outcome.brokenFindings,
+		bd003Directives:  outcome.bd003Directives,
+		file:             f,
+		fset:             fset,
+		filename:         filename,
+	}
 }
 
-// detectFile returns the findings of one Go file: one BD001 per unsuppressed
-// unnamed brand declaration, plus the file's BD002 directive findings.
-func detectFile(filename string) []gofinding.Finding {
+// detectFile returns the findings of one Go file for the selected rules:
+// BD001 findings plus their BD002 directive findings when BD001 is active,
+// malformed-directive BD002s in every mode, and BD003 findings plus their
+// BD002 directive findings when BD003 is active.
+func detectFile(filename string, rules RuleSet) []gofinding.Finding {
 	scan := scanFile(filename)
 
 	var findings []gofinding.Finding
 
-	for _, decl := range scan.decls {
-		if decl.HasName || scan.suppressed[decl.Offset] {
-			continue
+	if rules.BD001 {
+		for _, decl := range scan.decls {
+			if decl.HasName || scan.suppressed[decl.Offset] {
+				continue
+			}
+
+			findings = append(findings, findingForBrand(decl))
 		}
 
-		findings = append(findings, findingForBrand(decl))
+		findings = append(findings, scan.bd001Directives...)
 	}
 
-	return append(findings, scan.directives...)
+	findings = append(findings, scan.brokenDirectives...)
+
+	if rules.BD003 {
+		violations := primitiveIDViolations(scan.file, scan.fset, scan.filename)
+		kept, directiveFindings := suppressPrimitiveIDs(violations, scan.bd003Directives)
+
+		for _, violation := range kept {
+			findings = append(findings, findingForPrimitiveID(violation))
+		}
+
+		findings = append(findings, directiveFindings...)
+	}
+
+	return findings
 }

@@ -40,8 +40,20 @@ func run(args []string, stdout, stderr io.Writer) int {
 		false,
 		"apply repairs: insert the suggested Name() stub for every unsuppressed BD001 finding (dry-run by default)",
 	)
+	rules := flagSet.String(
+		"rules",
+		linter.DefaultRuleSet().String(),
+		"comma-separated rules to run: BD001, BD003 (default BD001; BD002 directive findings are emitted automatically)",
+	)
 
 	if err := flagSet.Parse(args); err != nil {
+		return 2
+	}
+
+	ruleSet, err := linter.ParseRuleSet(*rules)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "error: %v\n", err)
+
 		return 2
 	}
 
@@ -53,6 +65,12 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	if *fix {
+		if !ruleSet.BD001 {
+			_, _ = fmt.Fprintln(stderr, "error: -fix applies BD001 repairs only; include BD001 in -rules")
+
+			return 2
+		}
+
 		inserted, fixErr := repairAll(paths)
 		if fixErr != nil {
 			_, _ = fmt.Fprintf(stderr, "error: %v\n", fixErr)
@@ -70,7 +88,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		}
 	}
 
-	findings, runErr := detectAll(paths)
+	findings, runErr := detectAll(paths, ruleSet)
 	if runErr != nil {
 		_, _ = fmt.Fprintf(stderr, "error: %v\n", runErr)
 
@@ -90,12 +108,13 @@ func run(args []string, stdout, stderr io.Writer) int {
 	return 0
 }
 
-// detectAll scans every path and merges the findings.
-func detectAll(paths []string) ([]gofinding.Finding, error) {
+// detectAll scans every path with the selected rule set and merges the
+// findings.
+func detectAll(paths []string, rules linter.RuleSet) ([]gofinding.Finding, error) {
 	var findings []gofinding.Finding
 
 	for _, path := range paths {
-		pathFindings, err := linter.DetectPath(path)
+		pathFindings, err := linter.DetectPathWithRules(path, rules)
 		if err != nil {
 			return nil, fmt.Errorf("scan %s: %w", path, err)
 		}

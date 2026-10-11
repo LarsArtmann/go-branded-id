@@ -27,7 +27,7 @@ func writeTestFile(tb testing.TB, dir, src string) string {
 func detectSource(tb testing.TB, src string) []gofinding.Finding {
 	tb.Helper()
 
-	return detectFile(writeTestFile(tb, tb.TempDir(), src))
+	return detectFile(writeTestFile(tb, tb.TempDir(), src), DefaultRuleSet())
 }
 
 // assertFindings asserts the exact multiset of rules plus one required
