@@ -159,7 +159,7 @@ func TestBuildCodeSnippet(t *testing.T) {
 	}{
 		{
 			name: "param with parent", typeStr: "string", kind: locationParam, parentName: "getUser",
-			want: "func getUser(userId string)",
+			want: "func getUser(orderId string)",
 		},
 		{
 			name: "field with parent", typeStr: "int", kind: locationField, parentName: "Order",
@@ -175,7 +175,7 @@ func TestBuildCodeSnippet(t *testing.T) {
 		},
 		{
 			name: "param without parent falls back to bare declaration", typeStr: "string",
-			kind: locationParam, want: "userId string",
+			kind: locationParam, want: "orderId string",
 		},
 	}
 

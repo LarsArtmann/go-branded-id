@@ -96,6 +96,87 @@ func TestRun_NoPathsExitTwo(t *testing.T) {
 	}
 }
 
+func TestRun_RulesDefaultExcludesBD003(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	// The BD003 fixtures are full of primitive IDs; the default rule set
+	// must not report a single one.
+	code := run([]string{filepath.Join("..", "..", "testdata", "bd003")}, &stdout, &stderr)
+
+	if code != 0 {
+		t.Errorf("run() exit code = %d, want 0 (BD003 is opt-in)", code)
+	}
+}
+
+func TestRun_RulesBD003ReportsPrimitiveIDs(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{
+		"-rules", "BD003",
+		filepath.Join("..", "..", "testdata", "bd003", "params.go"),
+	}, &stdout, &stderr)
+
+	if code != 1 {
+		t.Errorf("run() exit code = %d, want 1", code)
+	}
+
+	if !strings.Contains(stdout.String(), "userId") {
+		t.Errorf("stdout = %q, want it to mention userId", stdout.String())
+	}
+}
+
+func TestRun_UnknownRuleExitTwo(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{"-rules", "BD999", cleanDir(t)}, &stdout, &stderr)
+
+	if code != 2 {
+		t.Errorf("run() exit code = %d, want 2", code)
+	}
+
+	if !strings.Contains(stderr.String(), "unknown rule") {
+		t.Errorf("stderr = %q, want unknown-rule error", stderr.String())
+	}
+}
+
+func TestRun_BD002NotSelectableExitTwo(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{"-rules", "BD002", cleanDir(t)}, &stdout, &stderr)
+
+	if code != 2 {
+		t.Errorf("run() exit code = %d, want 2", code)
+	}
+
+	if !strings.Contains(stderr.String(), "not selectable") {
+		t.Errorf("stderr = %q, want not-selectable error", stderr.String())
+	}
+}
+
+func TestRun_FixWithoutBD001ExitTwo(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{"-rules", "BD003", "-fix", cleanDir(t)}, &stdout, &stderr)
+
+	if code != 2 {
+		t.Errorf("run() exit code = %d, want 2", code)
+	}
+
+	if !strings.Contains(stderr.String(), "BD001") {
+		t.Errorf("stderr = %q, want the BD001 repair hint", stderr.String())
+	}
+}
+
 func TestRun_MissingPathExitTwo(t *testing.T) {
 	t.Parallel()
 

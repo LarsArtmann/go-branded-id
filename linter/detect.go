@@ -181,8 +181,6 @@ func detectFile(filename string, rules RuleSet) []gofinding.Finding {
 		findings = append(findings, scan.bd001Directives...)
 	}
 
-	findings = append(findings, scan.brokenDirectives...)
-
 	if rules.BD003 {
 		violations := primitiveIDViolations(scan.file, scan.fset, scan.filename)
 		kept, directiveFindings := suppressPrimitiveIDs(violations, scan.bd003Directives)
@@ -194,5 +192,7 @@ func detectFile(filename string, rules RuleSet) []gofinding.Finding {
 		findings = append(findings, directiveFindings...)
 	}
 
-	return findings
+	// Malformed directives stay loud in every mode, after the rule findings
+	// they belong to.
+	return append(findings, scan.brokenDirectives...)
 }
