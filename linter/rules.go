@@ -67,7 +67,7 @@ func (r RuleSet) String() string {
 // selected on its own. An unknown or empty rule is a hard error — a typo in a
 // CI flag must fail loudly, not silently scan with the wrong rules.
 func ParseRuleSet(spec string) (RuleSet, error) {
-	rules := RuleSet{}
+	var rules RuleSet
 
 	if strings.TrimSpace(spec) == "" {
 		return rules, errEmptyRuleSet

@@ -304,6 +304,7 @@ func createPrimitiveIDMessage(
 	kind primitiveLocation,
 ) string {
 	kindStr := "parameter"
+
 	switch kind {
 	case locationParam:
 		kindStr = "parameter"
