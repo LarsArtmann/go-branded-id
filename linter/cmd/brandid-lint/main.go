@@ -1,6 +1,8 @@
 // Command brandid-lint scans Go files for brand types used with
 // id.ID[Brand, Value] that are missing their Name() string method (rule
-// BD001) and prints one go-finding finding per violation.
+// BD001) and prints one go-finding finding per violation. The opt-in rule
+// BD003 (primitive-typed ID parameters, named returns, and struct fields)
+// joins the scan via -rules BD003.
 //
 // Usage:
 //
