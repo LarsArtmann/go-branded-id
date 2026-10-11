@@ -11,6 +11,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Nothing yet.
 
+## [0.3.0] - 2026-10-11
+
+### Fixed
+
+- **BD001 no longer fires on brands whose `Name()` method exists but does
+  not return a string literal** (issue #10). Detection asked "does the
+  method return a statically parseable literal?" while the shipped rule
+  contract asks "does a `Name() string` method exist?" — a `Name()`
+  returning a package-level constant was treated as missing, so Detect
+  produced a false BD001 on a compliant type and Repair inserted a duplicate
+  method that did not compile (go-sse saw five duplicate-method commits in
+  one day before inlining the literal as a workaround). Detection is now
+  existence-based, matching the rule contract: any `Name() string` method
+  counts, whatever its body returns. Repair can no longer insert a stub next
+  to an existing same-file `Name()` method, which makes the idempotence
+  guarantee unconditional. A suppression directive on a brand with a
+  constant-returning `Name()` is now correctly reported as stale (BD002).
+- **`testdata/` directories are never scanned**, by the same convention as
+  go vet, staticcheck, and golangci-lint: fixture files hold intentionally
+  incomplete brands, and repo-wide scans were rewriting them. This
+  repository's own `linter/testdata` fixtures were corrupted by repair
+  passes twice (restored 2026-10-05, re-corrupted 2026-10-08). A directory
+  passed as the scan root is still visited, so scanning fixtures directly
+  keeps working.
+- The reported tool `Version` tracks releases again (v0.2.0 shipped with
+  SARIF `ToolInfo` still saying 0.1.0).
+
 ## [0.2.0] - 2026-09-29
 
 ### Added
@@ -57,5 +84,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   findings as text or SARIF. Exit codes: 0 clean, 1 findings, 2 error.
 - Skips `.git`, `vendor`, and `node_modules` directories; scans test files.
 
+[0.3.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.3.0
 [0.2.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.2.0
 [0.1.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.1.0

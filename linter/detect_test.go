@@ -248,7 +248,7 @@ func TestDetectPath_SkipsIgnoredDirectories(t *testing.T) {
 
 	dir := t.TempDir()
 
-	for _, sub := range []string{"vendor", ".git", "node_modules"} {
+	for _, sub := range []string{"vendor", ".git", "node_modules", "testdata"} {
 		nested := filepath.Join(dir, sub, "nested")
 
 		if err := os.MkdirAll(nested, 0o750); err != nil {
@@ -300,11 +300,12 @@ func TestDetect_FallsBackToProcessWorkingDirectory(t *testing.T) {
 		t.Fatalf("Detect() error = %v", err)
 	}
 
-	// The process working directory is the linter package itself, whose
-	// non-test files declare no brands; testdata is excluded from scanning
-	// only in vendor/.git/node_modules terms, so its fixtures ARE scanned
-	// here and must yield the same six findings (4 BD001 + 2 BD002).
-	if len(findings) != 6 {
-		t.Fatalf("Detect() found %d findings, want 6", len(findings))
+	// The process working directory is the linter package itself. Its
+	// non-test files declare no brands, and its testdata fixtures are
+	// skipped by the testdata rule (see skipDir), so nothing is found
+	// here. Scanning the fixtures directly still works — the fixture
+	// tests pass testdata as the scan root, which is never skipped.
+	if len(findings) != 0 {
+		t.Fatalf("Detect() found %d findings, want 0", len(findings))
 	}
 }

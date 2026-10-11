@@ -35,9 +35,10 @@ func Repair(ctx context.Context) (int, error) {
 // RepairPath scans path and inserts the suggested Name() stub after every
 // unsuppressed brand declaration flagged by BD001, one stub per brand. It
 // returns the number of applied insertions. Suppressed brands are never
-// touched — a documented exception must stay an exception — and repair is
-// idempotent: brands that already have Name() produce no finding, so a
-// second run inserts nothing.
+// touched — a documented exception must stay an exception — and repair never
+// duplicates an existing method: a brand that declares a Name() string
+// method is skipped whatever its body returns, so repair is idempotent and
+// a second run inserts nothing.
 func RepairPath(path string) (int, error) {
 	inserted := 0
 

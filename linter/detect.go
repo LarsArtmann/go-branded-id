@@ -46,10 +46,15 @@ func DetectPath(path string) ([]gofinding.Finding, error) {
 	return findings, nil
 }
 
-// skipDir reports whether a directory must never be scanned.
+// skipDir reports whether a directory must never be scanned. testdata is
+// skipped by ecosystem convention (go vet, staticcheck, and golangci-lint do
+// the same): fixture files hold intentionally incomplete brands, and repair
+// passes were rewriting them — this linter's own testdata was corrupted
+// twice that way before the skip existed. A path passed as the scan root is
+// still visited, so the fixtures stay directly testable.
 func skipDir(name string) bool {
 	switch name {
-	case ".git", "vendor", "node_modules":
+	case ".git", "vendor", "node_modules", "testdata":
 		return true
 	default:
 		return false
@@ -57,9 +62,9 @@ func skipDir(name string) bool {
 }
 
 // walkGoFiles walks path (a single Go file or a directory tree), skipping
-// the directories .git, vendor, and node_modules and every non-Go file, and
-// calls visit for each Go file in deterministic lexicographic order. The
-// first error returned by visit aborts the walk.
+// the directories reported by skipDir and every non-Go file, and calls
+// visit for each Go file in deterministic lexicographic order. The first
+// error returned by visit aborts the walk.
 func walkGoFiles(path string, visit func(filename string) error) error {
 	info, err := os.Stat(path)
 	if err != nil {

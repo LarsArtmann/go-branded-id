@@ -32,10 +32,13 @@
 // Repair (and the CLI's -fix flag) inserts the suggested Name() stub after
 // the type declaration of every unsuppressed BD001 finding, as byte-level
 // insertion edits applied back to front so nothing shifts. It is idempotent
-// (a second run finds nothing to insert), preserves file permissions, and
-// never touches suppressed brands.
+// (a second run finds nothing to insert), never inserts a stub next to an
+// existing Name() method regardless of what that method returns, preserves
+// file permissions, and never touches suppressed brands.
 //
 // Detection is purely syntactic (go/parser): files that fail to parse are
 // skipped, and the scanner never resolves imports across packages. The
-// directories .git, vendor, and node_modules are never scanned.
+// directories .git, vendor, node_modules, and testdata are never scanned
+// (testdata holds intentionally incomplete fixtures, by the same convention
+// go vet, staticcheck, and golangci-lint follow).
 package linter

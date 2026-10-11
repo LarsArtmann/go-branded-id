@@ -172,6 +172,16 @@ func TestSuppression_BrokenDirectivesStayLoud(t *testing.T) {
 			wantMessageParts: []string{"is stale"},
 		},
 		{
+			name: "stale directive on a brand whose Name() returns a constant",
+			src: "package x\n\nimport id \"github.com/larsartmann/go-branded-id\"\n\n" +
+				"const markerName = \"Marker\"\n\n" +
+				"//brandid-lint:ignore(BD001) reason\ntype Marker struct{}\n\n" +
+				"func (Marker) Name() string { return markerName }\n\n" +
+				"func use() { _ = id.ID[Marker, string]{} }\n",
+			want:             []gofinding.RuleName{RuleIDBD002},
+			wantMessageParts: []string{"is stale"},
+		},
+		{
 			name: "stacked directives: only the last line of the group associates",
 			src: "package x\n\nimport id \"github.com/larsartmann/go-branded-id\"\n\n" +
 				"//brandid-lint:ignore(BD001) reason one\n" +
