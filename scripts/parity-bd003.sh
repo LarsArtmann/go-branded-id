@@ -54,7 +54,33 @@ sarif_rule_lines() {
 	' | sort
 }
 
+status=0
 
+# Documented accepts (file:startLine): findings the new tool emits but the
+# old one suppressed via the legacy "//lint:ignore STRONG_ID" comment form.
+# BD003 deliberately does not bridge that form (or //nolint:branching-flow):
+# verified zero uses outside this fixture, and the replacement directive is
+# //brandid-lint:ignore(BD003) <reason>. See the parity report.
+ACCEPTS=(
+	"$BF_DIR/pkg/strongid/testdata/sample.go:96"
+)
+
+# strip_accepts removes documented-accept findings from stdin.
+strip_accepts() {
+	local line accepted
+	while IFS= read -r line; do
+		accepted=false
+		for accept in "${ACCEPTS[@]}"; do
+			if [ "$line" = "$accept" ]; then
+				accepted=true
+				break
+			fi
+		done
+		if [ "$accepted" = false ]; then
+			echo "$line"
+		fi
+	done
+}
 
 : >"$WORK/new.txt"
 : >"$WORK/old.txt"
