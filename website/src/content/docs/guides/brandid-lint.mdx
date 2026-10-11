@@ -62,9 +62,9 @@ is reported as a **BD002** finding instead of silently doing nothing.
 
 ## How It Works
 
-1. Walks `.go` files (skipping `.git`, `vendor`, `node_modules`) and parses the AST.
+1. Walks `.go` files (skipping `.git`, `vendor`, `node_modules`, `testdata`) and parses the AST.
 2. Finds `id.ID[Brand, Value]` and `ID[Brand, Value]` usages (both qualified and same-package).
-3. Checks if the brand type (must be an empty struct) has a `Name() string` method.
+3. Checks if the brand type (must be an empty struct) has a `Name() string` method — any body counts (literal, constant, or computed return).
 4. Derives a suggested name by stripping `Brand`/`ID` suffixes and leading `T` prefix.
 
 ### Name Derivation Rules

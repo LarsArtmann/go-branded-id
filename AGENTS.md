@@ -195,6 +195,12 @@ CI is the reliable tripwire (root and linter jobs set `GOTOOLCHAIN=local`).
 `go-auto-upgrade`'s directive bump; check the BuildFlow audit-log if it
 recurs). Both restored before tagging; `scripts/check-go-pins.sh` caught the
 root bump locally pre-push — the tripwire's first in-anger catch.
+**Fifth instance (2026-10-08, caught 2026-10-11)**: daemon commit `9e5190d`
+bumped BOTH go.mods at once (root `1.26` → `1.27`, linter `1.27.1` →
+`1.27`) in the same commit that re-corrupted the linter testdata fixtures;
+`check-go-pins.sh` caught it and both directives were restored. The writer
+is still unidentified — treat any `go`-directive-only diff in an
+auto-commit as hostile and restore it.
 
 ### Nix Sandbox Build Cache (GOCACHE)
 
@@ -243,9 +249,25 @@ go-finding/toolsdk. The dependency direction is load-bearing:
   `String()` is a data key (go-cqrs-lite `StreamMarker`/`TimerMarker`) now
   carry the suppression directive in their own repos —
   see "Brands That Deliberately Skip Name()" below.
+- **BD001 detection is existence-based** (issue #10, linter v0.3.0): a brand
+  counts as named when ANY `Name() string` method exists — literal,
+  constant-identifier, or computed return. Do NOT reintroduce return-value
+  parsing into `HasName`: treating a non-literal method as "missing" makes
+  Detect lie ("has no Name() method") and Repair insert a duplicate method
+  that does not compile (go-sse lost a day to that loop).
+- **`testdata/` directories are never scanned** (`skipDir` in
+  `linter/detect.go`, same convention as go vet/staticcheck/golangci-lint).
+  Before this skip, repo-wide repair passes rewrote the linter's own
+  parse-only fixtures TWICE (restored 2026-10-05 in `79ef83d`, re-corrupted
+  by daemon `9e5190d` on 2026-10-08), leaving the linter's own tests red.
+  A testdata dir passed as the scan ROOT is still visited, so the fixture
+  tests keep working. If fixture tests fail with findings-count mismatches,
+  check `git log -p -- linter/testdata` for stray stub insertions first.
 - The root repo's own test brands (`StringBrand`, `Int64Brand`, … in
-  `*_test.go`) do not implement `Name()` and ARE reported when the linter
-  runs on this repo — expected, not a bug.
+  `*_test.go`) gained `Name()` stubs in a deliberate 2026-10-01 cleanup
+  (kept in `79ef83d`) so the linter runs clean on this repo. If they are
+  ever stripped again, repo-wide scans will report them — that is the
+  linter working as designed, not a bug.
 
 ### Dual-Mode Pre-Push Hook
 
