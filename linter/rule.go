@@ -26,3 +26,16 @@ const RuleIDBD001 gofinding.RuleName = "BD001"
 // than none, so every broken directive stays loud. BD002 itself is not
 // suppressible. The ID is stable forever.
 const RuleIDBD002 gofinding.RuleName = "BD002"
+
+// RuleIDBD003 flags primitive-typed identifiers — string/int/uint/bool
+// parameters, named returns, and struct fields whose name marks them as an
+// ID ("userId", "order_id", "PID") — that should become branded ID types
+// from github.com/larsartmann/go-branded-id. BD003 is opt-in: it joins a
+// scan only when the caller selects it via a RuleSet (CLI: -rules), because
+// brandid-lint runs fleet-wide and repos that deliberately silenced the old
+// strong-id rule must not be flooded by an upgrade. It is detect-only — a
+// real fix rewrites the declaration and every call site, which is a
+// codemod's job, not a lint repair — and every finding carries the suggested
+// type and brand name plus a complete type definition in metadata. The ID is
+// stable forever.
+const RuleIDBD003 gofinding.RuleName = "BD003"

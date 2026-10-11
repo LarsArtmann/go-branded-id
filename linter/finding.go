@@ -65,3 +65,52 @@ func findingForDirective(directive suppressionDirective, problem string) gofindi
 		WithSnippet(directive.Comment).
 		MustBuild()
 }
+
+// findingForPrimitiveID converts one primitive-ID violation into a BD003
+// finding. The fix is not machine-applicable (it rewrites the declaration and
+// every call site), so the strategy is Suggest and the actionable payload
+// travels as metadata: suggested type and brand names, the import path, and
+// a complete type definition to paste.
+func findingForPrimitiveID(v primitiveIDViolation) gofinding.Finding {
+	suggestedType := suggestIDTypeName(v.Name, v.ParentName)
+	suggestedBrand := suggestIDBrand(v.Name, v.ParentName)
+
+	builder := gofinding.NewBuilder(
+		RuleIDBD003,
+		ToolName,
+		createPrimitiveIDMessage(v.Name, v.CurrentType, suggestedType, v.ParentName, v.Kind),
+		primitiveIDRank(v.Name, v.Kind).severity(),
+		gofinding.Position{
+			File:   gofinding.FilePath(v.File),
+			Line:   v.Line,
+			Column: v.Column,
+			Offset: v.Offset,
+		},
+	).WithCategory(gofinding.CategoryTypeSafety).
+		WithConfidence(gofinding.ConfidenceHigh).
+		WithSuggestion("Replace with strong ID type " + suggestedType).
+		WithSnippet(v.Name + " " + v.CurrentType).
+		WithFixStrategy(gofinding.FixStrategySuggest).
+		WithBeforeCode(buildCodeSnippet(v.Name, v.CurrentType, v.Kind, v.ParentName)).
+		WithAfterCode(buildCodeSnippet(v.Name, suggestedType, v.Kind, v.ParentName)).
+		WithMetadata(map[string]string{
+			"name":              v.Name,
+			"currentType":       v.CurrentType,
+			"kindDisplay":       v.Kind.display(),
+			"suggestedTypeName": suggestedType,
+			"suggestedBrand":    suggestedBrand,
+			"importPath":        primitiveIDImportPath,
+			"typeDefinition": buildTypeDefinition(
+				suggestedType, suggestedBrand, v.CurrentType,
+			),
+		})
+
+	if v.DeclEndLine > v.Line {
+		builder = builder.WithRange(gofinding.Range{
+			Start: gofinding.Position{File: gofinding.FilePath(v.File), Line: v.Line},
+			End:   gofinding.Position{File: gofinding.FilePath(v.File), Line: v.DeclEndLine},
+		})
+	}
+
+	return builder.MustBuild()
+}
