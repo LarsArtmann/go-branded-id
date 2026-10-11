@@ -131,6 +131,7 @@ Three places per module must agree: the `go` directive, `flake.nix` (`go_1_26` r
 
 - **go-version-auto-configure** warns "CI pins 1.26 but the module floor is 1.27" on every root-module CI job. It compares each `go-version` against the repo-wide max floor, but `go.yml`/`release.yml` map jobs to per-module pins (root jobs 1.26, linter jobs 1.27). The authoritative guard is `scripts/check-go-pins.sh`. Do not "fix" by bumping root CI jobs.
 - **jscpd** would flag `website/dist/**` (gitignored build output mirroring `website/public/`) and the shared YAML in `.golangci.yml` vs `linter/.golangci.yml` (golangci-lint v2 has no config include mechanism). `.jscpd.json` owns the ignore list — keep its defaults in sync with BuildFlow's provider defaults, and re-check after BuildFlow changes its defaults.
+- **lychee** 404s on private-repo links (e.g. `stargazers`) and fails transiently with exit 2 when GitHub rate-limits unauthenticated checks — run with `GITHUB_TOKEN=$(gh auth token)` to stabilize. Result-cache replays can resurface stale findings after a fix: bypass with `BUILDFLOW_NO_RESULT_CACHE=1`.
 
 ### Two-Module Layout & Layering
 
