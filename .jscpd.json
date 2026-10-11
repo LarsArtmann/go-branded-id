@@ -1,0 +1,18 @@
+{
+  "minLines": 10,
+  "minTokens": 80,
+  "format": ["typescript", "tsx", "javascript", "jsx", "python", "rust", "bash", "yaml"],
+  "ignore": [
+    "**/vendor/**",
+    "**/node_modules/**",
+    "**/result/**",
+    "**/.git/**",
+    "**/.cache/**",
+    "**/.direnv/**",
+    "**/*_templ.go",
+    "**/*.gen.go",
+    "**/*.pb.go",
+    "**/dist/**",
+    "**/.golangci.yml"
+  ]
+}

@@ -99,7 +99,6 @@ func TestFormat_HashV_NamedBrand(t *testing.T) {
 func TestFormat_HashV_UnnamedBrand(t *testing.T) {
 	t.Parallel()
 
-	//brandid-lint:ignore(BD001) deliberately unnamed to exercise the %T fallback path
 	type localUnnamedBrand struct{}
 
 	id := NewID[localUnnamedBrand, int64](42)
