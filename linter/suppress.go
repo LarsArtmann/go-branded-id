@@ -149,6 +149,7 @@ func applySuppressions(
 	decls []BrandDecl,
 	directives []suppressionDirective,
 ) suppressionOutcome {
+	//nolint:exhaustruct_v5 // only the map is non-zero here; findings and directives accumulate below
 	outcome := suppressionOutcome{suppressed: make(map[int]bool)}
 
 	var bd001Directives []suppressionDirective

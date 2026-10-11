@@ -279,8 +279,10 @@ func violationsFromField(
 func suppressPrimitiveIDs(
 	violations []primitiveIDViolation,
 	directives []suppressionDirective,
-) (kept []primitiveIDViolation, findings []gofinding.Finding) {
+) ([]primitiveIDViolation, []gofinding.Finding) {
 	suppressed := make(map[int]bool, len(violations))
+
+	var directiveFindings []gofinding.Finding
 
 	for _, directive := range directives {
 		coversAny, suppressesNew := false, false
@@ -309,8 +311,10 @@ func suppressPrimitiveIDs(
 			problem = "is redundant: the finding(s) it covers are already suppressed by another directive"
 		}
 
-		findings = append(findings, findingForDirective(directive, problem))
+		directiveFindings = append(directiveFindings, findingForDirective(directive, problem))
 	}
+
+	var kept []primitiveIDViolation
 
 	for i, v := range violations {
 		if suppressed[i] {
@@ -320,7 +324,7 @@ func suppressPrimitiveIDs(
 		kept = append(kept, v)
 	}
 
-	return kept, findings
+	return kept, directiveFindings
 }
 
 // directiveCoversViolation reports whether one ignore(BD003) directive

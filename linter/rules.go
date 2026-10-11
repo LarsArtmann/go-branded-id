@@ -73,7 +73,7 @@ func ParseRuleSet(spec string) (RuleSet, error) {
 		return rules, errEmptyRuleSet
 	}
 
-	for _, token := range strings.Split(spec, ",") {
+	for token := range strings.SplitSeq(spec, ",") {
 		token = strings.TrimSpace(token)
 
 		switch token {
@@ -82,9 +82,9 @@ func ParseRuleSet(spec string) (RuleSet, error) {
 		case string(RuleIDBD003):
 			rules.BD003 = true
 		case string(RuleIDBD002):
-			return RuleSet{}, errBD002NotSelectable
+			return rules, errBD002NotSelectable
 		default:
-			return RuleSet{}, fmt.Errorf("%w %q: want %s or %s",
+			return rules, fmt.Errorf("%w %q: want %s or %s",
 				errUnknownRule, token, RuleIDBD001, RuleIDBD003)
 		}
 	}

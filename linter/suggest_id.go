@@ -217,8 +217,10 @@ func buildCodeSnippet(name, typeStr string, kind primitiveLocation, parentName s
 		}
 
 		return fmt.Sprintf("func %s() (%s %s, ...)", parentName, name, typeStr)
-	default:
+	case locationParam:
 		return fmt.Sprintf("func %s(%s %s)", parentName, name, typeStr)
+	default:
+		return fmt.Sprintf("%s %s", name, typeStr)
 	}
 }
 
@@ -241,6 +243,8 @@ func (r severityRank) severity() gofinding.Severity {
 		return gofinding.SeverityError
 	case rankMedium:
 		return gofinding.SeverityWarning
+	case rankLow:
+		return gofinding.SeverityInfo
 	default:
 		return gofinding.SeverityInfo
 	}
@@ -301,6 +305,8 @@ func createPrimitiveIDMessage(
 ) string {
 	kindStr := "parameter"
 	switch kind {
+	case locationParam:
+		kindStr = "parameter"
 	case locationField:
 		kindStr = "field"
 	case locationReturn:
