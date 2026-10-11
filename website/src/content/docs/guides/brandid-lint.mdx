@@ -126,11 +126,27 @@ The `linter/provider` package self-registers the tool as a BuildFlow provider
 with zero orchestrator-side glue. Findings are `go-finding` values, so they
 merge with the rest of the linter stack.
 
+To run BD003 through BuildFlow instead of shelling out to the CLI, set the
+`rules` tool option in `.buildflow.yml` (linter v0.5.0+):
+
+```yaml
+tool_options:
+  brandid-lint:
+    rules: "BD001,BD003"
+```
+
+The value is parsed by the same `ParseRuleSet` the CLI `-rules` flag uses, so
+an invalid entry (unknown rule ID, `BD002`, empty token) is a hard Detect
+error — a config typo cannot quietly scan with the wrong rule set. Without
+the option the provider runs the default rule set (BD001+BD002), identical to
+every earlier release. Repair stays scoped to BD001 `Name()` stub insertion
+regardless of the selected rules.
+
 ## Running on This Library
 
 ```bash
 cd linter && go run ./cmd/brandid-lint ..
 ```
 
-The library's own test brands intentionally have no `Name()` method and are
-flagged — this is expected.
+The library's own test brands carry `Name()` stubs, so the linter runs clean
+on this repository.

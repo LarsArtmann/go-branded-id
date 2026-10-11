@@ -48,7 +48,12 @@ func detect(ctx context.Context) ([]gofinding.Finding, error) {
 		}
 	}
 
-	return linter.DetectWithRules(ctx, rules)
+	findings, err := linter.DetectWithRules(ctx, rules)
+	if err != nil {
+		return nil, fmt.Errorf("brandid-lint detect: %w", err)
+	}
+
+	return findings, nil
 }
 
 // Provider registers the brandid-lint Spec in the process-global toolsdk
@@ -66,6 +71,7 @@ var Provider = gofstoolsdk.Register(
 		// Brands are a per-Go-module concept: fan out so findings paths are
 		// module-relative and monorepos get one run per module.
 		ModuleFanOut: true,
+		SwitchCases:  nil,
 		Inputs:       []string{"**/*.go"},
 		Detect:       gofinding.NamedDetectorFunc(linter.ToolName, detect),
 		Options: []gofstoolsdk.Option{
