@@ -1,11 +1,13 @@
 ---
 title: brandid-lint
-description: Linter CLI that finds brand types missing the Name() method, with in-source suppression and autofix.
+description: Linter CLI that finds brand types missing the Name() method (BD001) and primitive-typed IDs (BD003), with in-source suppression and autofix.
 ---
 
 `brandid-lint` scans Go source files for brand types (empty structs used as
 `id.ID[Brand, Value]` type arguments) that are missing the `Name() string`
-method (rule **BD001**), and can insert the missing stubs for you.
+method (rule **BD001**), and can insert the missing stubs for you. The
+opt-in rule **BD003** flags primitive-typed identifiers that should become
+branded ID types.
 
 It lives in the separate `linter/` module of this repository:
 
@@ -22,7 +24,7 @@ these by hand across a large codebase is tedious and error-prone.
 ## Usage
 
 ```bash
-# Detect (default): scan and print findings
+# Detect (default: BD001 + BD002): scan and print findings
 brandid-lint ./myproject/
 
 # Autofix: insert the suggested Name() stub for every unsuppressed finding
@@ -30,6 +32,9 @@ brandid-lint -fix ./myproject/
 
 # SARIF output for CI dashboards
 brandid-lint -format sarif ./myproject/
+
+# Also run BD003 (primitive-typed IDs)
+brandid-lint -rules BD001,BD003 ./myproject/
 ```
 
 Exit codes: `0` = clean, `1` = findings remain, `2` = invocation or runtime
@@ -42,6 +47,43 @@ files, and it never touches suppressed brands.
 main.go:12:6 WARNING BD001: brand type UserBrand is used with id.ID but has no Name() string method
   💡 func (UserBrand) Name() string { return "User" }
 ```
+
+## Rule BD003: Primitive-Typed IDs (Opt-In)
+
+BD003 flags `string`/`int`/`uint`/`bool` parameters, named return values, and
+struct fields whose name marks them as an identifier — `userId`, `order_id`,
+`PID` — and suggests the branded type to adopt instead. It never runs by
+default (brandid-lint runs fleet-wide, and repos that deliberately silenced
+the old `branching-flow strong-id` rule must not be flooded by an upgrade):
+select it with `-rules BD003` (alone or with BD001).
+
+```
+main.go:8:6 ERROR BD003: Replace parameter 'userId' (string) with strong ID type UserID in getUser
+  💡 Replace with strong ID type UserID
+  metadata: typeDefinition = type UserID = id.ID[UserBrand, string]
+            type UserBrand struct{}
+```
+
+Detection is ported from `branching-flow strong-id` (finding parity is gated
+by `scripts/parity-bd003.sh`), so counts carry over when migrating. BD003 has
+no autofix: a real fix rewrites the declaration and every call site, which is
+a codemod's job. Severities rank the domain (`user`/`order`/`product` →
+error in signatures, `config`/`item` → warning, the rest → info), and the
+scan skips `cmd/`, `ui/`, output, test-helper, and tooling paths plus
+`_test.go` files. `String`/`Error` method declarations are exempt (interface
+contracts stay primitive).
+
+Suppress a BD003 finding where the decision lives:
+
+```go
+// brandid-lint:ignore(BD003) external API contract, name is fixed
+func keep(userId string)
+```
+
+The directive may sit on the declaration line, directly above it, or on the
+enclosing function or type declaration (a doc directive covers all of that
+declaration's ID params, returns, and fields). The reason is mandatory, and
+a directive that suppresses nothing is reported as **BD002**.
 
 ## Suppressing a Finding
 
