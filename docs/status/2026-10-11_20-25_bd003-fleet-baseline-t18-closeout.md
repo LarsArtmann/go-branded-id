@@ -19,25 +19,25 @@ All 17 totals independently re-verified this session and match the T17b
 record exactly (anchors: branching-flow 0=0, go-finding 2=2, CV 0, journal
 69, go-cqrs-lite 224).
 
-| Repo                          | Total | Error | Warning | Note | Gate status                                   |
-| ----------------------------- | ----- | ----- | ------- | ---- | --------------------------------------------- |
-| branching-flow                | 0     | 0     | 0       | 0    | clean (parity anchor; strong-id removed v0.6.7) |
-| go-finding                    | 2     | 0     | 0       | 2    | advisory (parity anchor)                      |
-| CV                            | 0     | 0     | 0       | 0    | zero-ratchet via `go-change-gate.sh` brandid leg |
-| go-branded-id                 | 0     | 0     | 0       | 0    | clean outside skipped testdata/fixtures      |
-| journal                       | 69    | 0     | 4       | 65   | **error-gated** (`error_rules: brandid-lint: [BD003]`) — error count 0, gate green |
-| go-business-rules             | 0     | 0     | 0       | 0    | **error-gated** — clean                       |
-| DiscordSync                   | 218   | 2     | 12      | 204  | advisory (DEFER repo, comment-only config)    |
-| webphone                      | 6     | 0     | 0       | 6    | advisory (DEFER repo, comment-only config)    |
-| Kernovia                      | 1013  | 14    | 29      | 970  | advisory                                      |
-| CreditReformBilanzampel       | 945   | 32    | 49      | 864  | advisory                                      |
-| ActaFlow                      | 223   | 0     | 0       | 223  | advisory                                      |
-| ci-siblings                   | 335   | 8     | 24      | 303  | advisory                                      |
-| games                         | 727   | 81    | 93      | 553  | advisory                                      |
-| standard-bug-tracking-schema  | 692   | 107   | 41      | 544  | advisory                                      |
-| picoclaw                      | 510   | 18    | 27      | 465  | advisory                                      |
-| BuildFlow                     | 1     | 0     | 0       | 1    | advisory (dogfooding candidate, f.18)        |
-| **Totals**                    | 4965  | 262   | 293     | 4410 |                                               |
+| Repo                         | Total | Error | Warning | Note | Gate status                                                                        |
+| ---------------------------- | ----- | ----- | ------- | ---- | ---------------------------------------------------------------------------------- |
+| branching-flow               | 0     | 0     | 0       | 0    | clean (parity anchor; strong-id removed v0.6.7)                                    |
+| go-finding                   | 2     | 0     | 0       | 2    | advisory (parity anchor)                                                           |
+| CV                           | 0     | 0     | 0       | 0    | zero-ratchet via `go-change-gate.sh` brandid leg                                   |
+| go-branded-id                | 0     | 0     | 0       | 0    | clean outside skipped testdata/fixtures                                            |
+| journal                      | 69    | 0     | 4       | 65   | **error-gated** (`error_rules: brandid-lint: [BD003]`) — error count 0, gate green |
+| go-business-rules            | 0     | 0     | 0       | 0    | **error-gated** — clean                                                            |
+| DiscordSync                  | 218   | 2     | 12      | 204  | advisory (DEFER repo, comment-only config)                                         |
+| webphone                     | 6     | 0     | 0       | 6    | advisory (DEFER repo, comment-only config)                                         |
+| Kernovia                     | 1013  | 14    | 29      | 970  | advisory                                                                           |
+| CreditReformBilanzampel      | 945   | 32    | 49      | 864  | advisory                                                                           |
+| ActaFlow                     | 223   | 0     | 0       | 223  | advisory                                                                           |
+| ci-siblings                  | 335   | 8     | 24      | 303  | advisory                                                                           |
+| games                        | 727   | 81    | 93      | 553  | advisory                                                                           |
+| standard-bug-tracking-schema | 692   | 107   | 41      | 544  | advisory                                                                           |
+| picoclaw                     | 510   | 18    | 27      | 465  | advisory                                                                           |
+| BuildFlow                    | 1     | 0     | 0       | 1    | advisory (dogfooding candidate, f.18)                                              |
+| **Totals**                   | 4965  | 262   | 293     | 4410 |                                                                                    |
 
 **Key invariant:** every error- severity finding lives in a repo whose
 BuildFlow config does NOT error-gate BD003. The two gated repos (journal,
@@ -53,17 +53,18 @@ A script mode for this is tracked in `TODO_LIST.md` (High Impact).
 ### Journal 69-finding inventory (adjudication prep, f.13)
 
 Grouped by file (`brandid-lint -rules BD003 journal`, severity split 65 note
-+ 4 warning):
 
-| File                             | Findings | Dominant shape                                                        |
-| -------------------------------- | -------- | --------------------------------------------------------------------- |
-| `internal/cqrs/events.go`        | 23       | event struct string ID fields (note)                                  |
-| `internal/cqrs/readmodels.go`    | 21       | read-model row struct ID fields (note)                                |
-| `internal/config/config.go`      | 9        | config struct ID fields (note) — likely suppress-not-convert (config is presentation) |
-| `internal/app/ingest.go`         | 6        | ingest row structs (note)                                             |
-| `internal/app/export.go`         | 6        | export row structs (note)                                             |
-| `internal/app/convert.go`        | 3        | `bankSyncExportRow` ID fields (note)                                  |
-| `internal/app/book.go`           | 1        | `TaxKeyYAML.RuleID` (note)                                            |
+- 4 warning):
+
+| File                          | Findings | Dominant shape                                                                        |
+| ----------------------------- | -------- | ------------------------------------------------------------------------------------- |
+| `internal/cqrs/events.go`     | 23       | event struct string ID fields (note)                                                  |
+| `internal/cqrs/readmodels.go` | 21       | read-model row struct ID fields (note)                                                |
+| `internal/config/config.go`   | 9        | config struct ID fields (note) — likely suppress-not-convert (config is presentation) |
+| `internal/app/ingest.go`      | 6        | ingest row structs (note)                                                             |
+| `internal/app/export.go`      | 6        | export row structs (note)                                                             |
+| `internal/app/convert.go`     | 3        | `bankSyncExportRow` ID fields (note)                                                  |
+| `internal/app/book.go`        | 1        | `TaxKeyYAML.RuleID` (note)                                                            |
 
 The 4 warnings, itemized:
 

@@ -90,6 +90,7 @@
 ## f) NEXT — up to 50 things
 
 **Close out the migration (T18 + hygiene) — do first:**
+
 1. go-branded-id AGENTS.md: BD003 section (contract, `-rules` opt-in, suppression directive, generated-file skip, path exclusions, severity model).
 2. go-branded-id AGENTS.md: FOD content-addressing trap + `go mod vendor && nix hash path linter/vendor` procedure (from v0.5.0 session).
 3. go-branded-id AGENTS.md: testdata-fixture corruption postmortem + resolution (BuildFlow binary re-embed) + parity-gate self-healing note.
@@ -150,7 +151,7 @@
 
 ---
 
-*Execution paused here per instruction. Next action on resume: T18 items 1–6, then the f) list in order.*
+_Execution paused here per instruction. Next action on resume: T18 items 1–6, then the f) list in order._
 
 > **T18 executed 2026-10-11 20:25** — see
 > `2026-10-11_20-25_bd003-fleet-baseline-t18-closeout.md`: AGENTS.md knowledge
@@ -158,6 +159,7 @@
 > (f.5–f.6), CV verified + gate re-run (f.7, f.40), CI-dead acceptance left as
 > the existing TODO blocker (f.8, owner), SystemNix pin left to owner (f.10,
 > g.1), fleet baseline table committed (f.11), worktrees pruned + tags checked
-> + coverage locked + SPLIT-BRAIN archived (f.29, f.42, f.43, f.22). Journal
-> inventory prepared for g.2. Remaining f)-items are routed into
-> `TODO_LIST.md` / `ROADMAP.md` or blocked on the owner questions in §g.
+>
+> - coverage locked + SPLIT-BRAIN archived (f.29, f.42, f.43, f.22). Journal
+>   inventory prepared for g.2. Remaining f)-items are routed into
+>   `TODO_LIST.md` / `ROADMAP.md` or blocked on the owner questions in §g.
