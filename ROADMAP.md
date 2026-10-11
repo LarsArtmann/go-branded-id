@@ -32,6 +32,13 @@ Before tagging v1.0, the API surface should be frozen and audited:
 - Add JSON output mode to namer for CI/editor integration
 - Consider a `go generate` integration for brand type stubs
 - Cross-repo compatibility test harness
+- brandid-lint: `-format json` finding output for machine consumers (CV-style name-set ratchets)
+- brandid-lint: `-min-severity` CLI filter and a `.brandid-lint.yml` suppression file (vendored/generated-adjacent exceptions)
+- brandid-lint: SARIF `category` per rule for GitHub Security tab splitting
+- BD001/BD003 dedup advisory: same decl flagged by both rules → one finding carrying two rule IDs (design question)
+- Consider porting more branching-flow rules (BOOL_BLIND? FLAG_PARAM?) into go-finding-native linters — the extraction pipeline is proven twice (BD001, BD003)
+- Parity corpus: git-tag the frozen snapshot so "frozen" is mechanically enforced, and consider a `parity-bd003.sh --fuzz` mode over random small corpora
+- Root module Go 1.27 floor decision when json/v2 becomes the toolchain default (dual-mode gotcha notes say 1.27 flips the build tag)
 
 ## Theme 4: Advanced Serialization
 
