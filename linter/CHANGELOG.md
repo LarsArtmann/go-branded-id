@@ -11,6 +11,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Nothing yet.
 
+## [0.5.1] - 2026-10-11
+
+### Fixed
+
+- **Generated files are skipped** — files carrying the ecosystem-standard
+  `Code generated ... DO NOT EDIT.` header (sqlc, templ, protoc-gen-go,
+  mockgen, stringer) are now neither linted nor repaired, restoring the
+  `excludeGenerated` default of the rule's branching-flow ancestor. The
+  v0.4.0 parity corpus contained no generated files, so the gap only surfaced
+  on real output: the CV repo's BD003 zero-ratchet gate saw ~90 findings in
+  `internal/database/*.sql.go` and `*_templ.go` where the old strong-id rule
+  reported zero. The skip lives in `scanFile`, so detection and repair see it
+  identically — repair never inserts `Name()` stubs into machine output (the
+  next generation run would delete them). Applies to every rule (BD001, BD002,
+  BD003); a `Code generated` comment AFTER the package clause does not skip a
+  file. Pinned by `TestGeneratedFilesAreSkipped`.
+
 ## [0.5.0] - 2026-10-11
 
 ### Added

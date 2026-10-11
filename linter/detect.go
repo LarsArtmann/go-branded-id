@@ -40,7 +40,9 @@ func DetectWithRules(ctx context.Context, rules RuleSet) ([]gofinding.Finding, e
 // broken suppression directive (see suppress.go). It is byte-identical to
 // DetectPathWithRules(path, DefaultRuleSet()). Files that fail to parse are
 // skipped: a syntax error is not a brandid-lint finding, and the Go
-// toolchain reports it far more precisely.
+// toolchain reports it far more precisely. Generated files (the standard
+// "Code generated ... DO NOT EDIT." header) are skipped too — see
+// generated.go.
 func DetectPath(path string) ([]gofinding.Finding, error) {
 	return DetectPathWithRules(path, DefaultRuleSet())
 }
@@ -161,6 +163,11 @@ func scanFile(filename string) fileScan {
 	f, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
 		//nolint:exhaustruct_v5 // zero value: an unparseable file has no scan result
+		return fileScan{}
+	}
+
+	if isGenerated(f) {
+		//nolint:exhaustruct_v5 // zero value: generated files are neither linted nor repaired
 		return fileScan{}
 	}
 
