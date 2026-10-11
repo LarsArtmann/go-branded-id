@@ -139,7 +139,12 @@ func TestDetectPath_Directory(t *testing.T) {
 func TestDetectPath_CleanFiles(t *testing.T) {
 	t.Parallel()
 
-	cleanFiles := []string{"has_name.go", "no_id_usage.go", "pointer_receiver.go"}
+	cleanFiles := []string{
+		"has_name.go",
+		"has_name_const.go",
+		"no_id_usage.go",
+		"pointer_receiver.go",
+	}
 
 	for _, name := range cleanFiles {
 		t.Run(name, func(t *testing.T) {
@@ -152,6 +157,59 @@ func TestDetectPath_CleanFiles(t *testing.T) {
 
 			if len(findings) != 0 {
 				t.Errorf("DetectPath() found %d findings, want 0", len(findings))
+			}
+		})
+	}
+}
+
+// TestDetectPath_NonLiteralNameMethods is the issue #10 regression pin: a
+// Name() method exists, so BD001 must not fire — no matter whether the body
+// returns a literal, a constant identifier, or a computed value. The old
+// literal-only parse treated the constant form as "missing" and repair then
+// inserted a duplicate method that did not compile.
+func TestDetectPath_NonLiteralNameMethods(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		src  string
+	}{
+		{
+			name: "constant identifier return",
+			src: "package x\n\nimport id \"github.com/larsartmann/go-branded-id\"\n\n" +
+				"const brandName = \"widget\"\n\n" +
+				"type WidgetBrand struct{}\n\n" +
+				"func (WidgetBrand) Name() string { return brandName }\n\n" +
+				"func use() { _ = id.ID[WidgetBrand, string]{} }\n",
+		},
+		{
+			name: "computed return",
+			src: "package x\n\nimport id \"github.com/larsartmann/go-branded-id\"\n\n" +
+				"func computed() string { return \"widget\" }\n\n" +
+				"type WidgetBrand struct{}\n\n" +
+				"func (WidgetBrand) Name() string { return computed() }\n\n" +
+				"func use() { _ = id.ID[WidgetBrand, string]{} }\n",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			dir := t.TempDir()
+			writeTestFile(t, dir, tt.src)
+
+			findings, err := DetectPath(dir)
+			if err != nil {
+				t.Fatalf("DetectPath() error = %v", err)
+			}
+
+			if len(findings) != 0 {
+				t.Errorf("DetectPath() found %d findings, want 0", len(findings))
+
+				for _, f := range findings {
+					t.Errorf("unexpected finding %s: %s", f.Rule, f.Message)
+				}
 			}
 		})
 	}

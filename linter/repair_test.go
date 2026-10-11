@@ -174,6 +174,61 @@ func TestRepairPath_SkipsSuppressedAndNamedBrands(t *testing.T) {
 	assertGofmtStable(t, content)
 }
 
+// TestRepairPath_NeverDuplicatesNameMethods is the issue #10 regression pin:
+// a brand whose existing Name() method does not return a parseable string
+// literal must never gain a second method (two Name() methods on one type do
+// not compile). Repair skips any brand that declares a Name() string method.
+func TestRepairPath_NeverDuplicatesNameMethods(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name  string
+		decl  string
+		count func(content string) int
+	}{
+		{
+			name: "constant identifier return",
+			decl: "const brandName = \"Widget\"\n\n" +
+				"func (WidgetBrand) Name() string { return brandName }",
+			count: func(content string) int {
+				return strings.Count(content, "func (WidgetBrand) Name()")
+			},
+		},
+		{
+			name: "computed return",
+			decl: "func computed() string { return \"Widget\" }\n\n" +
+				"func (WidgetBrand) Name() string { return computed() }",
+			count: func(content string) int {
+				return strings.Count(content, "func (WidgetBrand) Name()")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			src := "package x\n\n" +
+				"import id \"github.com/larsartmann/go-branded-id\"\n\n" +
+				"type WidgetBrand struct{}\n\n" +
+				tt.decl + "\n\n" +
+				"func use() { _ = id.ID[WidgetBrand, string]{} }\n"
+
+			inserted, content := repairSource(t, src)
+
+			if inserted != 0 {
+				t.Errorf("RepairPath() inserted %d stubs, want 0", inserted)
+			}
+
+			if got := tt.count(content); got != 1 {
+				t.Errorf("content has %d Name() methods, want exactly the pre-existing 1", got)
+			}
+
+			assertGofmtStable(t, content)
+		})
+	}
+}
+
 func TestRepairPath_GroupedTypeBlock(t *testing.T) {
 	t.Parallel()
 

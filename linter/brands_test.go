@@ -116,34 +116,48 @@ func TestCollectNameMethods(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name        string
-		src         string
-		typeName    string
-		wantFound   bool
-		wantLiteral string
+		name      string
+		src       string
+		typeName  string
+		wantFound bool
 	}{
 		{
 			name: "value receiver with literal",
 			src: "package p\n\ntype A struct{}\n\n" +
 				"func (A) Name() string { return \"Alpha\" }\n",
-			typeName:    "A",
-			wantFound:   true,
-			wantLiteral: "\"Alpha\"",
+			typeName:  "A",
+			wantFound: true,
 		},
 		{
 			name: "pointer receiver with literal",
 			src: "package p\n\ntype B struct{}\n\n" +
 				"func (*B) Name() string { return \"Beta\" }\n",
-			typeName:    "B",
-			wantFound:   true,
-			wantLiteral: "\"Beta\"",
+			typeName:  "B",
+			wantFound: true,
 		},
 		{
-			name:        "non-literal return yields placeholder",
-			src:         "package p\n\nfunc (C) Name() string { return variable }\n",
-			typeName:    "C",
-			wantFound:   true,
-			wantLiteral: methodNamePlaceholder,
+			name: "const identifier return counts as present",
+			src: "package p\n\nconst constName = \"Gamma\"\n\n" +
+				"type G struct{}\n\n" +
+				"func (G) Name() string { return constName }\n",
+			typeName:  "G",
+			wantFound: true,
+		},
+		{
+			name: "computed return counts as present",
+			src: "package p\n\nfunc dynamic() string { return \"x\" }\n\n" +
+				"type H struct{}\n\n" +
+				"func (H) Name() string { return dynamic() }\n",
+			typeName:  "H",
+			wantFound: true,
+		},
+		{
+			name: "multi-statement body counts as present",
+			src: "package p\n\nimport \"strings\"\n\n" +
+				"type I struct{}\n\n" +
+				"func (I) Name() string { return strings.ToUpper(\"i\") }\n",
+			typeName:  "I",
+			wantFound: true,
 		},
 		{
 			name:      "non-string return is ignored",
@@ -172,13 +186,11 @@ func TestCollectNameMethods(t *testing.T) {
 			f := parseSource(t, token.NewFileSet(), tt.src)
 			got := collectNameMethods(f)
 
-			literal, found := got[tt.typeName]
-			if found != tt.wantFound {
-				t.Fatalf("collectNameMethods() found = %v, want %v", found, tt.wantFound)
-			}
-
-			if found && literal != tt.wantLiteral {
-				t.Errorf("collectNameMethods() = %q, want %q", literal, tt.wantLiteral)
+			if got[tt.typeName] != tt.wantFound {
+				t.Errorf(
+					"collectNameMethods()[%q] = %v, want %v (all = %v)",
+					tt.typeName, got[tt.typeName], tt.wantFound, got,
+				)
 			}
 		})
 	}

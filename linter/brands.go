@@ -41,7 +41,7 @@ func collectBrandDecls(
 	f *ast.File,
 	fset *token.FileSet,
 	brandsUsedWithID map[string]bool,
-	hasName map[string]string,
+	hasName map[string]bool,
 ) []BrandDecl {
 	var decls []BrandDecl
 
