@@ -16,6 +16,7 @@ No justfile/Makefile — all automation lives in `flake.nix`. Root floor: `go 1.
 | `nix run .#test-race`        | Race detector (both modules)                                    |
 | `nix run .#build`            | Build both modules                                              |
 | `nix run .#lint`             | golangci-lint (root v1+v2, then `linter/` with its own config)  |
+| `nix run .#brandid-lint`     | Run the linter CLI, e.g. `-- -rules BD003 <path>`               |
 | `nix run .#vet`              | `go vet ./...` (both modules)                                   |
 | `nix run .#coverage`         | Coverage report (both modules)                                  |
 | `nix flake check`            | All flake checks (root build/test + linter build/test + format) |
