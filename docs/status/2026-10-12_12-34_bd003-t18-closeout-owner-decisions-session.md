@@ -186,6 +186,7 @@ owner questions to the owner. **The SUPERB plan T01–T18 is now COMPLETE.**
 ## f) NEXT — up to 50 things
 
 **Activation + wiring tail:**
+
 1. Owner: `sudo nixos-rebuild switch` (SystemNix) — serves
    branching-flow 0.6.7 + brandid-lint 0.5.1 system-wide; verify
    `branching-flow version` = 0.6.7 and `brandid-lint --help` on PATH.
@@ -203,11 +204,11 @@ owner questions to the owner. **The SUPERB plan T01–T18 is now COMPLETE.**
 
 **Decided-but-not-started (owner already said "waves"):**
 6. Wave 1 — journal: convert/suppress the 69 findings (inventory +
-   itemized 4 warnings in the 20:25 closeout doc); keep the error-gate
-   green; glossary rows per CV's template.
+itemized 4 warnings in the 20:25 closeout doc); keep the error-gate
+green; glossary rows per CV's template.
 7. Wave 2 — DiscordSync (218); Wave 3 — webphone (6); then
-   ActaFlow/Kernovia/CreditReformBilanzampel/ci-siblings/games/
-   standard-bug-tracking-schema/picoclaw by owner-prioritized order.
+ActaFlow/Kernovia/CreditReformBilanzampel/ci-siblings/games/
+standard-bug-tracking-schema/picoclaw by owner-prioritized order.
 
 **Still-blocked / owner-decision items (carried):**
 8. BuildFlow v0.5.1 re-embed (g.3 — see g) below).
@@ -218,16 +219,16 @@ owner questions to the owner. **The SUPERB plan T01–T18 is now COMPLETE.**
 
 **Hardening + quality (routed in TODO/ROADMAP this session):**
 13. Parity corpus: add sqlc-shaped + templ-shaped generated fixtures
-    (f.19 — High row).
+(f.19 — High row).
 14. Fleet drift-check script mode against the committed baseline (f.11b).
 15. Fleet-wide BD001 re-run under v0.5.1 (f.39 — generated skip may have
-    freed suppressions).
+freed suppressions).
 16. Tag the frozen parity corpus snapshot (f.30 / ROADMAP).
 17. branching-flow: archive `docs/drafts/*strong-id*` (f.37);
-    sweep-linters REPOS/README cleanup (f.23/f.28).
+sweep-linters REPOS/README cleanup (f.23/f.28).
 18. ROADMAP Theme 3 follow-ons: `-format json`, `-min-severity`,
-    `.brandid-lint.yml`, SARIF category, BD001/BD003 dedup, more rule
-    ports, Go 1.27 floor decision.
+`.brandid-lint.yml`, SARIF category, BD001/BD003 dedup, more rule
+ports, Go 1.27 floor decision.
 
 ## g) Questions for the owner (cannot figure this out myself)
 
@@ -253,6 +254,6 @@ owner questions to the owner. **The SUPERB plan T01–T18 is now COMPLETE.**
 
 ---
 
-*Session closed here: plan T01–T18 complete, migration finished, decisions
+_Session closed here: plan T01–T18 complete, migration finished, decisions
 recorded, activation pending (sudo). Companion docs: 18:20 → 19:18 → 20:10
-→ 20:25 → this report.*
+→ 20:25 → this report._
