@@ -48,6 +48,24 @@
           # go-finding, which requires 1.27.1).
           linterGoPkg = pkgs.go_1_27;
 
+          # The brandid-lint CLI: hermetic build + tests via buildGoModule
+          # (the module has dependencies, so a raw runCommand sandbox fails on
+          # the module cache). Overridden to go_1_27 because the nixpkgs
+          # default Go (1.26) is below the linter's `go 1.27.1` floor.
+          # Version tracks linter/CHANGELOG.md (tags `linter/vX.Y.Z`) — bump
+          # it in the same change as a linter release.
+          brandidLint = pkgs.buildGoModule.override { go = linterGoPkg; } {
+            pname = "brandid-lint";
+            version = "0.5.1";
+            src = lib.fileset.toSource {
+              root = ./linter;
+              fileset = lib.fileset.gitTracked ./linter;
+            };
+            # Updated via `buildflow -s nix-hash-fix --fix` on FOD mismatch.
+            vendorHash = "sha256-gTwpx7dOuk4m2KT8KhmFmpyXVybY3DEf16mUd2m/u28=";
+            doCheck = true;
+          };
+
           mkApp = name: runtimeInputs: text: {
             type = "app";
             program = "${
@@ -135,24 +153,21 @@
               touch $out
             '';
 
-            # brandid-lint: hermetic build + tests via buildGoModule (the
-            # module has dependencies, so a raw runCommand sandbox fails on
-            # the module cache). Overridden to go_1_27 because the nixpkgs
-            # default Go (1.26) is below the linter's `go 1.27.1` floor.
-            linter = pkgs.buildGoModule.override { go = linterGoPkg; } {
-              pname = "brandid-lint";
-              version = "0.1.0";
-              src = lib.fileset.toSource {
-                root = ./linter;
-                fileset = lib.fileset.gitTracked ./linter;
-              };
-              # Updated via `buildflow -s nix-hash-fix --fix` on FOD mismatch.
-              vendorHash = "sha256-gTwpx7dOuk4m2KT8KhmFmpyXVybY3DEf16mUd2m/u28=";
-              doCheck = true;
-            };
+            linter = brandidLint;
+          };
+
+          packages = {
+            brandid-lint = brandidLint;
+            default = brandidLint;
           };
 
           apps = {
+            # nix run .#brandid-lint -- -rules BD003 .
+            brandid-lint = {
+              type = "app";
+              program = "${brandidLint}/bin/brandid-lint";
+            };
+
             test = mkApp "test" [ ] ''
               echo "=== Testing json v1 (go1.26) ==="
               PATH="$go126Bin:$PATH" go test ./... -count=1 "$@"
