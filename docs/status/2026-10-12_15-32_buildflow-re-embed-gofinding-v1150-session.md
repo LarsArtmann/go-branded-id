@@ -129,3 +129,5 @@
 ---
 
 **Session verdict:** Q-g.1 complete and verified (with the b)-list caveats). The BD003 migration's last open execution item is done; what remains is owner activation (SystemNix), owner decisions (push/waves/commit discipline), and the long-tail f)-list.
+
+> **b)-list CLOSED 2026-10-12 ~18:50** by `2026-10-12_18-50_bd003-reembed-blist-closure-session.md` (erraudit gate fixed+green, doctor/docs, gold-standard live BD003 probe, LSP, stale flake comment; plus post-sweep tidy catch and lint-gate recovery). Self-critique of THIS session: `2026-10-12_19-10` report was renamed to `18-50` (timestamp was fabricated without running `date`).
