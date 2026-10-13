@@ -27,9 +27,10 @@
 // -rules flag ("brandid-lint -rules BD001,BD003 ."), or RuleSet-based
 // library calls (DetectPathWithRules). The opt-in default is deliberate:
 // brandid-lint runs fleet-wide, and repos that deliberately silenced the old
-// branching-flow strong-id rule must not be flooded by an upgrade. BD002 is
-// not selectable: directive-integrity findings are emitted automatically for
-// every active rule.
+// branching-flow strong-id rule must not be flooded by an upgrade. BD002 has
+// no entry in the rule set: directive-integrity findings are emitted
+// automatically for every active rule, and naming BD002 in -rules is an
+// accepted no-op, as is the "all" alias for BD001+BD003.
 //
 // # BD003 findings
 //

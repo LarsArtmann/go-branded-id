@@ -9,7 +9,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Nothing yet.
+- **`-version` flag** — prints `brandid-lint <semver>` and exits 0. The
+  version was previously only visible inside SARIF reports.
+- **Go-style path patterns** — `./...`, `pkg/...`, and `/abs/...` now expand
+  to the directory tree the scanner walks. `brandid-lint ./...` used to fail
+  with `stat ./...: no such file or directory` because every argument was
+  treated as a literal path.
+- **Flags may appear anywhere** — `brandid-lint . -rules BD003 -fix` now
+  parses. Go's flag package stops flag parsing at the first positional
+  argument, so a path before `-rules` turned the flag into a stat target
+  (`error: repair -rules: stat -rules: stat -rules: ...`). The CLI now
+  permutes arguments into flags and paths before parsing; `--` still ends
+  flag parsing and `-` stays a path.
+- **`-rules all` alias and BD002 accepted as a no-op** — asking for every
+  rule (`-rules BD001,BD002,BD003` or `-rules all`) now just works instead
+  of failing with "rule BD002 is not selectable". BD002 needs no selection:
+  its directive-integrity findings ride along with every active rule.
+
+### Changed
+
+- **No path means the working directory** — `brandid-lint` and
+  `brandid-lint -fix` with no path argument now scan `.` (like
+  golangci-lint) instead of exiting 2 with a usage message. Duplicate paths
+  are collapsed, so `brandid-lint . .` scans once.
+
+### Fixed
+
+- **Errors name the offending path exactly once** — a missing path now
+  reports `error: scan: stat ./nope: no such file or directory` instead of
+  the triple-wrapped `stat` chains older versions produced.
 
 ## [0.5.1] - 2026-10-11
 

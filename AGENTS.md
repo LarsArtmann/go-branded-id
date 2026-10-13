@@ -54,7 +54,8 @@ The dev shell (`nix develop`) sets `GOWORK=off` and ships Go 1.27.x, golangci-li
 │   ├── suppress.go    #   //brandid-lint:ignore(...) directive parsing + BD002
 │   ├── repair.go      #   Repair — Name() stub insertion (idempotent, BD001 only)
 │   ├── provider/      #   toolsdk self-registration (BuildFlow blank-imports this)
-│   ├── cmd/brandid-lint/ # CLI: -rules, -format text|sarif, -fix; exit 0/1/2
+│   ├── cmd/brandid-lint/ # CLI: -rules, -format text|sarif, -fix, -version; ./... patterns, flags anywhere, path defaults to .; exit 0/1/2
+│   │   └── args.go    #   flag/path permutation, ./... expansion, path defaulting
 │   └── testdata/      #   Parse-only fixtures (never compiled)
 ├── website/           # Astro + Starlight documentation website (own flake, Firebase Hosting)
 └── *_test.go          # Tests, benchmarks, fuzz tests, example tests
@@ -146,7 +147,8 @@ Three places per module must agree: the `go` directive, `flake.nix` (`go_1_26` r
 - **`testdata/` directories are never scanned** (same convention as go vet/staticcheck), but a testdata dir passed as the scan ROOT is still visited — fixture tests rely on this. If fixture tests fail with findings-count mismatches, check `git log -p -- linter/testdata` for stray stub insertions.
 - The root repo's own test brands carry `Name()` stubs deliberately so the linter runs clean on this repo; stripping them re-fires BD001 repo-wide (by design, not a bug).
 - Suppression: `//brandid-lint:ignore(BD001) <reason>` on the brand declaration line or as the last line of the comment group directly above. BD002 polices broken/stale/duplicate/unplaced directives. **Top-level types only** — a directive on a function-local type is reported as unplaced ("suppresses nothing"); local types are never flagged, so delete such directives instead of repositioning them.
-- BD003 (primitive-typed identifier rule) is opt-in via the RuleSet (`-rules`).
+- BD003 (primitive-typed identifier rule) is opt-in via the RuleSet (`-rules`; `-rules all` selects both rules, and naming BD002 is an accepted no-op).
+- CLI ergonomics (since Unreleased): flags may appear anywhere (args are permuted before parsing), paths accept Go patterns (`./...`, `pkg/...`), no path means the working directory, `-version` prints the version, and scan/repair errors name the offending path exactly once.
 - End-to-end verification through BuildFlow: set `tool_options: {brandid-lint: {rules: BD003}}` in a repo's `.buildflow.yml` and run `buildflow -s brandid-lint --format finding` — validated 2026-10-12 through buildflow 8a34928 (finding + suggestion render, findings gate exit 69, negative control exit 0). Known gap: the summary shows `filesScanned: 0` until the provider adopts go-finding v1.15.0's `DetectResult` (TODO row).
 
 ### Brands That Deliberately Skip Name()
