@@ -18,10 +18,10 @@ func TestParseRuleSet(t *testing.T) {
 		{spec: "BD001, BD003", want: RuleSet{BD001: true, BD003: true}},
 		{spec: "BD001,BD001", want: RuleSet{BD001: true}},
 		{
-			spec: "BD001,",
+			spec:    "BD001,",
 			wantErr: true,
 		}, // empty trailing token: SplitSeq yields it, the switch rejects it
-		{spec: "BD002", want: RuleSet{}},                       // no-op: rides along automatically
+		{spec: "BD002", want: RuleSet{}}, // no-op: rides along automatically
 		{spec: "BD001,BD002,BD003", want: RuleSet{BD001: true, BD003: true}},
 		{spec: "all", want: RuleSet{BD001: true, BD003: true}},
 		{spec: "all,BD001", want: RuleSet{BD001: true, BD003: true}},

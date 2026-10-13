@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/larsartmann/go-branded-id/linter"
 )
 
 // cleanDir returns a directory whose only Go file declares a brand that HAS a
@@ -82,17 +84,18 @@ func TestRun_UnknownFormatExitTwo(t *testing.T) {
 	}
 }
 
-func TestRun_NoPathsExitTwo(t *testing.T) {
-	t.Parallel()
+//nolint:paralleltest // t.Chdir locks the process working directory
+func TestRun_NoPathsDefaultsToWorkingDir(t *testing.T) {
+	t.Chdir(cleanDir(t))
 
 	var stdout, stderr bytes.Buffer
 
-	if code := run(nil, &stdout, &stderr); code != 2 {
-		t.Errorf("run() exit code = %d, want 2", code)
+	if code := run(nil, &stdout, &stderr); code != 0 {
+		t.Errorf("run() exit code = %d, want 0 (clean working directory)", code)
 	}
 
-	if !strings.Contains(stderr.String(), "Usage:") {
-		t.Errorf("stderr = %q, want usage text", stderr.String())
+	if stderr.String() != "" {
+		t.Errorf("stderr = %q, want it empty instead of a usage lecture", stderr.String())
 	}
 }
 
@@ -145,19 +148,92 @@ func TestRun_UnknownRuleExitTwo(t *testing.T) {
 	}
 }
 
-func TestRun_BD002NotSelectableExitTwo(t *testing.T) {
+func TestRun_BD002AcceptedAsNoop(t *testing.T) {
 	t.Parallel()
 
 	var stdout, stderr bytes.Buffer
 
-	code := run([]string{"-rules", "BD002", cleanDir(t)}, &stdout, &stderr)
+	code := run([]string{"-rules", "BD001,BD002,BD003", cleanDir(t)}, &stdout, &stderr)
 
-	if code != 2 {
-		t.Errorf("run() exit code = %d, want 2", code)
+	if code != 0 {
+		t.Errorf("run() exit code = %d, want 0 (BD002 rides along, it is not an error)", code)
+	}
+}
+
+func TestRun_AllRulesAlias(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{
+		"-rules", "all",
+		filepath.Join("..", "..", "testdata", "bd003", "params.go"),
+	}, &stdout, &stderr)
+
+	if code != 1 {
+		t.Errorf("run() exit code = %d, want 1 (all includes BD003)", code)
 	}
 
-	if !strings.Contains(stderr.String(), "not selectable") {
-		t.Errorf("stderr = %q, want not-selectable error", stderr.String())
+	if !strings.Contains(stdout.String(), "userId") {
+		t.Errorf("stdout = %q, want it to mention userId", stdout.String())
+	}
+}
+
+func TestRun_Version(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{"-version"}, &stdout, &stderr)
+
+	if code != 0 {
+		t.Errorf("run() exit code = %d, want 0", code)
+	}
+
+	want := linter.ToolName + " " + linter.Version + "\n"
+	if got := stdout.String(); got != want {
+		t.Errorf("stdout = %q, want %q", got, want)
+	}
+}
+
+func TestRun_FlagsAfterPaths(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	// "."-style paths first used to end flag parsing, so "-rules" became a
+	// stat target; the permuted parse must accept the same invocation shape.
+	code := run([]string{cleanDir(t), "-rules", "all", "-format", "text"}, &stdout, &stderr)
+
+	if code != 0 {
+		t.Errorf("run() exit code = %d, want 0 (flags after paths are flags)", code)
+	}
+
+	if stderr.String() != "" {
+		t.Errorf("stderr = %q, want it empty", stderr.String())
+	}
+}
+
+func TestRun_PatternArguments(t *testing.T) {
+	t.Parallel()
+
+	var stdout, stderr bytes.Buffer
+
+	code := run([]string{filepath.ToSlash(cleanDir(t)) + "/..."}, &stdout, &stderr)
+
+	if code != 0 {
+		t.Errorf("run() exit code = %d, want 0 (./... expands to the tree root)", code)
+	}
+}
+
+//nolint:paralleltest // t.Chdir locks the process working directory
+func TestRun_FixWithoutPathsDefaultsToWorkingDir(t *testing.T) {
+	t.Chdir(cleanDir(t))
+
+	var stdout, stderr bytes.Buffer
+
+	if code := run([]string{"-fix"}, &stdout, &stderr); code != 0 {
+		t.Errorf("run() exit code = %d, want 0", code)
 	}
 }
 
@@ -186,6 +262,12 @@ func TestRun_MissingPathExitTwo(t *testing.T) {
 
 	if code != 2 {
 		t.Errorf("run() exit code = %d, want 2", code)
+	}
+
+	// The error names the path exactly once: the phase label plus the raw
+	// *fs.PathError, never the triple-wrapped stat chains of older versions.
+	if got := stderr.String(); strings.Count(got, "stat ") != 1 {
+		t.Errorf("stderr = %q, want the stat error exactly once", got)
 	}
 }
 

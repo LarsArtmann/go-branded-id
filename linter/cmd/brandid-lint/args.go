@@ -5,20 +5,21 @@ import (
 	"strings"
 )
 
-// valueFlags are the flags that consume a separate value token when written
-// as "-flag value"; every other flag of this CLI is boolean. The table only
-// drives arg permutation: an unknown flag stays a parse error from
+// takesValue reports whether the named flag consumes a separate value token
+// when written as "-flag value"; every other flag of this CLI is boolean. It
+// only drives arg permutation: an unknown flag stays a parse error from
 // flag.FlagSet, exactly as before.
-var valueFlags = map[string]bool{
-	"format": true,
-	"rules":  true,
+func takesValue(name string) bool {
+	return name == "format" || name == "rules"
 }
 
 // splitArgs permutes argv into flag tokens and positional paths so flags may
 // appear anywhere. Go's flag package would stop at the first path and then
 // treat a trailing "-rules" as one, which is how "brandid-lint . -rules ..."
 // turned into a stat call. "--" ends flag parsing; "-" stays a path.
-func splitArgs(argv []string) (flagArgs, paths []string) {
+func splitArgs(argv []string) ([]string, []string) {
+	var flagArgs, paths []string
+
 	for i := 0; i < len(argv); i++ {
 		arg := argv[i]
 
@@ -31,7 +32,7 @@ func splitArgs(argv []string) (flagArgs, paths []string) {
 			flagArgs = append(flagArgs, arg)
 
 			name := strings.TrimLeft(arg, "-")
-			if valueFlags[name] && !strings.Contains(arg, "=") && i+1 < len(argv) {
+			if takesValue(name) && !strings.Contains(arg, "=") && i+1 < len(argv) {
 				i++
 				flagArgs = append(flagArgs, argv[i])
 			}
