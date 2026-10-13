@@ -8,7 +8,7 @@
 
 ## a) FULLY DONE
 
-*(Detailed evidence in the 18-50 report; this is the audited summary.)*
+_(Detailed evidence in the 18-50 report; this is the audited summary.)_
 
 1. **b)-list closed**: erraudit #132 (failed → `compileGate`/`NewToolchainFloorError` narrowed to `*errorfamily.Error`; typed-nil audited per gotcha #213; 34/34 green) · doctor --strict + docs --check exit 0 (fod-hash advisory = designed branch, adjudicated via nix build + nix-hash-fix) · **gold-standard live BD003 probe** through the installed binary (finding + suggestion + gate exit 69; negative control exit 0) · LSP clean project-wide · go-structure-linter flake comment made truthful.
 2. **Post-sweep tidy catch**: 18 modules flagged → `nix run .#deps` (v1.14.0 residue gone; f.9 resolved by MVS — all modules uniform root v1.15.0 / pipeline v1.14.0 / analysis v1.13.0); vendorHash verified current.

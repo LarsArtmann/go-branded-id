@@ -11,7 +11,9 @@ import (
 var (
 	// errEmptyRuleSet rejects a blank -rules value, which is usually a shell
 	// quoting mistake rather than "run nothing".
-	errEmptyRuleSet = errors.New("empty rule set: want a comma-separated list of BD001, BD002, BD003, or all")
+	errEmptyRuleSet = errors.New(
+		"empty rule set: want a comma-separated list of BD001, BD002, BD003, or all",
+	)
 	// errUnknownRule rejects a rule ID this tool never had.
 	errUnknownRule = errors.New("unknown rule")
 )

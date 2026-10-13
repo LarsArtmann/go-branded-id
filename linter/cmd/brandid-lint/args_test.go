@@ -81,10 +81,26 @@ func TestResolvePaths(t *testing.T) {
 		{name: "bare pattern", raw: []string{"..."}, want: []string{"."}},
 		{name: "dot pattern", raw: []string{"./..."}, want: []string{"."}},
 		{name: "subtree pattern keeps its root", raw: []string{"pkg/..."}, want: []string{"pkg"}},
-		{name: "absolute pattern keeps its root", raw: []string{"/abs/..."}, want: []string{"/abs"}},
-		{name: "root pattern becomes the filesystem root", raw: []string{"/..."}, want: []string{"/"}},
-		{name: "plain paths stay themselves", raw: []string{"x.go", "pkg"}, want: []string{"x.go", "pkg"}},
-		{name: "duplicates collapse in order", raw: []string{".", "./...", "pkg", "pkg"}, want: []string{".", "pkg"}},
+		{
+			name: "absolute pattern keeps its root",
+			raw:  []string{"/abs/..."},
+			want: []string{"/abs"},
+		},
+		{
+			name: "root pattern becomes the filesystem root",
+			raw:  []string{"/..."},
+			want: []string{"/"},
+		},
+		{
+			name: "plain paths stay themselves",
+			raw:  []string{"x.go", "pkg"},
+			want: []string{"x.go", "pkg"},
+		},
+		{
+			name: "duplicates collapse in order",
+			raw:  []string{".", "./...", "pkg", "pkg"},
+			want: []string{".", "pkg"},
+		},
 	}
 
 	for _, tt := range tests {

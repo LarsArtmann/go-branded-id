@@ -39,33 +39,33 @@
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | CLI name question answered (`brandid-lint`) | session Q&A |
-| 2 | Config verification BOTH sides: local flake exposes package+app+default (evaluates to `brandid-lint-0.5.1`); SystemNix input master-tracked, lock entry present, follows wired, `nix build SystemNix#brandid-lint` succeeds | flake.nix:57-168; SystemNix flake.nix:504, lib/lars-packages.nix:36; store path built in-session |
-| 3 | cmdguard non-adoption explained with evidence (ecosystem layering: cmdguard is a downstream consumer pinning v0.5.1; vendor weight: charmbracelet/cobra stack vs. 3-module vendor tree; ROADMAP Theme 3 reserves cmdguard for namer) | README/go.mod/vendor read; ROADMAP.md:29 |
-| 4 | Rules-default question answered (BD001 default, BD002 automatic companion, BD003 opt-in) incl. fleet-flood rationale | linter/rules.go:32-35 |
-| 5 | **Flags may appear anywhere** — arg permutation before flag parsing; `--` terminator and `-` as path preserved; duplicate paths collapsed | cmd/brandid-lint/args.go (`splitArgs`, `takesValue`); TestSplitArgs |
-| 6 | **Go-style path patterns** — `./...`, `pkg/...`, `/abs/...`, bare `...` expand to walk roots | args.go (`expandPattern`, `resolvePaths`); TestResolvePaths |
-| 7 | **No path = working directory** (like golangci-lint) instead of usage+exit 2 | main.go; TestRun_NoPathsDefaultsToWorkingDir, TestRun_FixWithoutPathsDefaultsToWorkingDir |
-| 8 | **`-version` flag** — prints `brandid-lint 0.5.1`, exit 0 | main.go; TestRun_Version |
-| 9 | **BD002 accepted as no-op + `all` alias** — `-rules BD001,BD002,BD003` and `-rules all` now work; `errBD002NotSelectable` removed; messages/docs updated | rules.go; TestRun_BD002AcceptedAsNoop, TestRun_AllRulesAlias |
-| 10 | **Errors name the path exactly once** — stat/walk wraps de-duplicated; phase labels kept (`error: scan: stat ./nope: ...`) | detect.go, main.go; TestRun_MissingPathExitTwo asserts single `stat` |
-| 11 | Usage text + package doc.go updated (patterns, default path, flag placement) | main.go printUsage, doc.go |
-| 12 | CHANGELOG: full Unreleased section (Added/Changed/Fixed) in house style | linter/CHANGELOG.md |
-| 13 | AGENTS.md updated: code tree (args.go line, CLI comment) + brandid-lint Behavior bullets | AGENTS.md |
-| 14 | All gates green: `go test ./...` (linter 3 pkgs), `nix run .#test` (root v1+v2 + linter), `nix run .#lint` (0 issues both modules) | session log |
-| 15 | Real-repo verification in go-credentials-store: `-version`, `-fix ./...` (exit 0), `. -rules BD001,BD002,BD003 -fix .` (works, BD003 findings correct), `-rules all` (exit 1 as expected) | /tmp/brandid-lint build, session log |
-| 16 | Root module untouched (zero-dependency library not affected); user's working tree in go-credentials-store not modified by verification (dirty `*_templ.go` files predate session) | git status check |
+| #  | Item                                                                                                                                                                                                                                 | Evidence                                                                                         |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| 1  | CLI name question answered (`brandid-lint`)                                                                                                                                                                                          | session Q&A                                                                                      |
+| 2  | Config verification BOTH sides: local flake exposes package+app+default (evaluates to `brandid-lint-0.5.1`); SystemNix input master-tracked, lock entry present, follows wired, `nix build SystemNix#brandid-lint` succeeds          | flake.nix:57-168; SystemNix flake.nix:504, lib/lars-packages.nix:36; store path built in-session |
+| 3  | cmdguard non-adoption explained with evidence (ecosystem layering: cmdguard is a downstream consumer pinning v0.5.1; vendor weight: charmbracelet/cobra stack vs. 3-module vendor tree; ROADMAP Theme 3 reserves cmdguard for namer) | README/go.mod/vendor read; ROADMAP.md:29                                                         |
+| 4  | Rules-default question answered (BD001 default, BD002 automatic companion, BD003 opt-in) incl. fleet-flood rationale                                                                                                                 | linter/rules.go:32-35                                                                            |
+| 5  | **Flags may appear anywhere** — arg permutation before flag parsing; `--` terminator and `-` as path preserved; duplicate paths collapsed                                                                                            | cmd/brandid-lint/args.go (`splitArgs`, `takesValue`); TestSplitArgs                              |
+| 6  | **Go-style path patterns** — `./...`, `pkg/...`, `/abs/...`, bare `...` expand to walk roots                                                                                                                                         | args.go (`expandPattern`, `resolvePaths`); TestResolvePaths                                      |
+| 7  | **No path = working directory** (like golangci-lint) instead of usage+exit 2                                                                                                                                                         | main.go; TestRun_NoPathsDefaultsToWorkingDir, TestRun_FixWithoutPathsDefaultsToWorkingDir        |
+| 8  | **`-version` flag** — prints `brandid-lint 0.5.1`, exit 0                                                                                                                                                                            | main.go; TestRun_Version                                                                         |
+| 9  | **BD002 accepted as no-op + `all` alias** — `-rules BD001,BD002,BD003` and `-rules all` now work; `errBD002NotSelectable` removed; messages/docs updated                                                                             | rules.go; TestRun_BD002AcceptedAsNoop, TestRun_AllRulesAlias                                     |
+| 10 | **Errors name the path exactly once** — stat/walk wraps de-duplicated; phase labels kept (`error: scan: stat ./nope: ...`)                                                                                                           | detect.go, main.go; TestRun_MissingPathExitTwo asserts single `stat`                             |
+| 11 | Usage text + package doc.go updated (patterns, default path, flag placement)                                                                                                                                                         | main.go printUsage, doc.go                                                                       |
+| 12 | CHANGELOG: full Unreleased section (Added/Changed/Fixed) in house style                                                                                                                                                              | linter/CHANGELOG.md                                                                              |
+| 13 | AGENTS.md updated: code tree (args.go line, CLI comment) + brandid-lint Behavior bullets                                                                                                                                             | AGENTS.md                                                                                        |
+| 14 | All gates green: `go test ./...` (linter 3 pkgs), `nix run .#test` (root v1+v2 + linter), `nix run .#lint` (0 issues both modules)                                                                                                   | session log                                                                                      |
+| 15 | Real-repo verification in go-credentials-store: `-version`, `-fix ./...` (exit 0), `. -rules BD001,BD002,BD003 -fix .` (works, BD003 findings correct), `-rules all` (exit 1 as expected)                                            | /tmp/brandid-lint build, session log                                                             |
+| 16 | Root module untouched (zero-dependency library not affected); user's working tree in go-credentials-store not modified by verification (dirty `*_templ.go` files predate session)                                                    | git status check                                                                                 |
 
 ## b) PARTIALLY DONE
 
-| # | Item | What remains |
-|---|------|--------------|
-| 1 | BD003 output-quality problem | Diagnosed (suggestion zoo: one-off types per callsite — `CredentialCreatedID`, `RotateFormURLID`, `RawID`, per-handler `URLID` variants where one `CredentialID`/`URLID` would do) and flagged to user; redesign NOT started |
-| 2 | Release readiness | CHANGELOG Unreleased cut, but `linter.Version` still 0.5.1 (deliberate: bump at release), no `linter/v0.6.0` tag, nothing pushed |
-| 3 | SystemNix propagation | Not started — blocked on push + lock bump; PATH binary stale (old behavior) |
-| 4 | provider.go tool-option description | Still reads "BD001, BD003" — does not mention `all` or the BD002 no-op |
+| # | Item                                | What remains                                                                                                                                                                                                                 |
+| - | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | BD003 output-quality problem        | Diagnosed (suggestion zoo: one-off types per callsite — `CredentialCreatedID`, `RotateFormURLID`, `RawID`, per-handler `URLID` variants where one `CredentialID`/`URLID` would do) and flagged to user; redesign NOT started |
+| 2 | Release readiness                   | CHANGELOG Unreleased cut, but `linter.Version` still 0.5.1 (deliberate: bump at release), no `linter/v0.6.0` tag, nothing pushed                                                                                             |
+| 3 | SystemNix propagation               | Not started — blocked on push + lock bump; PATH binary stale (old behavior)                                                                                                                                                  |
+| 4 | provider.go tool-option description | Still reads "BD001, BD003" — does not mention `all` or the BD002 no-op                                                                                                                                                       |
 
 ## c) NOT STARTED
 
@@ -129,4 +129,4 @@
 
 ---
 
-*Format note: .md was explicitly demanded by the user (skill default is a styled HTML dashboard — override honored, flagged here). Commit of this report intentionally skipped: the harness forbids commits without explicit request; the auto-commit daemon picks the file up.*
+_Format note: .md was explicitly demanded by the user (skill default is a styled HTML dashboard — override honored, flagged here). Commit of this report intentionally skipped: the harness forbids commits without explicit request; the auto-commit daemon picks the file up._
