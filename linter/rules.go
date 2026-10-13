@@ -11,19 +11,15 @@ import (
 var (
 	// errEmptyRuleSet rejects a blank -rules value, which is usually a shell
 	// quoting mistake rather than "run nothing".
-	errEmptyRuleSet = errors.New("empty rule set: want a comma-separated list of BD001 and BD003")
+	errEmptyRuleSet = errors.New("empty rule set: want a comma-separated list of BD001, BD002, BD003, or all")
 	// errUnknownRule rejects a rule ID this tool never had.
 	errUnknownRule = errors.New("unknown rule")
-	// errBD002NotSelectable rejects selecting the directive-integrity rule on
-	// its own: BD002 rides along with every active rule automatically.
-	errBD002NotSelectable = errors.New(
-		"rule BD002 is not selectable: BD002 findings are emitted automatically for active rules",
-	)
 )
 
-// RuleSet selects which detection rules a scan runs. BD002 is not selectable:
+// RuleSet selects which detection rules a scan runs. BD002 needs no entry:
 // it is the directive-integrity companion that runs automatically for every
-// active rule whose directives could break.
+// active rule whose directives could break; naming it in a rule list is an
+// accepted no-op so "-rules BD001,BD002,BD003" and "-rules all" just work.
 type RuleSet struct {
 	BD001 bool
 	BD003 bool
@@ -62,10 +58,10 @@ func (r RuleSet) String() string {
 }
 
 // ParseRuleSet parses a comma-separated rule list ("BD001,BD003"). Whitespace
-// around tokens is trimmed, tokens are case-sensitive, and BD002 is rejected
-// with an explanatory error: it is emitted automatically and cannot be
-// selected on its own. An unknown or empty rule is a hard error — a typo in a
-// CI flag must fail loudly, not silently scan with the wrong rules.
+// around tokens is trimmed and tokens are case-sensitive. "all" selects every
+// rule; "BD002" is accepted as a no-op because its findings ride along with
+// every active rule automatically. An unknown or empty rule is a hard error:
+// a typo in a CI flag must fail loudly, not silently scan with the wrong rules.
 func ParseRuleSet(spec string) (RuleSet, error) {
 	var rules RuleSet
 
@@ -82,10 +78,13 @@ func ParseRuleSet(spec string) (RuleSet, error) {
 		case string(RuleIDBD003):
 			rules.BD003 = true
 		case string(RuleIDBD002):
-			return rules, errBD002NotSelectable
+			// No-op: BD002 findings are emitted automatically for every
+			// active rule; naming it explicitly must not be an error.
+		case "all":
+			rules = AllRules()
 		default:
-			return rules, fmt.Errorf("%w %q: want %s or %s",
-				errUnknownRule, token, RuleIDBD001, RuleIDBD003)
+			return rules, fmt.Errorf("%w %q: want %s, %s, %s, or all",
+				errUnknownRule, token, RuleIDBD001, RuleIDBD002, RuleIDBD003)
 		}
 	}
 

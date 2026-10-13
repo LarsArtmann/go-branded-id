@@ -6,8 +6,10 @@
 //
 // Usage:
 //
-//	brandid-lint [flags] <path>...
+//	brandid-lint [flags] [path]...
 //
+// Paths may be Go files, directories, or Go-style patterns like ./...
+// (the default path is the working directory). Flags may appear anywhere.
 // Exit codes: 0 = no findings, 1 = findings remain, 2 = invocation or
 // runtime error.
 package main
@@ -45,11 +47,22 @@ func run(args []string, stdout, stderr io.Writer) int {
 	rules := flagSet.String(
 		"rules",
 		linter.DefaultRuleSet().String(),
-		"comma-separated rules to run: BD001, BD003 (default BD001; BD002 directive findings are emitted automatically)",
+		`comma-separated rules: BD001, BD003, or "all" (BD002 rides along automatically)`,
 	)
+	version := flagSet.Bool("version", false, "print version and exit")
 
-	if err := flagSet.Parse(args); err != nil {
+	flagSet.Usage = func() { printUsage(stderr, flagSet) }
+
+	flagArgs, rawPaths := splitArgs(args)
+
+	if err := flagSet.Parse(flagArgs); err != nil {
 		return 2
+	}
+
+	if *version {
+		_, _ = fmt.Fprintf(stdout, "%s %s\n", linter.ToolName, linter.Version)
+
+		return 0
 	}
 
 	ruleSet, err := linter.ParseRuleSet(*rules)
@@ -59,12 +72,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 2
 	}
 
-	paths := flagSet.Args()
-	if len(paths) < 1 {
-		printUsage(stderr, flagSet)
-
-		return 2
-	}
+	paths := resolvePaths(rawPaths)
 
 	if *fix {
 		if !ruleSet.BD001 {
@@ -121,7 +129,7 @@ func detectAll(paths []string, rules linter.RuleSet) ([]gofinding.Finding, error
 	for _, path := range paths {
 		pathFindings, err := linter.DetectPathWithRules(path, rules)
 		if err != nil {
-			return nil, fmt.Errorf("scan %s: %w", path, err)
+			return nil, fmt.Errorf("scan: %w", err)
 		}
 
 		findings = append(findings, pathFindings...)
@@ -138,7 +146,7 @@ func repairAll(paths []string) (int, error) {
 	for _, path := range paths {
 		count, err := linter.RepairPath(path)
 		if err != nil {
-			return inserted, fmt.Errorf("repair %s: %w", path, err)
+			return inserted, fmt.Errorf("repair: %w", err)
 		}
 
 		inserted += count
@@ -178,12 +186,17 @@ func printFindings(w io.Writer, findings []gofinding.Finding, format string) err
 }
 
 func printUsage(w io.Writer, flagSet *flag.FlagSet) {
-	_, _ = fmt.Fprintf(w, "Usage: %s [flags] <path>...\n", linter.ToolName)
+	_, _ = fmt.Fprintf(w, "Usage: %s [flags] [path]...\n", linter.ToolName)
 	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(
 		w,
 		"Scans Go files for brand types missing their Name() string method (BD001).",
 	)
+	_, _ = fmt.Fprintln(
+		w,
+		"Paths may be files, directories, or Go patterns like ./...; the default is the working directory.",
+	)
+	_, _ = fmt.Fprintln(w, "Flags may appear anywhere, before or after paths.")
 	_, _ = fmt.Fprintln(w, "Exit codes: 0 = clean, 1 = findings, 2 = error.")
 	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(w, "Flags:")

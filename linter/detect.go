@@ -100,7 +100,8 @@ func underTestDataPath(filename string) bool {
 func walkGoFiles(path string, visit func(filename string) error) error {
 	info, err := os.Stat(path)
 	if err != nil {
-		return fmt.Errorf("stat %s: %w", path, err)
+		//nolint:wrapcheck // *fs.PathError already reads "stat <path>: <cause>"; callers add phase context
+		return err
 	}
 
 	if !info.IsDir() {
@@ -115,7 +116,7 @@ func walkGoFiles(path string, visit func(filename string) error) error {
 
 	walkErr := filepath.WalkDir(path, func(p string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
-			return fmt.Errorf("walk %s: %w", p, walkErr)
+			return fmt.Errorf("walk: %w", walkErr)
 		}
 
 		if entry.IsDir() {
@@ -133,7 +134,7 @@ func walkGoFiles(path string, visit func(filename string) error) error {
 		return visit(p)
 	})
 	if walkErr != nil {
-		return fmt.Errorf("walk %s: %w", path, walkErr)
+		return fmt.Errorf("walk: %w", walkErr)
 	}
 
 	return nil
