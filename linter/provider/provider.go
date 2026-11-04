@@ -73,6 +73,7 @@ var Provider = gofstoolsdk.Register(
 		ModuleFanOut: true,
 		SwitchCases:  nil,
 		Inputs:       []string{"**/*.go"},
+		Outputs:      []string{"**/*.go"},
 		Detect:       gofinding.NamedDetectorFunc(linter.ToolName, detect),
 		Options: []gofstoolsdk.Option{
 			{
@@ -90,7 +91,9 @@ var Provider = gofstoolsdk.Register(
 				}
 
 				return gofstoolsdk.RepairResult{
-					Description: fmt.Sprintf("inserted %d Name() stub(s)", inserted),
+					Description:   fmt.Sprintf("inserted %d Name() stub(s)", inserted),
+					ModifiedFiles: nil,
+					Facts:         nil,
 				}, nil
 			},
 		),

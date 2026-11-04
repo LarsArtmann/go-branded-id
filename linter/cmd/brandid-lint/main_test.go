@@ -84,7 +84,6 @@ func TestRun_UnknownFormatExitTwo(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // t.Chdir locks the process working directory
 func TestRun_NoPathsDefaultsToWorkingDir(t *testing.T) {
 	t.Chdir(cleanDir(t))
 
@@ -226,7 +225,6 @@ func TestRun_PatternArguments(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // t.Chdir locks the process working directory
 func TestRun_FixWithoutPathsDefaultsToWorkingDir(t *testing.T) {
 	t.Chdir(cleanDir(t))
 
