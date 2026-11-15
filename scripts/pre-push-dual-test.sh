@@ -3,6 +3,11 @@
 # Install: cp this file to .git/hooks/pre-push && chmod +x
 # This catches single-mode blind spots where code passes v1 but fails v2.
 #
+# Both legs pin GOEXPERIMENT explicitly. On a Go 1.27 toolchain the
+# goexperiment.jsonv2 tag is default-true, so an unpinned "v1" leg would
+# compile the v2 files (and an ambient GOEXPERIMENT=jsonv2 in the calling
+# shell would do the same) — testing v2 twice without noticing.
+#
 # The import guard runs BEFORE go test: when the v1 files import
 # encoding/json/v2, the v1 package fails to compile and no test can run, so a
 # Go-level contract test is structurally blind to that corruption
@@ -33,7 +38,7 @@ fi
 echo "Running dual-mode go tests..."
 
 echo "  → json v1..."
-if go test ./... -count=1 -race; then
+if GOEXPERIMENT=nojsonv2 go test ./... -count=1 -race; then
 	echo "  → json v1 ok"
 else
 	echo "  → json v1 FAILED"
