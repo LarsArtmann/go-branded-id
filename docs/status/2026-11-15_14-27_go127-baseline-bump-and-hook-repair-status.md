@@ -6,6 +6,7 @@
 ## Scope Line — What This Report VERIFIED vs Did NOT Verify
 
 **VERIFIED (command / artifact):**
+
 - `bash scripts/check-go-pins.sh` → "Go pins consistent: root 1.27.0 <= go_1.27, linter 1.27 <= go_1.27, CI go-versions match" — run twice (after edits AND after the daemon commits).
 - `GOEXPERIMENT={nojsonv2|<empty>|jsonv2} go vet ./...` → all three green after the bump; all three FAILED before (12 language-gate errors on empty/jsonv2). This was the empirical proof of the root cause.
 - `bash scripts/pre-push-dual-test.sh` (the exact command that failed in the user's paste) → "Dual-mode tests passed", both race legs green.
@@ -14,6 +15,7 @@
 - Git state: daemon committed everything (f009281 at 14:01: my code changes + pre-existing dep-update dirt; 4305fbf at 14:04: my doc changes). Tree clean. `go.mod` intact (`go 1.27.0` — no hostile sweep). Hook reinstalled to `.git/hooks/pre-push`.
 
 **NOT VERIFIED:**
+
 - golangci-lint under the new env pins (flake `.#lint`, CI lint matrix) — never executed locally, and factually broken anyway (see d1).
 - CI on GitHub after the bump — not pushed yet (`git town` sync is paused awaiting `git town continue`).
 - The source of the ambient `GOEXPERIMENT=jsonv2` in the user's shell — never located.
@@ -27,6 +29,7 @@
 The user's `git sync` (git town) push failed: the pre-push hook's "json v1" leg failed with `json.Marshal requires go1.27 or later (module is go126)` errors pointing at `id_json_v2.go` — i.e., the v1 leg compiled the V2 files.
 
 Root cause (empirically established): Go 1.27.3 **default-enables** the `goexperiment.jsonv2` tag regardless of module language version, and the `encoding/json/v2` API is language-gated at go1.27. Three facts proven by probing:
+
 1. `GOEXPERIMENT=jsonv2` (exported in the user's shell — verified in env) forces the v2 files → gate errors on a `go 1.26` module.
 2. Empty `GOEXPERIMENT` (= defaults) ALSO compiles the v2 files on a 1.27 toolchain → same gate errors. CI's v1 legs (`GOEXPERIMENT: ''`) were broken by design too.
 3. Only `GOEXPERIMENT=nojsonv2` compiles the v1 files.
@@ -37,15 +40,15 @@ The user then directed: "make v1.27.0 the baseline version." Per AGENTS.md "Go V
 
 ## a) FULLY DONE (verified this session)
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | Root-cause diagnosis with 3-setting empirical probe (not doc-reasoning) | vet matrix before/after |
-| 2 | `go.mod` → `go 1.27.0` (commit f009281) | pins guard green, `head go.mod` |
+| # | Item                                                                                                                                                                                                                                             | Evidence                                                      |
+| - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| 1 | Root-cause diagnosis with 3-setting empirical probe (not doc-reasoning)                                                                                                                                                                          | vet matrix before/after                                       |
+| 2 | `go.mod` → `go 1.27.0` (commit f009281)                                                                                                                                                                                                          | pins guard green, `head go.mod`                               |
 | 3 | `flake.nix`: root toolchain `go_1_26`→`go_1_27`; `go126Bin/go127Bin`→`rootGoBin/linterGoBin` (lying-name fix); `GOEXPERIMENT=nojsonv2` pinned on checks.build/test + test/test-race/build/vet/lint/coverage apps; comments + echo labels updated | nix flake check green; no stray `go_1_26`/`go12xBin` in flake |
-| 4 | Pre-push hook v1 leg pinned `nojsonv2` + header comment; reinstalled to `.git/hooks/pre-push` | full hook run green end-to-end |
-| 5 | CI `go.yml` + `release.yml`: v1 matrix legs `''` → `nojsonv2`; job-level env added to both lint matrices | diffs in 4305fbf |
-| 6 | Docs: AGENTS.md (floors, pins section, dev-shell gotcha rewritten as "mode legs are pinned, never defaulted"), README prerequisite 1.27+, MIGRATION ×2, CONTRIBUTING ×2, website contributing.mdx, CHANGELOG Unreleased "Changed" entry | diffs in 4305fbf |
-| 7 | Verification battery: pins guard ×2, vet ×3 env settings, hook end-to-end, linter tests, `nix flake check` | all green (see scope line) |
+| 4 | Pre-push hook v1 leg pinned `nojsonv2` + header comment; reinstalled to `.git/hooks/pre-push`                                                                                                                                                    | full hook run green end-to-end                                |
+| 5 | CI `go.yml` + `release.yml`: v1 matrix legs `''` → `nojsonv2`; job-level env added to both lint matrices                                                                                                                                         | diffs in 4305fbf                                              |
+| 6 | Docs: AGENTS.md (floors, pins section, dev-shell gotcha rewritten as "mode legs are pinned, never defaulted"), README prerequisite 1.27+, MIGRATION ×2, CONTRIBUTING ×2, website contributing.mdx, CHANGELOG Unreleased "Changed" entry          | diffs in 4305fbf                                              |
+| 7 | Verification battery: pins guard ×2, vet ×3 env settings, hook end-to-end, linter tests, `nix flake check`                                                                                                                                       | all green (see scope line)                                    |
 
 ## b) PARTIALLY DONE
 
@@ -61,7 +64,7 @@ The user then directed: "make v1.27.0 the baseline version." Per AGENTS.md "Go V
 3. Mutation-testing the new pins (the go-pins guard is mutation-tested per v0.7.0; these pins are not).
 4. Next release cut (version per question g1), including website changelog + deploy.
 5. `git town continue` → push → watch the real CI matrix.
-6. Post-bump benchmark refresh: README:232 + website performance.mdx:12 say "benchmarked on Go 1.26.4" (and performance.mdx:12 has broken empty inline code: ``with ``:``).
+6. Post-bump benchmark refresh: README:232 + website performance.mdx:12 say "benchmarked on Go 1.26.4" (and performance.mdx:12 has broken empty inline code: `with`:``).
 
 ## d) TOTALLY FUCKED UP
 
@@ -95,6 +98,7 @@ The user then directed: "make v1.27.0 the baseline version." Per AGENTS.md "Go V
 ## f) NEXT — 40 items (P0 = correctness of what this session shipped, P1 = release + ecosystem, P2 = hygiene/ROADMAP; P2 items are ROADMAP fuel per docs-health HARVEST rules)
 
 **P0**
+
 1. Remove `goexperiment.jsonv2` from `.golangci.yml` build-tags; audit the other 4 experiments (arenas/goroutineleakprofile/runtimesecret/simd) for deletion.
 2. Verify the lint v1 leg locally: `GOEXPERIMENT=nojsonv2 golangci-lint run ./...` must type-check `id_json_v1.go` (sentinel-error test: plant an error in the v1 file, confirm only the v1 leg flags it).
 3. Add a mode tripwire: `GOEXPERIMENT=nojsonv2 go list -f '{{.GoFiles}}' .` must contain `id_json_v1.go` and NOT `id_json_v2.go` (inverse for jsonv2) — in CI and in the pre-push hook.
@@ -102,7 +106,7 @@ The user then directed: "make v1.27.0 the baseline version." Per AGENTS.md "Go V
 5. Add `GOTOOLCHAIN: local` to release.yml root verify+lint jobs (tripwire parity with go.yml).
 6. `git town continue` → push → watch go.yml build/test/lint matrices on real CI.
 7. Docs truth sweep: MIGRATION.md:12 + :164 table, website serialization.mdx:40 — state the toolchain-dependent default; re-check AGENTS.md/CHANGELOG claims after P0-1/2 land.
-**P1**
+   **P1**
 8. Decide semver for the floor bump (g1) and cut the release: finalize CHANGELOG section, website changelog.mdx, tag, `nix run .#deploy`.
 9. go-ecosystem-upgrade sweep across 14+ downstream repos for the new floor.
 10. Locate the ambient `GOEXPERIMENT=jsonv2` source (direnv cache, shell rc, stale `.envrc`); clean or document as deliberate.
@@ -113,7 +117,7 @@ The user then directed: "make v1.27.0 the baseline version." Per AGENTS.md "Go V
 15. linter/go.mod `go 1.27` vs flake comment "1.27.1": verify go-finding's true requirement, align one way.
 16. Diagnose the failing dependabot go-finding 1.15.1 PR seen in `gh run list` (42982924790, 2026-11-11).
 17. Website build after contributing.mdx edit (`nix run .#build` from website/).
-**P2 (ROADMAP fuel)**
+    **P2 (ROADMAP fuel)**
 18. docs-health HARVEST: carry P0/P1 into TODO_LIST.md.
 19. Decide devshell GOEXPERIMENT policy (g2) — default to nojsonv2 for v1-default mental model, or none + docs.
 20. Add a grep/pins-style guard (`check-mode-pins.sh`) asserting every v1 leg string exists in hook/flake/CI — mechanical enforcement of pin presence.
@@ -128,7 +132,7 @@ The user then directed: "make v1.27.0 the baseline version." Per AGENTS.md "Go V
 29. Split-brain audit: confirm no other doc says "v1 default" (search "encoding/json` (v1, default)" patterns repo-wide).
 30. Add release-notes note template mention: floor bump is consumer-breaking (pin previous release).
 
-*(Capped at a representative 30 of the "up to 50" — the remaining candidates were variants of the above; padding the list would be noise.)*
+_(Capped at a representative 30 of the "up to 50" — the remaining candidates were variants of the above; padding the list would be noise.)_
 
 ## g) Questions I CANNOT Figure Out Myself
 
