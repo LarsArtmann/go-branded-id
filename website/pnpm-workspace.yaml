@@ -1,7 +1,11 @@
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  - astro@7.3.3
+  - astro@7.3.3 || 7.4.8 || 7.4.11
+  - html-validate@11.21.0
+  - '@astrojs/markdown-satteri@0.4.9'
+  - '@astrojs/runtime@0.1.1'
+  - '@astrojs/vite-plugin-astro@0.1.2'
 overrides:
   brace-expansion: "5.0.6"
   devalue: "^5.9.2"
