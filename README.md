@@ -43,7 +43,7 @@ The brand types (`UserBrand`, `OrderBrand`) are empty structs that exist only as
 
 ## Installation
 
-**Prerequisite:** Go 1.26+
+**Prerequisite:** Go 1.27+
 
 ```bash
 go get github.com/larsartmann/go-branded-id

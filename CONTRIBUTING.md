@@ -9,7 +9,7 @@
 git clone https://github.com/LarsArtmann/go-branded-id.git
 cd go-branded-id
 
-# 2. Enter the Nix dev shell (provides Go 1.26, golangci-lint, gopls)
+# 2. Enter the Nix dev shell (provides Go 1.27, golangci-lint, gopls)
 nix develop
 
 # 3. Verify everything works
@@ -26,7 +26,7 @@ All build and task automation goes through the Nix flake:
 
 | Command               | Purpose                                                    |
 | --------------------- | ---------------------------------------------------------- |
-| `nix develop`         | Enter dev shell (Go 1.26, golangci-lint, gopls, trash-cli) |
+| `nix develop`         | Enter dev shell (Go 1.27, golangci-lint, gopls, trash-cli) |
 | `nix run .#test`      | Run tests                                                  |
 | `nix run .#test-race` | Run with race detector                                     |
 | `nix run .#build`     | Build                                                      |

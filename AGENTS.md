@@ -8,7 +8,7 @@ The repository is **two independent Go modules**: the zero-dependency root libra
 
 ## Essential Commands
 
-No justfile/Makefile — all automation lives in `flake.nix`. Root floor: `go 1.26`. Linter floor: `go 1.27`. CI builds and tests the root module in BOTH JSON modes (v1 default + `GOEXPERIMENT=jsonv2`).
+No justfile/Makefile — all automation lives in `flake.nix`. Root floor: `go 1.27.0`. Linter floor: `go 1.27`. CI builds and tests the root module in BOTH JSON modes (v1 via `GOEXPERIMENT=nojsonv2`, v2 via `GOEXPERIMENT=jsonv2` — never rely on defaults).
 
 | Command                      | Purpose                                                         |
 | ---------------------------- | --------------------------------------------------------------- |
@@ -24,7 +24,7 @@ No justfile/Makefile — all automation lives in `flake.nix`. Root floor: `go 1.
 | `go test ./... -count=1`     | Plain Go test in the CURRENT module (root: no Nix needed)       |
 | `cd linter && go test ./...` | Linter module tests (needs go ≥ 1.27; dev shell ships it)       |
 
-The dev shell (`nix develop`) sets `GOWORK=off` and ships Go 1.27.x, golangci-lint, gopls, and trash-cli. Flake checks deliberately build the root with `go_1_26` to enforce the root consumer floor.
+The dev shell (`nix develop`) sets `GOWORK=off` and ships Go 1.27.x, golangci-lint, gopls, and trash-cli. Flake checks deliberately build the root with `go_1_27` to enforce the root consumer floor.
 
 ## Code Organization
 
@@ -100,7 +100,7 @@ There is no `internal/` or `pkg/` — intentionally flat, single-package (root m
 
 - `id_json_v1.go` (`!goexperiment.jsonv2`) and `id_json_v2.go` (`goexperiment.jsonv2`) plus the `json_helpers_v{1,2}_test.go` pairs must stay in sync. This project deliberately supports BOTH modes.
 - **Never rewrite the v1 imports to `"encoding/json/v2"`.** Signature of corruption: `build constraints exclude all Go files in encoding/json/v2` on a plain (no GOEXPERIMENT) build — fix by restoring `"encoding/json"` imports in `id_json_v1.go` / `json_helpers_v1_test.go`. The pre-push hook greps these imports and fails fast.
-- **Dev-shell gotcha**: inside `nix develop`, plain root `go vet`/`go test ./...` fails (`json.Marshal requires go1.27 or later (module is go1.26)`) because Go 1.27 default-enables the jsonv2 tag, which is language-version-gated above the root's `go 1.26`. Use `GOEXPERIMENT=jsonv2 go test ./...` in the dev shell — the flake apps pin per-module toolchains and are immune. Do NOT "fix" this by raising the root `go` directive.
+- **JSON mode legs are pinned, never defaulted**: on a Go 1.27 toolchain the jsonv2 tag is default-true, so a plain `go test ./...` exercises the V2 files. Every v1 leg (pre-push hook, flake checks/apps, CI matrices) pins `GOEXPERIMENT=nojsonv2`; every v2 leg pins `GOEXPERIMENT=jsonv2` — ambient `GOEXPERIMENT` in the calling shell cannot flip a leg. When running modes by hand, use the same pins. (Historical: while the root floor was `go 1.26`, any jsonv2-tagged build failed the language gate with `json.Marshal requires go1.27 or later (module is go1.26)`; the 1.27.0 baseline removed that failure class.)
 
 ### String() vs Get()
 
@@ -123,7 +123,7 @@ Unnamed brands render as `fmt.Sprintf("%T", brand)` — package-qualified (`"mai
 
 ### Go Version Pins Must Move Together
 
-Three places per module must agree: the `go` directive, `flake.nix` (`go_1_26` root / `go_1_27` linter), and CI `go-version` (`GOTOOLCHAIN=local` as tripwire).
+Three places per module must agree: the `go` directive, `flake.nix` (`go_1_27` root and linter), and CI `go-version` (`GOTOOLCHAIN=local` as tripwire).
 
 - `scripts/check-go-pins.sh` asserts the three-way agreement (CI `go-pins` job + first pre-push guard). When it fires: restore the go.mod directive AND check the other two pins — never "fix" it by bumping the flake pin to match the rewrite.
 - **Treat any `go`-directive-only diff in an auto-commit as hostile and restore it.** The bump lands as a dirty file the auto-commit daemon sweeps into an unrelated commit — check `git log -p -- go.mod` when CI fails with `go.mod requires go >= ...`. `go-mod-update` is in `skip_steps` in `.buildflow.yml`, but writers have appeared anyway.

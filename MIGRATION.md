@@ -8,7 +8,7 @@ The `id/` directory no longer exists in `go-composable-business-types` — migra
 
 ## Prerequisites
 
-- **Go 1.26+** (see [`go.mod`](go.mod))
+- **Go 1.27+** (see [`go.mod`](go.mod))
 - No special environment variables required. The library uses `encoding/json` by default.
   Set `GOEXPERIMENT=jsonv2` only if you want to use `encoding/json/v2` internally.
 
@@ -105,7 +105,7 @@ Serialization (JSON, SQL, Text, Binary, Gob) is unaffected — always uses the r
 
 ### `go get` fails with Go version error
 
-Ensure your project's `go.mod` has `go 1.26` or later. This library uses modern Go generics features.
+Ensure your project's `go.mod` has `go 1.27` or later. This library uses modern Go generics features.
 
 ### `go get` or `go build` fails with "build constraints exclude all Go files in encoding/json/v2"
 

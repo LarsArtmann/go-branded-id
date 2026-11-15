@@ -56,7 +56,7 @@ jobs:
       - name: Build (json ${{ matrix.mode }})
         run: go build ./...
         env:
-          GOEXPERIMENT: ${{ matrix.mode == 'v2' && 'jsonv2' || '' }}
+          GOEXPERIMENT: ${{ matrix.mode == 'v2' && 'jsonv2' || 'nojsonv2' }}
           GOTOOLCHAIN: local
 
   test:
@@ -75,7 +75,7 @@ jobs:
       - name: Test (json ${{ matrix.mode }})
         run: go test ./... -race -count=1 -cover
         env:
-          GOEXPERIMENT: ${{ matrix.mode == 'v2' && 'jsonv2' || '' }}
+          GOEXPERIMENT: ${{ matrix.mode == 'v2' && 'jsonv2' || 'nojsonv2' }}
           GOTOOLCHAIN: local
 
   linter-build:
@@ -118,6 +118,8 @@ jobs:
         # GOEXPERIMENT=jsonv2 code paths via build tags. Both file pairs are
         # mutually exclusive, so both modes are required for full coverage.
         mode: [v1, v2]
+    env:
+      GOEXPERIMENT: ${{ matrix.mode == 'v2' && 'jsonv2' || 'nojsonv2' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 

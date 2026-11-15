@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **"When NOT to brand" README rubric** (distilled from the CV strong-id zero-conversion wave's 130-site evidence): the four defined-string exception classes (encoding/xml round-trips, untyped-constant enum slugs, registry-text comparisons, ephemeral process state) plus the brand-at-boundaries rule of thumb, and two wire-shape trap pins in Serialization (zero encodes `null` → `omitzero` for absence semantics; zero `String()` delegates to struct-ish value types such as ULID, rendering the all-zero string rather than `""`).
 
+### Changed
+
+- **Go baseline raised to `go 1.27.0`** (root `go` directive; `linter/` already requires 1.27): the flake root toolchain moves `go_1_26` → `go_1_27` and CI pins were already 1.27 — all three pins moved together per the version-pins contract. Motivation: Go 1.27 default-enables the `goexperiment.jsonv2` tag while the jsonv2 API is language-gated at go1.27, so with a `go 1.26` floor every build touching `GOEXPERIMENT=jsonv2` failed the gate (`json.Marshal requires go1.27 or later`) — and on a 1.27 toolchain, unpinned "v1" legs silently compile v2 instead. Every v1 leg (pre-push hook, flake checks/apps, CI and release matrices) now pins `GOEXPERIMENT=nojsonv2` explicitly, making each JSON mode deterministic regardless of ambient environment. Consumers on Go 1.26 should pin the previous release.
+
 ### Fixed
 
 - Nothing yet.
