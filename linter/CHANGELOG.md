@@ -15,6 +15,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Nothing yet.
 
+## [0.6.1] - 2026-11-21
+
+### Fixed
+
+- **`-version` and SARIF report the release version** — the tool `Version`
+  constant still read 0.5.1 in v0.6.0, so the flag released in that very
+  version printed the previous release's number, and SARIF `ToolInfo`
+  carried the stale string too. Also bumped the flake `brandid-lint`
+  derivation version, which the release checklist requires to move in the
+  same change.
+
 ## [0.6.0] - 2026-11-21
 
 ### Added
@@ -211,7 +222,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   findings as text or SARIF. Exit codes: 0 clean, 1 findings, 2 error.
 - Skips `.git`, `vendor`, and `node_modules` directories; scans test files.
 
-[Unreleased]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.6.0...HEAD
+[Unreleased]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.6.1...HEAD
+[0.6.1]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.6.0...linter/v0.6.1
 [0.6.0]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.5.1...linter/v0.6.0
 [0.5.1]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.5.0...linter/v0.5.1
 [0.5.0]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.4.0...linter/v0.5.0

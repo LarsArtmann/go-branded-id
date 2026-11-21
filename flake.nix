@@ -51,12 +51,12 @@
           # The brandid-lint CLI: hermetic build + tests via buildGoModule
           # (the module has dependencies, so a raw runCommand sandbox fails on
           # the module cache). Overridden to go_1_27 because the nixpkgs
-          # default Go (1.26) is below the linter's `go 1.27.1` floor.
+          # default Go (1.26) is below the linter's `go 1.27` floor.
           # Version tracks linter/CHANGELOG.md (tags `linter/vX.Y.Z`) — bump
           # it in the same change as a linter release.
           brandidLint = pkgs.buildGoModule.override { go = linterGoPkg; } {
             pname = "brandid-lint";
-            version = "0.5.1";
+            version = "0.6.1";
             src = lib.fileset.toSource {
               root = ./linter;
               fileset = lib.fileset.gitTracked ./linter;
