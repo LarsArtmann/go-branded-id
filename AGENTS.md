@@ -173,7 +173,7 @@ Extracted from `go-composable-business-types/id`; 14+ downstream repos (InboxCle
 
 - CI creates a GitHub Release on semver tags; the body is extracted from the `## [X.Y.Z]` section of `CHANGELOG.md` — **cut the CHANGELOG section BEFORE tagging**, or the release has empty notes.
 - Tags must be signed (SSH) and annotated: `git tag -a vX.Y.Z`, then `git push origin vX.Y.Z`.
-- The linter releases separately: cut its `linter/CHANGELOG.md` section, tag `linter/vX.Y.Z`. `release.yml` matches `linter/v*` and creates the release from that section.
+- The linter releases separately: cut its `linter/CHANGELOG.md` section, tag `linter/vX.Y.Z`. `release.yml` matches `linter/v*` and creates the release from that section. **A linter release must move FOUR version strings in one commit** (the v0.6.0 release shipped with the constant still reading 0.5.1): the `Version` const in `linter/rule.go` (read by `-version` and SARIF `ToolInfo`), the flake `brandidLint` derivation `version` in `flake.nix`, the `linter/CHANGELOG.md` section, and the `linter/vX.Y.Z` tag. Verify with `nix run .#brandid-lint -- -version` before pushing the tag.
 - CI hygiene rejects tracked binaries ANYWHERE in the repo (`linter/brandid-lint` is gitignored).
 - The website changelog page is manually maintained — add the new version section and `nix run .#deploy` (from `website/`) as part of each release, or the live site goes stale.
 - The BuildFlow pre-commit hook runs Go-mode checks including `doc-files-age-check`: README.md and TODO_LIST.md must be touched within 3 weeks of code changes.
