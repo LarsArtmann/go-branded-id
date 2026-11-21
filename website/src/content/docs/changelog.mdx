@@ -3,6 +3,48 @@ title: Changelog
 description: All notable changes to go-branded-id.
 ---
 
+## [0.8.0] — 2026-11-21
+
+### Changed
+
+- **Go baseline raised to `go 1.27`** — consumers on Go 1.26 should pin
+  v0.7.1. All three pins (go directive, flake toolchain, CI) moved together,
+  and every JSON-mode leg (pre-push hook, flake checks/apps, CI matrices)
+  now pins `GOEXPERIMENT=nojsonv2` explicitly, so v1/v2 selection is
+  deterministic regardless of ambient environment.
+
+## [linter/v0.6.0] — 2026-11-21
+
+### Added
+
+- **CLI ergonomics overhaul** — `-version` flag; Go-style path patterns
+  (`./...`, `pkg/...`, `/abs/...`); flags may appear anywhere (arguments are
+  permuted before parsing); `-rules all` works, with BD002 accepted as a
+  no-op. See the [brandid-lint guide](/guides/brandid-lint/).
+
+### Changed
+
+- **No path means the working directory** — like golangci-lint. Requires
+  go-finding/toolsdk v1.16.0: the BuildFlow provider declares the `Outputs`
+  write contract (host ordering, result-cache keying) and repair
+  provenance (`ModifiedFiles`/`Facts`).
+
+### Fixed
+
+- Errors name the offending path exactly once (no more triple-wrapped
+  `stat` chains).
+
+## [0.7.1] — 2026-11-04
+
+### Added
+
+- **"When NOT to brand" README rubric** — the four defined-string exception
+  classes (encoding/xml round-trips, untyped-constant enum slugs,
+  registry-text comparisons, ephemeral process state), the
+  brand-at-boundaries rule of thumb, and two wire-shape trap pins in
+  Serialization (zero encodes `null` → `omitzero`; zero `String()`
+  delegates to struct-ish value types such as ULID).
+
 ## [linter/v0.5.1] — 2026-10-11
 
 ### Fixed

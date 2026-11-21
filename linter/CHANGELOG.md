@@ -9,6 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.6.0] - 2026-11-21
+
+### Added
+
 - **`-version` flag** — prints `brandid-lint <semver>` and exits 0. The
   version was previously only visible inside SARIF reports.
 - **Go-style path patterns** — `./...`, `pkg/...`, and `/abs/...` now expand
@@ -32,6 +42,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `brandid-lint -fix` with no path argument now scan `.` (like
   golangci-lint) instead of exiting 2 with a usage message. Duplicate paths
   are collapsed, so `brandid-lint . .` scans once.
+- **go-finding/toolsdk v1.16.0 required** — the BuildFlow provider now
+  declares the toolsdk v1.16 write contract: Spec.`Outputs` (host-ordered
+  outputs and result-cache keying) and RepairResult.`ModifiedFiles`/`Facts`
+  (repair provenance). BuildFlow hosts pinned to toolsdk v1.15.0 must bump
+  to keep the provider's ordering and provenance contract.
 
 ### Fixed
 
@@ -196,6 +211,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   findings as text or SARIF. Exit codes: 0 clean, 1 findings, 2 error.
 - Skips `.git`, `vendor`, and `node_modules` directories; scans test files.
 
+[Unreleased]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.6.0...HEAD
+[0.6.0]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.5.1...linter/v0.6.0
+[0.5.1]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.5.0...linter/v0.5.1
+[0.5.0]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.4.0...linter/v0.5.0
+[0.4.0]: https://github.com/larsartmann/go-branded-id/compare/linter/v0.3.0...linter/v0.4.0
 [0.3.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.3.0
 [0.2.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.2.0
 [0.1.0]: https://github.com/larsartmann/go-branded-id/releases/tag/linter%2Fv0.1.0

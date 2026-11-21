@@ -8,7 +8,7 @@ The repository is **two independent Go modules**: the zero-dependency root libra
 
 ## Essential Commands
 
-No justfile/Makefile — all automation lives in `flake.nix`. Root floor: `go 1.27.0`. Linter floor: `go 1.27`. CI builds and tests the root module in BOTH JSON modes (v1 via `GOEXPERIMENT=nojsonv2`, v2 via `GOEXPERIMENT=jsonv2` — never rely on defaults).
+No justfile/Makefile — all automation lives in `flake.nix`. Root floor: `go 1.27`. Linter floor: `go 1.27`. CI builds and tests the root module in BOTH JSON modes (v1 via `GOEXPERIMENT=nojsonv2`, v2 via `GOEXPERIMENT=jsonv2` — never rely on defaults).
 
 | Command                      | Purpose                                                         |
 | ---------------------------- | --------------------------------------------------------------- |
@@ -30,7 +30,7 @@ The dev shell (`nix develop`) sets `GOWORK=off` and ships Go 1.27.x, golangci-li
 
 ```
 .
-├── go.mod             # module github.com/larsartmann/go-branded-id (go 1.26, ZERO dependencies)
+├── go.mod             # module github.com/larsartmann/go-branded-id (go 1.27, ZERO dependencies)
 ├── id.go              # Core ID type, NewID, Get, IsZero, Equal, Compare, Or, String, GoString, Format
 ├── errors.go          # Sentinel errors (ErrInvalidID, ErrNotOrdered, ErrUnsupportedType, etc.)
 ├── id_brand.go        # BrandNamer interface, BrandName, ValidateID, ValidateIDWithValue, MustValidateID
@@ -131,7 +131,7 @@ Three places per module must agree: the `go` directive, `flake.nix` (`go_1_27` r
 
 ### Tool False Positives — Deliberate Non-Fixes
 
-- **go-version-auto-configure** warns "CI pins 1.26 but the module floor is 1.27" on every root-module CI job. It compares each `go-version` against the repo-wide max floor, but `go.yml`/`release.yml` map jobs to per-module pins (root jobs 1.26, linter jobs 1.27). The authoritative guard is `scripts/check-go-pins.sh`. Do not "fix" by bumping root CI jobs.
+- **go-version-auto-configure** compares each CI `go-version` against the repo-wide max go.mod floor. While the root floor was `go 1.26` it warned "CI pins 1.26 but the module floor is 1.27" on every root-module CI job — a deliberate non-fix: `go.yml`/`release.yml` mapped jobs to per-module pins (root 1.26, linter 1.27), and the authoritative guard is `scripts/check-go-pins.sh`. Since the 1.27 baseline bump (v0.8.0) every CI `go-version` and both module floors are 1.27, so that mismatch no longer exists. The standing rule is unchanged: never reconcile a pins complaint by rewriting go.mod to match, and treat directive-only diffs as hostile.
 - **jscpd** would flag `website/dist/**` (gitignored build output mirroring `website/public/`) and the shared YAML in `.golangci.yml` vs `linter/.golangci.yml` (golangci-lint v2 has no config include mechanism). `.jscpd.json` owns the ignore list — keep its defaults in sync with BuildFlow's provider defaults, and re-check after BuildFlow changes its defaults.
 - **lychee** 404s on private-repo links (e.g. `stargazers`) and fails transiently with exit 2 when GitHub rate-limits unauthenticated checks — run with `GITHUB_TOKEN=$(gh auth token)` to stabilize. Result-cache replays can resurface stale findings after a fix: bypass with `BUILDFLOW_NO_RESULT_CACHE=1`.
 
